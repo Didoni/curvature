@@ -1,0 +1,72 @@
+#include <Servo.h>
+#include <DSSerial.h>
+//#include <stdlib.h>
+
+int servoPin = 11;
+int servoPintwo = 9;
+Servo myServo;
+Servo myServotwo;
+int incomingByte = 0;
+int incomingByte2 = 0;
+int incomingByte3 = 0;
+int angle;
+int oldDegree, oldDegreeTwo;
+int degree, degreetwo;
+
+DSSerial serial = DSSerial();
+
+void setup()
+{
+  myServo.attach(servoPin,600,2400);
+  myServotwo.attach(servoPintwo,600,2400);
+  
+  int ang = 90; //8
+  int angtwo =90;  //6
+  //ang = map(ang, 72,108,71, 116);
+  //ang = map(ang,78,102,77, 106);
+  //angtwo = map(angtwo,78,102,75, 103);
+  //angtwo = map(angtwo,72,108,70, 110);
+  //ang=ang-1;
+  myServo.write(ang);
+  myServotwo.write(angtwo);
+  
+  Serial.begin(115200);
+  oldDegree = 0;
+  oldDegreeTwo = 0;
+  delay(30); 
+}
+
+void loop() 
+{
+
+  
+  if (Serial.available()) {
+    
+
+    int key = Serial.read(); 
+    if (key == 255) {
+       int degree= serial.readInt();
+       //degree = map(degree,78,102,77, 106);
+       //degree = map(degree,  72,108,71, 116);
+       int degreetwo = serial.readInt();
+       //degreetwo = map(degreetwo,78,102,75, 103);
+       //degreetwo = map(degreetwo, 72,108,69, 110);
+
+
+       if(oldDegree != degree) {
+          oldDegree = degree;
+          myServo.writeMicroseconds(600+degree*10);
+          //myServo.write(degree); 
+       }
+       if(oldDegreeTwo != degreetwo) {
+          oldDegreeTwo = degreetwo;
+          //myServotwo.write(degreetwo);
+          myServotwo.writeMicroseconds(600+degreetwo*10);
+         //myServo.writeMicroseconds(600+degreetwo*10); 
+       }
+     }
+        
+   
+  
+  }
+}
