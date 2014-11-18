@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="fingerCombo" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="gainText" max="32767" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="sendCheck" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="f3RxText" linkSize="1" min="-2" pref="88" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Component id="f3RzText" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="f4RxText" linkSize="1" min="-2" pref="88" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Component id="f4RzText" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="f2RxText" linkSize="1" min="-2" pref="88" max="-2" attributes="0"/>
+                                  <Component id="f1RxText" linkSize="1" min="-2" pref="88" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace min="-2" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="f1RzText" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
+                                  <Component id="f2RzText" linkSize="1" min="-2" pref="89" max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="loadButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="f1RxText" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="f1RzText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="f2RxText" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="f2RzText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="f3RxText" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="f3RzText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="f4RxText" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="f4RzText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="gainText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+              <Component id="fingerCombo" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="loadButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="sendCheck" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JTextField" name="f1RxText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F1 RX"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="f1RzText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F1 RZ"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="f2RzText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F2 RZ"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="f2RxText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F2 RX"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="f3RzText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F3 RZ"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="f3RxText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F3 RX"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="f4RzText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F4 RZ"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="f4RxText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="F4 RX"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="f4RxTextActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="fingerCombo">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="4">
+            <StringItem index="0" value="Finger 1"/>
+            <StringItem index="1" value="Finger 2"/>
+            <StringItem index="2" value="Finger 3"/>
+            <StringItem index="3" value="Finger 4"/>
+          </StringArray>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Calib File:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="loadButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Load"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="sendCheck">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Send trhough serial"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel2">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Gain:"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="gainText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="1.0"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="showSimBBCheck" alignment="1" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="minYText" alignment="0" max="32767" attributes="0"/>
+                          <Component id="minXText" alignment="0" max="32767" attributes="0"/>
+                          <Component id="minZText" alignment="1" max="32767" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="1" attributes="0">
+                          <Component id="maxYText" alignment="0" max="32767" attributes="0"/>
+                          <Component id="maxXText" alignment="0" max="32767" attributes="0"/>
+                          <Component id="maxZText" alignment="1" max="32767" attributes="0"/>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="guiGainText" max="32767" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jLabel18" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="applySizeButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="autoSizeButton" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace min="-2" max="-2" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel14" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="guiGainText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="jLabel18" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="applySizeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="autoSizeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="minXText" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="maxXText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="minYText" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="maxYText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="minZText" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="maxZText" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="showSimBBCheck" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JLabel" name="jLabel18">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Sim Size"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="minXText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="minX"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="maxXText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="maxX"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="minYText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="minY"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="maxYText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="maxY"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="minZText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="minZ"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="maxZText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="maxZ"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="applySizeButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Apply"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="applySizeButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="autoSizeButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Auto"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="autoSizeButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="jLabel14">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="GUI gain"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="guiGainText">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="0.01"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="showSimBBCheck">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" value="ShowBB"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="showSimBBCheckActionPerformed"/>
+      </Events>
+    </Component>
+  </SubComponents>
+</Form>
