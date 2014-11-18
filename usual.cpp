@@ -16,7 +16,7 @@
 // Missing this file?  Get the latest VRPN distro at
 #include "vrpn_Tracker.h"    //    ftp://ftp.cs.unc.edu/pub/packages/GRIP/vrpn
 #include <glm/glm.hpp>
-//#include "conio.h"           // for kbhit()
+//#include "conio.h"            // for kbhit()
 #define DEGREES_PER_RADIAN (180 / acos(-1.0))
 #define PI 3.14159265
 using namespace std;
