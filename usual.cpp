@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <vector>
 #include <fstream>
 #include <Windows.h>
 #include <stdlib.h>
@@ -13,14 +14,23 @@
 #include <string.h>
 #include "vrpn_Connection.h"
 #include "quat\quat.h"
+#include "MultiVariableInterp2D.h"
 // Missing this file?  Get the latest VRPN distro at
 #include "vrpn_Tracker.h"    //    ftp://ftp.cs.unc.edu/pub/packages/GRIP/vrpn
-#include <glm/glm.hpp>
-//#include "conio.h"            // for kbhit()
+//F#include <glm/glm.hpp>
+//#include "conio.h"           // for kbhit()
 #define DEGREES_PER_RADIAN (180 / acos(-1.0))
 #define PI 3.14159265
 using namespace std;
 using namespace cv;
+
+//#define EXPERIMENT_1 1
+//#define EXPERIMENT_2 1
+#define EXPERIMENT_3 1
+
+#ifdef EXPERIMENT_3
+static MultiVariableInterp2D* mInterp;
+#endif
 
 bool stopped=true;
 HANDLE hSerialIN = INVALID_HANDLE_VALUE; 
@@ -76,6 +86,11 @@ HANDLE hDevice;
 
 void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t);
 
+long getMillisTime(){
+	timeval time;
+	gettimeofday(&time, NULL);
+	return (time.tv_sec * 1000) + (time.tv_usec / 1000);
+}
 
 void openSerialPort(){
 	DCB dcb;
@@ -172,20 +187,20 @@ short mapTest(float coordinate) {
 
 
 void sendBytesTestRange() {
-	short theta = 90;
-	while( (theta < 45)||(theta > 135) )
-	{
+	short theta = 1500;
+	//while( (theta < 45)||(theta > 135) )
+	//{
 		cout<<"Enter theta: "<<endl;
 		cin>>theta;
-	}
+	//}
 
-	short fi = 190;
-	while( (fi < 45)||(fi > 135) )
-	{
+	short fi = 1500;
+	//while( (fi < 45)||(fi > 135) )
+	//{
 		cout<<"Enter fi: "<<endl;
 		cin>>fi;
-	}
-	sendBytesTest(theta,fi);
+	//}
+	//sendBytesTest(theta,fi);
 	/*while(theta < 179) {
 		sendBytesTest(theta, fi);
 		theta++;
@@ -194,38 +209,8 @@ void sendBytesTestRange() {
 
 }
 
-
-void q_from_euler_local(q_type destQuat, double yaw, double pitch, double roll)
-{
-   double  cosYaw, sinYaw, cosPitch, sinPitch, cosRoll, sinRoll;
-   double  half_roll, half_pitch, half_yaw;
-
-
-   /* put angles into radians and divide by two, since all angles in formula
-    *  are (angle/2)
-    */
-
-   half_yaw = yaw / 2.0;
-   half_pitch = pitch / 2.0;
-   half_roll = roll / 2.0;
-
-   cosYaw = cos(half_yaw);
-   sinYaw = sin(half_yaw);
-
-   cosPitch = cos(half_pitch);
-   sinPitch = sin(half_pitch);
-
-   cosRoll = cos(half_roll);
-   sinRoll = sin(half_roll);
-
-
-   destQuat[0] = cosRoll * cosYaw ;
-   destQuat[1] = cosYaw * sinRoll;
-   destQuat[2] = sinRoll * sinYaw;
-
-   destQuat[3] = cosRoll * sinYaw;
-
-}
+static float rx;
+static float ry;
 
 void findCurve(float coordinateX, float coordinateZ,int curvature) {
 	short thetaAngle, phiAngle;
@@ -237,14 +222,20 @@ void findCurve(float coordinateX, float coordinateZ,int curvature) {
 	if(z > 90) z =90;
 	if(z <-90) z = -90;
 
-	if(z<0) thetaAngle = 90+angleArray[abs(x)][-z][curvature].getTheta();
-	else thetaAngle = 90-angleArray[abs(x)][z][curvature].getTheta();
-	if(x<0) phiAngle = 90-angleArray[-x][abs(z)][curvature].getPhi();
-	else phiAngle = 90+angleArray[x][abs(z)][curvature].getPhi();
+
+	if(z<0) thetaAngle = 0+angleArray[abs(x)][-z][curvature].getTheta();
+	else thetaAngle = 0-angleArray[abs(x)][z][curvature].getTheta();
+	if(x<0) phiAngle = 0-angleArray[-x][abs(z)][curvature].getPhi();
+	else phiAngle = 0+angleArray[x][abs(z)][curvature].getPhi();
+
+	rx = thetaAngle;
+	ry = phiAngle;
 
 	cout<<"x "<<x<<" z "<<z<<" Theta "<<thetaAngle<<" phi "<<phiAngle<<endl;
-	sendBytesTest((short)thetaAngle,(short)phiAngle);
-
+	int sx,sy;
+	mInterp->query(thetaAngle,phiAngle, sx,sy);
+	sendBytesTest((short)sy,(short)sx);
+	
 }
 
 void printArray(int curvature) {
@@ -359,22 +350,107 @@ void mapCurve(float radius, int curvature) {
 
 }
 
+
+static float getRoll(float x, float y, float z, float w, bool reprojectAxis)
+	{
+		if (reprojectAxis)
+		{
+			// roll = atan2(localx.y, localx.x)
+			// pick parts of xAxis() implementation that we need
+//			float fTx  = 2.0*x;
+			float fTy  = 2.0f*y;
+			float fTz  = 2.0f*z;
+			float fTwz = fTz*w;
+			float fTxy = fTy*x;
+			float fTyy = fTy*y;
+			float fTzz = fTz*z;
+
+			// Vector3(1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
+
+			return float(atan2(fTxy+fTwz, 1.0f-(fTyy+fTzz)));
+
+		}
+		else
+		{
+			return float(atan2(2*(x*y + w*z), w*w + x*x - y*y - z*z));
+		}
+	}
+    //-----------------------------------------------------------------------
+static float getPitch(float x, float y, float z, float w,  bool reprojectAxis) 
+	{
+		if (reprojectAxis)
+		{
+			// pitch = atan2(localy.z, localy.y)
+			// pick parts of yAxis() implementation that we need
+			float fTx  = 2.0f*x;
+//			float fTy  = 2.0f*y;
+			float fTz  = 2.0f*z;
+			float fTwx = fTx*w;
+			float fTxx = fTx*x;
+			float fTyz = fTz*y;
+			float fTzz = fTz*z;
+
+			// Vector3(fTxy-fTwz, 1.0-(fTxx+fTzz), fTyz+fTwx);
+			return float(atan2(fTyz+fTwx, 1.0f-(fTxx+fTzz)));
+		}
+		else
+		{
+			// internal version
+			return float(atan2(2*(y*z + w*x), w*w - x*x - y*y + z*z));
+		}
+	}
+    //-----------------------------------------------------------------------
+static float getYaw(float x, float y, float z, float w,  bool reprojectAxis) 
+	{
+		if (reprojectAxis)
+		{
+			// yaw = atan2(localz.x, localz.z)
+			// pick parts of zAxis() implementation that we need
+			float fTx  = 2.0f*x;
+			float fTy  = 2.0f*y;
+			float fTz  = 2.0f*z;
+			float fTwy = fTy*w;
+			float fTxx = fTx*x;
+			float fTxz = fTz*x;
+			float fTyy = fTy*y;
+
+			// Vector3(fTxz+fTwy, fTyz-fTwx, 1.0-(fTxx+fTyy));
+
+			return float(atan2(fTxz+fTwy, 1.0f-(fTxx+fTyy)));
+
+		}
+		else
+		{
+			// internal version
+			return float(asin(-2*(x*z - w*y)));
+		}
+	}
+
+static float mPitch = 0;
+static float mRoll = 0;
+static float mYaw = 0;
+static FILE* fileExp3;
+
 void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 {
 
 	//printf("Tracker Position:(%.4f,%.4f,%.4f) Orientation:(%.2f,%.2f,%.2f,%.2f)\n",t.pos[0], t.pos[1], t.pos[2],t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
-	static bool send=true;
-	send=!send;
-	if(!send)
-		return;
+	
+	const float pitch = getPitch(t.quat[0], t.quat[1], t.quat[2], t.quat[3], false) * 180.0f / PI;
+	const float roll = getRoll(t.quat[0], t.quat[1], t.quat[2], t.quat[3], false) * 180.0f / PI;
+	const float yaw = getYaw(t.quat[0], t.quat[1], t.quat[2], t.quat[3], false) * 180.0f / PI;
 
-	//Euler
+	mPitch = pitch;
+	mRoll = roll;
+	mYaw = yaw;
+
+#ifdef EXPERIMENT_3
+	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+
 	float coordinateX = t.pos[0]-0.0084;
-	float coordinateZ = t.pos[2] + 0.0107;
+	float coordinateZ = t.pos[2]+ 0.0107;
 	findCurve(coordinateZ,coordinateX,curvatureNum);
-
-
-	//fitCurve(coordinateZ,coordinateX, t.quat[1], t.quat[2]);
+#endif
 
 }
 
@@ -480,6 +556,35 @@ void fitCurve(float coordX, float coordY, float rotX, float rotY) {
 	cout<<"fitting Curve"<<endl;
 }
 
+float interp(float a, float b, float p){
+	return a + (b-a)*p;
+}
+
+
+void initRandomSeed() {
+	srand(time(NULL));
+}
+
+int intRandom(int min, int max){
+	return min + rand() % (max - min);
+}
+
+float unitRandom (){
+	return (float)rand()/(float)RAND_MAX;
+}
+
+float rangeRandom (float fLow, float fHigh){
+	return (fHigh-fLow)*unitRandom() + fLow;
+}
+
+ class Point2D{
+ public:
+	 int x,y;
+	 inline Point2D(int px, int py) : x(px), y(py) { }
+};
+
+
+
 int main(int argc, char* argv[])
 {
     vrpn_Connection *connection;
@@ -496,37 +601,148 @@ int main(int argc, char* argv[])
 	//initializeSequence();
 	//Library
 
-	//init time
-	curvatureNum = 3;
-	begin_time = clock();
-	trial = 0;
+
 
 	// Arduino port
 	//openSerialPort();
-	COMToolkit::connect(L"COM4");
+	COMToolkit::connect(L"\\\\.\\COM15");
 
-	//handshake();
+
+	//first experiment
+#ifdef EXPERIMENT_1
+	bool shuffle = true;
+	int N = 19;
+	char fileName[] = "fish_Shuffled2.csv";
+	const int minX = 1250, maxX = 1750;
+	const int minY = 1250, maxY = 1750;
+
+	//generate the grid with the values to send to the arduino (sx,sy)
+	std::vector<Point2D> points;
+	std::vector<int> permutations;
+	int index = 0;
+	for (int ix = 0; ix <= N; ++ix) {
+		for (int iy = 0; iy <= N; ++iy) {
+			const int sx = (int) interp(minX, maxX, ix / (float) N);
+			const int sy = (int) interp(minY, maxY, iy / (float) N);
+			points.push_back( Point2D(sx, sy) );
+			permutations.push_back(index);
+			index++;
+		}
+	}
+	
+
+	if (shuffle){
+		initRandomSeed();
+		for(int i = permutations.size() - 1; i >= 0; --i){
+			int target = intRandom(0,i+1);
+			const int tmp = permutations[i];
+			permutations[i] = permutations[target];
+			permutations[target] = tmp;
+		}
+	}
+
+	FILE* f = fopen(fileName, "w");
+#endif
+#ifdef EXPERIMENT_2
+	//second experiment
+	const int N = 400;
+	
+	MultiVariableInterp2D* interpolator;
+	char calibFile[] = "fish_calib.csv";
+	char outputFile[] = "fishDelunay.csv";
+	
+	FILE* f = fopen(outputFile, "w");
+	//interpolator = new MVILinear(calibFile);
+	//interpolator = new MVIInverseWeight(calibFile, 4);
+	interpolator = new MVIDelunayLinear(calibFile);
+
+	const float minrX = -18, maxrX = 18;
+	const float minrY = -18, maxrY = 18;
+#endif
+
+#ifdef EXPERIMENT_3
+	char calibFile[] = "fish_calib.csv";
+	mInterp = new MVIDelunayLinear(calibFile);
+	char fileName[] = "fish_SlowLow.csv";
+	curvatureNum = 8;
+
+	fileExp3 = fopen(fileName, "w");
+	//init time
+	
 	begin_time = clock();
-	stopped=false;
-    while(!kbhit())
+	trial = 0;
+
+	//third experiement
+
+	 while(!kbhit())
     {
 		tracker->mainloop();
 		connection->mainloop();
         Sleep(5);
-		if(float( clock () - begin_time ) >20000) {
-			stopped=true;
-			cout<<float( clock () - begin_time )<<" seconds "<<endl;
-			cout<<"Trial nuumber "<<trial/2<<endl;
-			trial ++;
-			cout<<"Enter curvature : "<<endl;
-			cin>>curvatureNum;
-			if(curvatureNum<0) curvatureNum =0;
-			if(curvatureNum>12) curvatureNum =12;
-			stopped=false;
-			begin_time = clock();	
-		}
     }
 
+
+#endif
+
+	//handshake();
+	begin_time = clock();
+	stopped=false;
+
+	tracker->mainloop(); 
+	connection->mainloop();
+
+#ifdef EXPERIMENT_1
+	for(int i = 0; i < points.size() ; ++i )
+    {
+		
+		const int permIndex = permutations[i];
+		const Point2D& pointToSend = points[ permIndex ];
+		sendBytesTest(pointToSend.x, pointToSend.y);
+        Sleep(1000);
+		tracker->mainloop(); 
+		connection->mainloop();
+		const float rx = mPitch;
+		const float ry = mRoll;
+		fprintf(f, "%d,%d,%d,%f,%f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
+		printf("Index %d, servoX %d, servoY %d, Pitch %f,Roll %f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
+
+    }
+#endif
+
+#ifdef EXPERIMENT_2
+	for(int i = 0; i < N ; ++i )
+    {
+		const float targetRX = rangeRandom(minrX, maxrX);
+		const float targetRY = rangeRandom(minrY, maxrY);
+		int sx, sy;
+		interpolator->query(targetRX, targetRY, sx, sy);
+		sendBytesTest(sx, sy);
+        Sleep(500);
+		tracker->mainloop(); 
+		connection->mainloop();
+		Sleep(500);
+		const float realRx = mPitch;
+		const float realRy = mRoll;
+		fprintf(f, "%d,%d,%f,%f,%f,%f\n", sx, sy, targetRX, targetRY, realRx, realRy);
+		const float errorRX = abs(targetRX - realRx);
+		const float errorRY = abs(targetRY - realRy);
+		printf("%d %d,%d,%f,%f,%f,%f  errRX %.4f   errRY %.4f \n", i, sx, sy, targetRX, targetRY, realRx, realRy,errorRX,errorRY);
+
+    }
+#endif
+
+
+
+#ifdef EXPERIMENT_1
+	fclose(f);
+#endif
+#ifdef EXPERIMENT_2
+	fclose(f);
+	delete interpolator;
+#endif
+#ifdef EXPERIMENT_3
+	fclose(fileExp3);
+#endif
 	CloseHandle(hDevice);
 	return 0;
 }
