@@ -28,9 +28,9 @@ using namespace cv;
 //#define EXPERIMENT_2 1
 #define EXPERIMENT_3 1
 
-#ifdef EXPERIMENT_3
+//#ifdef EXPERIMENT_3
 static MultiVariableInterp2D* mInterp;
-#endif
+//#endif
 
 bool stopped=true;
 HANDLE hSerialIN = INVALID_HANDLE_VALUE; 
@@ -231,9 +231,11 @@ void findCurve(float coordinateX, float coordinateZ,int curvature) {
 	rx = thetaAngle;
 	ry = phiAngle;
 
-	cout<<"x "<<x<<" z "<<z<<" Theta "<<thetaAngle<<" phi "<<phiAngle<<endl;
+	
 	int sx,sy;
 	mInterp->query(thetaAngle,phiAngle, sx,sy);
+	cout<<"x "<<x<<" z "<<z<<" Theta "<<thetaAngle<<" phi "<<phiAngle<<endl;
+	cout<<" sx "<<sx<<" sy "<<sy<<endl;
 	sendBytesTest((short)sy,(short)sx);
 	
 }
@@ -446,6 +448,7 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 
 #ifdef EXPERIMENT_3
 	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	printf( "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
 
 	float coordinateX = t.pos[0]-0.0084;
 	float coordinateZ = t.pos[2]+ 0.0107;
@@ -612,7 +615,7 @@ int main(int argc, char* argv[])
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
 	int N = 19;
-	char fileName[] = "fish_Shuffled2.csv";
+	char fileName[] = "earth_Shuffled3.csv";
 	const int minX = 1250, maxX = 1750;
 	const int minY = 1250, maxY = 1750;
 
@@ -645,26 +648,26 @@ int main(int argc, char* argv[])
 #endif
 #ifdef EXPERIMENT_2
 	//second experiment
-	const int N = 400;
+	const int N = 200;
 	
 	MultiVariableInterp2D* interpolator;
-	char calibFile[] = "fish_calib.csv";
-	char outputFile[] = "fishDelunay.csv";
+	char calibFile[] = "earth_calib.csv";
+	char outputFile[] = "earthDelunay1.csv";
 	
 	FILE* f = fopen(outputFile, "w");
-	//interpolator = new MVILinear(calibFile);
+	interpolator = new MVILinear(calibFile);
 	//interpolator = new MVIInverseWeight(calibFile, 4);
-	interpolator = new MVIDelunayLinear(calibFile);
+	//interpolator = new MVIDelunayLinear(calibFile);
 
 	const float minrX = -18, maxrX = 18;
 	const float minrY = -18, maxrY = 18;
 #endif
 
 #ifdef EXPERIMENT_3
-	char calibFile[] = "fish_calib.csv";
+	char calibFile[] = "earth_calib_1.csv";
 	mInterp = new MVIDelunayLinear(calibFile);
-	char fileName[] = "fish_SlowLow.csv";
-	curvatureNum = 8;
+	char fileName[] = "earth_MediumMedium.csv";
+	curvatureNum = 3;
 
 	fileExp3 = fopen(fileName, "w");
 	//init time
@@ -698,9 +701,10 @@ int main(int argc, char* argv[])
 		const int permIndex = permutations[i];
 		const Point2D& pointToSend = points[ permIndex ];
 		sendBytesTest(pointToSend.x, pointToSend.y);
-        Sleep(1000);
+        Sleep(800);
 		tracker->mainloop(); 
 		connection->mainloop();
+		Sleep(200);
 		const float rx = mPitch;
 		const float ry = mRoll;
 		fprintf(f, "%d,%d,%d,%f,%f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
@@ -717,10 +721,10 @@ int main(int argc, char* argv[])
 		int sx, sy;
 		interpolator->query(targetRX, targetRY, sx, sy);
 		sendBytesTest(sx, sy);
-        Sleep(500);
+        Sleep(2000);
 		tracker->mainloop(); 
 		connection->mainloop();
-		Sleep(500);
+		//Sleep(500);
 		const float realRx = mPitch;
 		const float realRy = mRoll;
 		fprintf(f, "%d,%d,%f,%f,%f,%f\n", sx, sy, targetRX, targetRY, realRx, realRy);
