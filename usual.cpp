@@ -24,9 +24,9 @@
 using namespace std;
 using namespace cv;
 
-//#define EXPERIMENT_1 1
+#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
-#define EXPERIMENT_3 1
+//#define EXPERIMENT_3 1
 
 //#ifdef EXPERIMENT_3
 static MultiVariableInterp2D* mInterp;
@@ -41,23 +41,20 @@ int x;
 int trial;
 int y;
 int atstart = 0;
-const int FRAME_WIDTH = 640;
-const int FRAME_HEIGHT = 480;
-const int DESKTOP_WIDTH = 200;
-const int DESKTOP_HEIGHT = 200;
+
 
 class Instruction{
 public:
-	short getPhi() {Instruction instr = *this; return instr.phi;};
-	short getTheta() {Instruction instr = *this; return instr.theta;};
-	void setPhi(short input) { 
+	float getPhi() {Instruction instr = *this; return instr.phi;};
+	float getTheta() {Instruction instr = *this; return instr.theta;};
+	void setPhi(float input) { 
 		phi = input; } ; 
-	void setTheta(short input) { 
+	void setTheta(float input) { 
 		theta = input; } ; 
 
 private:
-	short phi;
-	short theta;
+	float phi;
+	float theta;
 }; 
 
 class Trial{
@@ -92,59 +89,9 @@ long getMillisTime(){
 	return (time.tv_sec * 1000) + (time.tv_usec / 1000);
 }
 
-void openSerialPort(){
-	DCB dcb;
-	//HANDLE hDevice;
-
-	//Get info to port COM4
-	hDevice = CreateFile(L"COM4",GENERIC_READ | GENERIC_WRITE,FILE_SHARE_READ | FILE_SHARE_WRITE,NULL,OPEN_EXISTING,0,0);
-    DCB lpTest;
-    GetCommState(hDevice,&lpTest);
-    lpTest.BaudRate = CBR_9600;
-    lpTest.ByteSize = 8;
-    lpTest.Parity = NOPARITY;
-    lpTest.StopBits = ONESTOPBIT;
-    SetCommState(hDevice,&lpTest);
-    DWORD btsIO;
-}
 
 
-void writeSerialPortAsInt(int value){
-    bool retVal, retValTwo;
-	unsigned char lowByte, highByte;
-	DWORD byteswritten;
 
-	if (value < 0) value = 0;
-
-	// lower 8 bits
-	lowByte = (unsigned char) value & 255;
-	retVal = WriteFile(hDevice,&lowByte,1,&byteswritten,NULL);
-	cout<< " lowByte "<< lowByte << endl;
-
-	// upper 8 bits
-	highByte = (unsigned char) (value >> 8) & 255;
-	retValTwo = WriteFile(hDevice,&highByte,1,&byteswritten,NULL);
-	cout<< " highByte "<< highByte << endl;
-
-	//cout<<" buffer X "<<degree[0]<<" , "<<degree[1]<<" , "<<degree[2]<<" , "<<degree[3]<<" bytes "<<byteswritten<<endl;//" ; "<<degreetwo[0]<<" , "<<degreetwo[1]<<" , "<<degreetwo[2]<<" , "<<degreetwo[3]<<" bytes "<<endl;
-
-	//cout<<" buffer zeroth "<<degree[0]<<" first "<<degree[1]<<" second "<<degree[2]<<" third "<<degree[3]<<" size "<<byteswritten<<endl;
-}
-
-
-void writeSerialPortAsChar(int value){
-	char degree[4];
-	DWORD byteswritten;
-
-	if (value < 0) value = 0;
-	itoa(value, degree, 10);
-
-	bool retVal, retValTwo;
-	retVal = WriteFile(hDevice,degree,strlen(degree)+1,&byteswritten,NULL);
-	retValTwo = WriteFile(hDevice,"\r\n",2,&byteswritten,NULL);
-	//cout<<" buffer X "<<degree[0]<<" , "<<degree[1]<<" , "<<degree[2]<<" , "<<degree[3]<<" bytes "<<byteswritten<<endl;//" ; "<<degreetwo[0]<<" , "<<degreetwo[1]<<" , "<<degreetwo[2]<<" , "<<degreetwo[3]<<" bytes "<<endl;
-	//cout<<" buffer zeroth "<<degree[0]<<" first "<<degree[1]<<" second "<<degree[2]<<" third "<<degree[3]<<" size "<<byteswritten<<endl;
-}
 
 //== Main entry point ==--
 
@@ -176,44 +123,12 @@ void handshake () {
 
 
 
-short mapTest(float coordinate) {
-	short mapping =0;
-	float temp = (100000*coordinate)/FRAME_WIDTH;
-	//cout<<temp<<" ";
-	mapping = (short) floor(temp*180/100);
-    if(mapping <0 ) mapping = 0;
-	return mapping;
-}
-
-
-void sendBytesTestRange() {
-	short theta = 1500;
-	//while( (theta < 45)||(theta > 135) )
-	//{
-		cout<<"Enter theta: "<<endl;
-		cin>>theta;
-	//}
-
-	short fi = 1500;
-	//while( (fi < 45)||(fi > 135) )
-	//{
-		cout<<"Enter fi: "<<endl;
-		cin>>fi;
-	//}
-	//sendBytesTest(theta,fi);
-	/*while(theta < 179) {
-		sendBytesTest(theta, fi);
-		theta++;
-		fi++;
-	}*/
-
-}
 
 static float rx;
 static float ry;
 
 void findCurve(float coordinateX, float coordinateZ,int curvature) {
-	short thetaAngle, phiAngle;
+	float thetaAngle, phiAngle;
 	float r = 500;
 	int x = floor(1000*(coordinateX)+0.5);
 	int z = floor(1000*(coordinateZ)+0.5);
@@ -225,38 +140,23 @@ void findCurve(float coordinateX, float coordinateZ,int curvature) {
 
 	if(z<0) thetaAngle = 0+angleArray[abs(x)][-z][curvature].getTheta();
 	else thetaAngle = 0-angleArray[abs(x)][z][curvature].getTheta();
-	if(x<0) phiAngle = 0-angleArray[-x][abs(z)][curvature].getPhi();
-	else phiAngle = 0+angleArray[x][abs(z)][curvature].getPhi();
+	if(x<0) phiAngle = 0+angleArray[-x][abs(z)][curvature].getPhi();
+	else phiAngle = 0-angleArray[x][abs(z)][curvature].getPhi();
 
 	rx = thetaAngle;
 	ry = phiAngle;
+	int offsetTheta = 4;
+	int offsetPhi = 11;
+	thetaAngle = thetaAngle + offsetTheta;
+	phiAngle = phiAngle + offsetPhi;
 
-	
 	int sx,sy;
 	mInterp->query(thetaAngle,phiAngle, sx,sy);
-	cout<<"x "<<x<<" z "<<z<<" Theta "<<thetaAngle<<" phi "<<phiAngle<<endl;
-	cout<<" sx "<<sx<<" sy "<<sy<<endl;
+	cout<<"x "<<x<<" z "<<z<<" Theta "<<(thetaAngle-offsetTheta)<<" phi "<<(phiAngle-offsetPhi)<<" Sx"<<sx<<" Sy "<<sy<<endl;
 	sendBytesTest((short)sy,(short)sx);
 	
 }
 
-void printArray(int curvature) {
-	cout<<"printingTheta"<<endl;
-	for( int i=0; i<91; i++) {
-		for(int j=0; j< 91; j++) {
-			cout<<">"<<j<<"<"<<angleArray[i][j][curvature].getTheta()<<" ";
-		}
-	cout<<">"<<i<<"<"<<endl;
-	}
-	cout<<endl;
-	cout<<"printingPhi"<<endl;
-	for( int i=0; i<91; i++) {
-		for(int j=0; j< 91; j++) {
-			cout<<">"<<j<<"<"<<angleArray[i][j][curvature].getPhi()<<" ";
-		}
-	cout<<">"<<i<<"<"<<endl;
-	}
-}
 
 void readFromMyFile(int curvature) {
 
@@ -276,11 +176,10 @@ void readFromMyFile(int curvature) {
 			string subtheta,subphi;
 			thetastream >> subtheta;
 			phistream >> subphi;
-			angleArray[i][j][curvature].setTheta(atoi(subtheta.c_str()));
-			angleArray[i][j][curvature].setPhi(atoi(subphi.c_str()));
+			angleArray[i][j][curvature].setTheta(atof(subtheta.c_str()));
+			angleArray[i][j][curvature].setPhi(atof(subphi.c_str()));
 		}
 	}
-	//printArray(curvature);
 }
 
 void writeToFile(int curvature) {
@@ -315,8 +214,8 @@ void mapCurve(float radius, int curvature) {
 	if(r == 0) {
 		for( int i=0; i<91; i++) {
 			for(int j=0; j< 91; j++) {
-				angleArray[i][j][curvature].setTheta((short) 0);
-				angleArray[i][j][curvature].setPhi((short) 0);
+				angleArray[i][j][curvature].setTheta((float) 0.0);
+				angleArray[i][j][curvature].setPhi((float) 0.0);
 			}
 		}
 	}
@@ -332,8 +231,8 @@ void mapCurve(float radius, int curvature) {
 			float phi = acos(y/(r*tempCos))*180/PI;
 			float tempSin = asin(-i/(r*tempCos))*180/PI;
 	
-			short mappingTheta = (short) floor(theta+ 0.5);
-			short mappingPhi = (short) floor(tempSin + 0.5);
+			float mappingTheta = (float) theta;
+			float mappingPhi = (float) tempSin;
 			//cout<<"mapX "<<x<<" map Y "<<y<<" map Z "<<z<<" temp "<< temp<<"tempcos "<<tempCos<<" Theta is "<<theta<<" phi is "<<phi<<" phi2check "<<tempSin<<" map "<<mapping<<" mapB "<<mappingB<<endl;
 			cout<<"x "<<i<<" y "<<y<<" z "<<j<<" Theta "<<theta<<" phi "<<tempSin<<" map "<<mappingTheta<<" mapB "<<mappingPhi<<endl;
 			if(mappingTheta <-20) mappingTheta=-20;
@@ -342,8 +241,8 @@ void mapCurve(float radius, int curvature) {
 			if(mappingPhi > 20) mappingPhi = 20;
 
 
-			angleArray[i][j][curvature].setTheta((short)mappingTheta);
-			angleArray[i][j][curvature].setPhi((short)mappingPhi);
+			angleArray[i][j][curvature].setTheta((float)mappingTheta);
+			angleArray[i][j][curvature].setPhi((float)mappingPhi);
 	
 		  }
 		}
@@ -448,7 +347,6 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 
 #ifdef EXPERIMENT_3
 	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-	printf( "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
 
 	float coordinateX = t.pos[0]-0.0084;
 	float coordinateZ = t.pos[2]+ 0.0107;
@@ -607,7 +505,6 @@ int main(int argc, char* argv[])
 
 
 	// Arduino port
-	//openSerialPort();
 	COMToolkit::connect(L"\\\\.\\COM15");
 
 
@@ -615,7 +512,7 @@ int main(int argc, char* argv[])
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
 	int N = 19;
-	char fileName[] = "earth_Shuffled3.csv";
+	char fileName[] = "saturn_Shuffled1.csv";
 	const int minX = 1250, maxX = 1750;
 	const int minY = 1250, maxY = 1750;
 
@@ -648,26 +545,26 @@ int main(int argc, char* argv[])
 #endif
 #ifdef EXPERIMENT_2
 	//second experiment
-	const int N = 200;
+	const int N = 400;
 	
 	MultiVariableInterp2D* interpolator;
-	char calibFile[] = "earth_calib.csv";
-	char outputFile[] = "earthDelunay1.csv";
+	char calibFile[] = "mars_calib.csv";
+	char outputFile[] = "marsDelunay.csv";
 	
 	FILE* f = fopen(outputFile, "w");
-	interpolator = new MVILinear(calibFile);
+	//interpolator = new MVILinear(calibFile);
 	//interpolator = new MVIInverseWeight(calibFile, 4);
-	//interpolator = new MVIDelunayLinear(calibFile);
+	interpolator = new MVIDelunayLinear(calibFile);
 
 	const float minrX = -18, maxrX = 18;
 	const float minrY = -18, maxrY = 18;
 #endif
 
 #ifdef EXPERIMENT_3
-	char calibFile[] = "earth_calib_1.csv";
+	char calibFile[] = "mars_calib.csv";
 	mInterp = new MVIDelunayLinear(calibFile);
-	char fileName[] = "earth_MediumMedium.csv";
-	curvatureNum = 3;
+	char fileName[] = "mars_MedMed.csv";
+	curvatureNum = 8;
 
 	fileExp3 = fopen(fileName, "w");
 	//init time
@@ -695,21 +592,30 @@ int main(int argc, char* argv[])
 	connection->mainloop();
 
 #ifdef EXPERIMENT_1
+	
 	for(int i = 0; i < points.size() ; ++i )
     {
 		
 		const int permIndex = permutations[i];
 		const Point2D& pointToSend = points[ permIndex ];
-		sendBytesTest(pointToSend.x, pointToSend.y);
-        Sleep(800);
+
+		int sx,sy;
+		printf("input sx sy you ugly twat: ");
+		scanf("%d %d", &sx, &sy);
+
+		//sendBytesTest(pointToSend.x, pointToSend.y);
+		sendBytesTest(sx, sy);
+        Sleep(600);
 		tracker->mainloop(); 
 		connection->mainloop();
-		Sleep(200);
+        Sleep(400);
+		tracker->mainloop(); 
+		connection->mainloop();
 		const float rx = mPitch;
 		const float ry = mRoll;
 		fprintf(f, "%d,%d,%d,%f,%f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
-		printf("Index %d, servoX %d, servoY %d, Pitch %f,Roll %f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
-
+		//printf("Index %d, servoX %d, servoY %d, Pitch %f,Roll %f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
+		printf("Index %d, servoX %d, servoY %d, Pitch %.4f,Roll %.4f\n", permIndex, sx, sy, rx, ry);
     }
 #endif
 
@@ -721,10 +627,12 @@ int main(int argc, char* argv[])
 		int sx, sy;
 		interpolator->query(targetRX, targetRY, sx, sy);
 		sendBytesTest(sx, sy);
-        Sleep(2000);
+        Sleep(600);
 		tracker->mainloop(); 
 		connection->mainloop();
-		//Sleep(500);
+        Sleep(400);
+		tracker->mainloop(); 
+		connection->mainloop();
 		const float realRx = mPitch;
 		const float realRy = mRoll;
 		fprintf(f, "%d,%d,%f,%f,%f,%f\n", sx, sy, targetRX, targetRY, realRx, realRy);
