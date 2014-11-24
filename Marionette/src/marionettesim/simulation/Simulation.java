@@ -181,7 +181,7 @@ public class Simulation {
         scene.getEntities().add( handCenter );
         
         //initial surface
-        surface = new MeshEntity(Resources.MESH_CUSTOM, null, Resources.SHADER_SOLID_SPEC);
+        surface = new MeshEntity(Resources.MESH_CUSTOM, null, Resources.SHADER_STATIC_SURFACE);
         surface.customMesh = new Quad(1.0f, 1.0f, 128);
         surface.setColor( Color.RED );
         surface.setTag( EntityTag.SURFACE );
@@ -199,9 +199,12 @@ public class Simulation {
         //update surface if needed
         
         //get input position X,Z,RY
-        float inputX = mf.inputPanel.getLastX();
-        float inputZ = mf.inputPanel.getLastZ();
-        float inputRy = mf.inputPanel.getLastRY();
+        final float inputX = mf.inputPanel.getLastX();
+        final float inputZ = mf.inputPanel.getLastZ();
+        final float inputRy = mf.inputPanel.getLastRY();
+        
+        final float minAngle = mf.outputPanel.getMinAngle() * FastMath.DEG_TO_RAD;
+        final float maxAngle = mf.outputPanel.getMaxAngle() * FastMath.DEG_TO_RAD;
         
         //update hand
         assignXZRYtoEntity(handCenter, inputX, inputZ, inputRy);
@@ -226,6 +229,10 @@ public class Simulation {
             fRot.toAngles(euler);
             euler[2] = currentFunction.calcRotationX(fPos.x, -fPos.z, euler[1], gain, h);
             euler[0] = currentFunction.calcRotationY(fPos.x, -fPos.z, euler[1], gain, h);
+            
+            euler[2] = FastMath.clamp(euler[2], minAngle, maxAngle);
+            euler[0] = FastMath.clamp(euler[0], minAngle, maxAngle);
+            
             fRot.fromAngles(euler);
             
             //update fingers

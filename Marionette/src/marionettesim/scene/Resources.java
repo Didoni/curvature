@@ -16,6 +16,7 @@ import marionettesim.shapes.Sphere;
 import marionettesim.shapes.Torus;
 import java.util.HashMap;
 import javax.media.opengl.GL2;
+import marionettesim.renderer.StaticSurfaceShader;
 
 /**
  *
@@ -25,8 +26,8 @@ public class Resources {
     public static final int SHADER_SOLID = 1;
     public static final int SHADER_SOLID_SPEC = 2;
     public static final int SHADER_SOLID_DIFF = 3;
-
     public static final int SHADER_MASK = 9;
+    public static final int SHADER_STATIC_SURFACE = 10;
     
     public static final String MESH_CUSTOM = "custom";
     public static final String MESH_QUAD = "quad";
@@ -65,9 +66,9 @@ public class Resources {
         shaders.put(SHADER_SOLID, new Shader("ColorPlain.vsh", "ColorPlain.fsh", Shader.ORDER_OPAQUE).init(gl));
         shaders.put(SHADER_SOLID_SPEC, new Shader("ColorSpec.vsh", "ColorSpec.fsh", Shader.ORDER_OPAQUE).init(gl));
         shaders.put(SHADER_SOLID_DIFF, new Shader("ColorDiff.vsh", "ColorDiff.fsh", Shader.ORDER_OPAQUE).init(gl));
-        
         shaders.put(SHADER_MASK, new Shader("MatteMask.vsh", "MatteMask.fsh", Shader.ORDER_MASK).init(gl));
-       
+        shaders.put(SHADER_STATIC_SURFACE, new StaticSurfaceShader("StaticSlice_V.glsl", "StaticSlice_F.glsl").init(gl));
+           
         //load meshes
         meshes.put(MESH_BOX, new Box(0.5f, 0.5f, 0.5f) );
         meshes.put(MESH_SPHERE, new Sphere(8, 8, 0.5f) );

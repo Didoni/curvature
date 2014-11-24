@@ -4,7 +4,7 @@
 
 varying vec4 normal;
 varying vec4 wPos;
-varying vec4 color;
+varying vec4 gradientColor;
 
 uniform vec4 colorMod;
 uniform vec4 lightPos;
@@ -25,7 +25,7 @@ void main()
     float lambertTerm = abs( dot(N,L) );
     float specularTerm = pow( abs( dot(N, HV) ), shininess);
     
-    vec4 textureColor = color;
+    vec4 textureColor = gradientColor;
     gl_FragColor = (ambient + diffuse * lambertTerm) * textureColor + specularTerm * specular * vec4(1.0);		
 }
 

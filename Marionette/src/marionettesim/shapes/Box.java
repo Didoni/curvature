@@ -91,6 +91,7 @@ public class Box extends Mesh {
         zExtent = z;
         updateGeometry();
     }
+    
 
 
     /**

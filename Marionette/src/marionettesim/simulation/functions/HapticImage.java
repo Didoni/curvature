@@ -62,7 +62,7 @@ public class HapticImage extends Function2D{
         //extract greyscale
         values = new float[width][height];
         int index = 0;
-        for(int iy = 0; iy < height; ++iy){
+        for(int iy = height-1; iy >= 0; --iy){
             for(int ix = 0; ix < width; ++ix){
                 int sourceColor = data[index];
                 values[ix][iy] = (((sourceColor >> 16) & 0x000000FF ) +
@@ -81,13 +81,25 @@ public class HapticImage extends Function2D{
     
     @Override
     public float eval(float x, float y) {
-        int px = (int)(x * sw + halfWidth);
-        int py = (int)(y * sh + halfHeight);
+        float px = x * sw + halfWidth;
+        float py = y * sh + halfHeight;
         
-        px = FastMath.iclamp(px, 0, width-1);
-        py = FastMath.iclamp(py, 0, height-1);
+        px = FastMath.clamp(px, 1, width-2);
+        py = FastMath.clamp(py, 1, height-2);
         
-        return values[px][py];
+        return bilinear(px, py);
+    }
+    
+     public float bilinear(float x, float y) {
+        int xx = (int) Math.floor(x);
+        int yy = (int) Math.floor(y);
+        float dx = x - xx;
+        float dy = y - yy;
+       
+        float a = values[xx][yy] + dx * (values[xx][yy + 1] - values[xx][yy]);
+        float b = values[xx + 1][yy] + dx * (values[xx + 1][yy + 1] - values[xx + 1][yy]);
+        
+        return a + dy * (b - a);
     }
     
 }

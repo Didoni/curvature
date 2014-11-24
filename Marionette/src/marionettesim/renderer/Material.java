@@ -18,9 +18,9 @@ public class Material {
 
     public Material() {
         ambient = 0.5f;
-        diffuse = 0.6f;
-        specular = 0.7f;
-        shininess = 15;
+        diffuse = 0.5f;
+        specular = 0.4f;
+        shininess = 25;
     }
 
     public float getAmbient() {

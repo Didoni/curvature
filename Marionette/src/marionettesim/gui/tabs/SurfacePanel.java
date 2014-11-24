@@ -36,6 +36,15 @@ public class SurfacePanel extends javax.swing.JPanel {
     public float getGain(){
         return Parse.stringToFloat( gainText.getText() );
     }
+    public float getMinColor(){
+        return Parse.stringToFloat( colAmpMinText.getText() );
+    }
+    public float getMaxColor(){
+        return Parse.stringToFloat( colAmpMaxText.getText() );
+    }
+    public int getColorGradient(){
+        return colouringCombo.getSelectedIndex();
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -260,7 +269,7 @@ public class SurfacePanel extends javax.swing.JPanel {
             }
         });
 
-        colAmpMaxText.setText("1500");
+        colAmpMaxText.setText("0.05");
         colAmpMaxText.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 colAmpMaxTextActionPerformed(evt);
