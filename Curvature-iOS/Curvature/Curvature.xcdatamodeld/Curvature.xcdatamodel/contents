@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6252" systemVersion="14A389" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Trial" representedClassName="Trial">
+        <attribute name="left" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="leftTime" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="right" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="rightTime" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="selectedLeft" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="timeStamp" optional="YES" attributeType="Date">
+            <userInfo/>
+        </attribute>
+        <attribute name="trial" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="trialType" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="user" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="User" inverseName="trials" inverseEntity="User" syncable="YES"/>
+        <userInfo/>
+    </entity>
+    <entity name="User" representedClassName="User" syncable="YES">
+        <attribute name="userId" optional="YES" attributeType="Integer 16" defaultValueString="0" indexed="YES" syncable="YES"/>
+        <relationship name="trials" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Trial" inverseName="user" inverseEntity="Trial" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Trial" positionX="261" positionY="189" width="128" height="180"/>
+        <element name="User" positionX="270" positionY="243" width="128" height="73"/>
+    </elements>
+</model>

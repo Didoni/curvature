@@ -1,0 +1,829 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F223C2671A1BD1B100D3245A /* HorizontalTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C2661A1BD1B100D3245A /* HorizontalTableView.m */; };
+		F223C26B1A1BD36E00D3245A /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F28D9A1A1A15856500070B2D /* QuartzCore.framework */; };
+		F223C26C1A1BD37900D3245A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F223C2681A1BD34200D3245A /* CoreGraphics.framework */; };
+		F223C27C1A1BF03600D3245A /* MDRadialProgressLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C2771A1BF03600D3245A /* MDRadialProgressLabel.m */; };
+		F223C27D1A1BF03600D3245A /* MDRadialProgressTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C2791A1BF03600D3245A /* MDRadialProgressTheme.m */; };
+		F223C27E1A1BF03600D3245A /* MDRadialProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C27B1A1BF03600D3245A /* MDRadialProgressView.m */; };
+		F23F73C81A22290200C814BE /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = F23F73C71A22290200C814BE /* User.m */; };
+		F23F73CB1A22290300C814BE /* Trial.m in Sources */ = {isa = PBXBuildFile; fileRef = F23F73CA1A22290300C814BE /* Trial.m */; };
+		F26BEDEA1A23AAE1003075C7 /* Telephone.mm in Sources */ = {isa = PBXBuildFile; fileRef = F26BEDE91A23AAE1003075C7 /* Telephone.mm */; };
+		F26BEDF01A23BC01003075C7 /* SoundManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F26BEDEF1A23BC01003075C7 /* SoundManager.m */; };
+		F26BEDF61A23C9E5003075C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26BEDF51A23C9E5003075C7 /* AVFoundation.framework */; };
+		F26BEDFB1A23CD8B003075C7 /* sound1.caf in Resources */ = {isa = PBXBuildFile; fileRef = F26BEDF71A23CD2C003075C7 /* sound1.caf */; };
+		F26BEDFC1A23CD8D003075C7 /* sound2.caf in Resources */ = {isa = PBXBuildFile; fileRef = F26BEDF81A23CD2C003075C7 /* sound2.caf */; };
+		F26BEDFD1A23CD90003075C7 /* track1.caf in Resources */ = {isa = PBXBuildFile; fileRef = F26BEDF91A23CD2C003075C7 /* track1.caf */; };
+		F26BEDFE1A23CD93003075C7 /* track2.caf in Resources */ = {isa = PBXBuildFile; fileRef = F26BEDFA1A23CD2C003075C7 /* track2.caf */; };
+		F26BEE031A23CFE0003075C7 /* track3.caf in Resources */ = {isa = PBXBuildFile; fileRef = F26BEE021A23CFE0003075C7 /* track3.caf */; };
+		F28D99E21A1556F100070B2D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F28D99E11A1556F100070B2D /* main.m */; };
+		F28D99E51A1556F200070B2D /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F28D99E41A1556F200070B2D /* AppDelegate.m */; };
+		F28D99E81A1556F300070B2D /* Curvature.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F28D99E61A1556F300070B2D /* Curvature.xcdatamodeld */; };
+		F28D99EB1A1556F300070B2D /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F28D99EA1A1556F300070B2D /* MasterViewController.m */; };
+		F28D99EE1A1556F300070B2D /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F28D99ED1A1556F300070B2D /* DetailViewController.m */; };
+		F28D99F11A1556F300070B2D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F28D99EF1A1556F300070B2D /* Main.storyboard */; };
+		F28D99F31A1556F300070B2D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F28D99F21A1556F300070B2D /* Images.xcassets */; };
+		F28D9A0D1A15667000070B2D /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F28D9A0C1A15667000070B2D /* UserViewController.m */; };
+		F28D9A141A1567A100070B2D /* UICustom.m in Sources */ = {isa = PBXBuildFile; fileRef = F28D9A131A1567A100070B2D /* UICustom.m */; };
+		F28D9A291A15A20200070B2D /* Matrix.m in Sources */ = {isa = PBXBuildFile; fileRef = F28D9A261A15A20200070B2D /* Matrix.m */; };
+		F2929A2C1A1D6AA6006390EC /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F2929A2B1A1D6AA6006390EC /* Settings.bundle */; };
+		F2929A2E1A1D7119006390EC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2929A2D1A1D7119006390EC /* Foundation.framework */; };
+		F2929A301A1D7121006390EC /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2929A2F1A1D7121006390EC /* Security.framework */; };
+		F2929A321A1D7128006390EC /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F2929A311A1D7128006390EC /* CFNetwork.framework */; };
+		F2929A341A1D713F006390EC /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F2929A331A1D713F006390EC /* libicucore.dylib */; };
+		F2929A391A1D72AE006390EC /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = F2929A381A1D72AE006390EC /* SRWebSocket.m */; };
+		F2946BC11A23EBFD00635A18 /* drum.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BBC1A23EBFD00635A18 /* drum.caf */; };
+		F2946BC21A23EBFD00635A18 /* duck.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BBD1A23EBFD00635A18 /* duck.caf */; };
+		F2946BC51A23EBFD00635A18 /* tong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BC01A23EBFD00635A18 /* tong.caf */; };
+		F2946BC71A23ED8A00635A18 /* ding.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BC61A23ED8A00635A18 /* ding.caf */; };
+		F2946C771A26710900635A18 /* VRPN.mm in Sources */ = {isa = PBXBuildFile; fileRef = F2946C761A26710900635A18 /* VRPN.mm */; };
+		F2946C791A26798F00635A18 /* libvrpn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2946C781A26798F00635A18 /* libvrpn.a */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F223C2651A1BD1B100D3245A /* HorizontalTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HorizontalTableView.h; sourceTree = "<group>"; };
+		F223C2661A1BD1B100D3245A /* HorizontalTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HorizontalTableView.m; sourceTree = "<group>"; };
+		F223C2681A1BD34200D3245A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		F223C2761A1BF03600D3245A /* MDRadialProgressLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDRadialProgressLabel.h; sourceTree = "<group>"; };
+		F223C2771A1BF03600D3245A /* MDRadialProgressLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDRadialProgressLabel.m; sourceTree = "<group>"; };
+		F223C2781A1BF03600D3245A /* MDRadialProgressTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDRadialProgressTheme.h; sourceTree = "<group>"; };
+		F223C2791A1BF03600D3245A /* MDRadialProgressTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDRadialProgressTheme.m; sourceTree = "<group>"; };
+		F223C27A1A1BF03600D3245A /* MDRadialProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDRadialProgressView.h; sourceTree = "<group>"; };
+		F223C27B1A1BF03600D3245A /* MDRadialProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDRadialProgressView.m; sourceTree = "<group>"; };
+		F23F73C61A22290200C814BE /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
+		F23F73C71A22290200C814BE /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
+		F23F73C91A22290300C814BE /* Trial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trial.h; sourceTree = "<group>"; };
+		F23F73CA1A22290300C814BE /* Trial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Trial.m; sourceTree = "<group>"; };
+		F26BEDE81A23AAE1003075C7 /* Telephone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Telephone.h; sourceTree = "<group>"; };
+		F26BEDE91A23AAE1003075C7 /* Telephone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Telephone.mm; sourceTree = "<group>"; };
+		F26BEDEE1A23BC01003075C7 /* SoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
+		F26BEDEF1A23BC01003075C7 /* SoundManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SoundManager.m; sourceTree = "<group>"; };
+		F26BEDF51A23C9E5003075C7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		F26BEDF71A23CD2C003075C7 /* sound1.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sound1.caf; sourceTree = SOURCE_ROOT; };
+		F26BEDF81A23CD2C003075C7 /* sound2.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = sound2.caf; sourceTree = SOURCE_ROOT; };
+		F26BEDF91A23CD2C003075C7 /* track1.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = track1.caf; sourceTree = SOURCE_ROOT; };
+		F26BEDFA1A23CD2C003075C7 /* track2.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = track2.caf; sourceTree = SOURCE_ROOT; };
+		F26BEE021A23CFE0003075C7 /* track3.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = track3.caf; sourceTree = SOURCE_ROOT; };
+		F28D99DC1A1556F100070B2D /* Curvature.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Curvature.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F28D99E01A1556F100070B2D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F28D99E11A1556F100070B2D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F28D99E31A1556F200070B2D /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		F28D99E41A1556F200070B2D /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		F28D99E71A1556F300070B2D /* Curvature.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Curvature.xcdatamodel; sourceTree = "<group>"; };
+		F28D99E91A1556F300070B2D /* MasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
+		F28D99EA1A1556F300070B2D /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
+		F28D99EC1A1556F300070B2D /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
+		F28D99ED1A1556F300070B2D /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
+		F28D99F01A1556F300070B2D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		F28D99F21A1556F300070B2D /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		F28D9A001A1556F300070B2D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F28D9A011A1556F300070B2D /* CurvatureTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CurvatureTests.m; sourceTree = "<group>"; };
+		F28D9A0B1A15667000070B2D /* UserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
+		F28D9A0C1A15667000070B2D /* UserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
+		F28D9A121A1567A100070B2D /* UICustom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UICustom.h; sourceTree = "<group>"; };
+		F28D9A131A1567A100070B2D /* UICustom.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UICustom.m; sourceTree = "<group>"; };
+		F28D9A151A1584EA00070B2D /* Curvature-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Curvature-Bridging-Header.h"; sourceTree = "<group>"; };
+		F28D9A1A1A15856500070B2D /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		F28D9A251A15A20200070B2D /* Matrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Matrix.h; sourceTree = "<group>"; };
+		F28D9A261A15A20200070B2D /* Matrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Matrix.m; sourceTree = "<group>"; };
+		F2929A2B1A1D6AA6006390EC /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Settings.bundle; path = ../Settings.bundle; sourceTree = "<group>"; };
+		F2929A2D1A1D7119006390EC /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F2929A2F1A1D7121006390EC /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		F2929A311A1D7128006390EC /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		F2929A331A1D713F006390EC /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		F2929A361A1D72AE006390EC /* SocketRocket-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SocketRocket-Prefix.pch"; sourceTree = "<group>"; };
+		F2929A371A1D72AE006390EC /* SRWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SRWebSocket.h; sourceTree = "<group>"; };
+		F2929A381A1D72AE006390EC /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRWebSocket.m; sourceTree = "<group>"; };
+		F2946BBC1A23EBFD00635A18 /* drum.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = drum.caf; sourceTree = SOURCE_ROOT; };
+		F2946BBD1A23EBFD00635A18 /* duck.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = duck.caf; sourceTree = SOURCE_ROOT; };
+		F2946BC01A23EBFD00635A18 /* tong.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = tong.caf; sourceTree = SOURCE_ROOT; };
+		F2946BC61A23ED8A00635A18 /* ding.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ding.caf; sourceTree = SOURCE_ROOT; };
+		F2946C751A26710900635A18 /* VRPN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VRPN.h; sourceTree = "<group>"; };
+		F2946C761A26710900635A18 /* VRPN.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VRPN.mm; sourceTree = "<group>"; };
+		F2946C781A26798F00635A18 /* libvrpn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libvrpn.a; sourceTree = "<group>"; };
+		F2946C7B1A267BD400635A18 /* jni_layer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jni_layer.h; path = vrpn/jni_layer.h; sourceTree = "<group>"; };
+		F2946C7C1A267BD400635A18 /* vrpn_3DConnexion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_3DConnexion.h; path = vrpn/vrpn_3DConnexion.h; sourceTree = "<group>"; };
+		F2946C7D1A267BD400635A18 /* vrpn_3DMicroscribe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_3DMicroscribe.h; path = vrpn/vrpn_3DMicroscribe.h; sourceTree = "<group>"; };
+		F2946C7E1A267BD400635A18 /* vrpn_3Space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_3Space.h; path = vrpn/vrpn_3Space.h; sourceTree = "<group>"; };
+		F2946C7F1A267BD400635A18 /* vrpn_5DT16.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_5DT16.h; path = vrpn/vrpn_5DT16.h; sourceTree = "<group>"; };
+		F2946C801A267BD400635A18 /* vrpn_ADBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_ADBox.h; path = vrpn/vrpn_ADBox.h; sourceTree = "<group>"; };
+		F2946C811A267BD400635A18 /* vrpn_Analog_5dt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Analog_5dt.h; path = vrpn/vrpn_Analog_5dt.h; sourceTree = "<group>"; };
+		F2946C821A267BD400635A18 /* vrpn_Analog_5dtUSB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Analog_5dtUSB.h; path = vrpn/vrpn_Analog_5dtUSB.h; sourceTree = "<group>"; };
+		F2946C831A267BD400635A18 /* vrpn_Analog_Output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Analog_Output.h; path = vrpn/vrpn_Analog_Output.h; sourceTree = "<group>"; };
+		F2946C841A267BD400635A18 /* vrpn_Analog_Radamec_SPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Analog_Radamec_SPI.h; path = vrpn/vrpn_Analog_Radamec_SPI.h; sourceTree = "<group>"; };
+		F2946C851A267BD400635A18 /* vrpn_Analog_USDigital_A2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Analog_USDigital_A2.h; path = vrpn/vrpn_Analog_USDigital_A2.h; sourceTree = "<group>"; };
+		F2946C861A267BD400635A18 /* vrpn_Analog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Analog.h; path = vrpn/vrpn_Analog.h; sourceTree = "<group>"; };
+		F2946C871A267BD400635A18 /* vrpn_Android.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Android.h; path = vrpn/vrpn_Android.h; sourceTree = "<group>"; };
+		F2946C881A267BD400635A18 /* vrpn_Atmel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Atmel.h; path = vrpn/vrpn_Atmel.h; sourceTree = "<group>"; };
+		F2946C891A267BD400635A18 /* vrpn_Auxiliary_Logger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Auxiliary_Logger.h; path = vrpn/vrpn_Auxiliary_Logger.h; sourceTree = "<group>"; };
+		F2946C8A1A267BD400635A18 /* vrpn_BaseClass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_BaseClass.h; path = vrpn/vrpn_BaseClass.h; sourceTree = "<group>"; };
+		F2946C8B1A267BD400635A18 /* vrpn_BiosciencesTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_BiosciencesTools.h; path = vrpn/vrpn_BiosciencesTools.h; sourceTree = "<group>"; };
+		F2946C8C1A267BD400635A18 /* vrpn_Button_NI_DIO24.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Button_NI_DIO24.h; path = vrpn/vrpn_Button_NI_DIO24.h; sourceTree = "<group>"; };
+		F2946C8D1A267BD400635A18 /* vrpn_Button_USB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Button_USB.h; path = vrpn/vrpn_Button_USB.h; sourceTree = "<group>"; };
+		F2946C8E1A267BD400635A18 /* vrpn_Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Button.h; path = vrpn/vrpn_Button.h; sourceTree = "<group>"; };
+		F2946C8F1A267BD400635A18 /* vrpn_CerealBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_CerealBox.h; path = vrpn/vrpn_CerealBox.h; sourceTree = "<group>"; };
+		F2946C901A267BD400635A18 /* vrpn_CHProducts_Controller_Raw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_CHProducts_Controller_Raw.h; path = vrpn/vrpn_CHProducts_Controller_Raw.h; sourceTree = "<group>"; };
+		F2946C911A267BD400635A18 /* vrpn_Configure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Configure.h; path = vrpn/vrpn_Configure.h; sourceTree = "<group>"; };
+		F2946C921A267BD400635A18 /* vrpn_Connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Connection.h; path = vrpn/vrpn_Connection.h; sourceTree = "<group>"; };
+		F2946C931A267BD400635A18 /* vrpn_ConnectionPtr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_ConnectionPtr.h; path = vrpn/vrpn_ConnectionPtr.h; sourceTree = "<group>"; };
+		F2946C941A267BD400635A18 /* vrpn_Contour.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Contour.h; path = vrpn/vrpn_Contour.h; sourceTree = "<group>"; };
+		F2946C951A267BD400635A18 /* vrpn_DevInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_DevInput.h; path = vrpn/vrpn_DevInput.h; sourceTree = "<group>"; };
+		F2946C961A267BD400635A18 /* vrpn_Dial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Dial.h; path = vrpn/vrpn_Dial.h; sourceTree = "<group>"; };
+		F2946C971A267BD400635A18 /* vrpn_DirectXFFJoystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_DirectXFFJoystick.h; path = vrpn/vrpn_DirectXFFJoystick.h; sourceTree = "<group>"; };
+		F2946C981A267BD400635A18 /* vrpn_DirectXRumblePad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_DirectXRumblePad.h; path = vrpn/vrpn_DirectXRumblePad.h; sourceTree = "<group>"; };
+		F2946C991A267BD400635A18 /* vrpn_DreamCheeky.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_DreamCheeky.h; path = vrpn/vrpn_DreamCheeky.h; sourceTree = "<group>"; };
+		F2946C9A1A267BD400635A18 /* vrpn_Dyna.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Dyna.h; path = vrpn/vrpn_Dyna.h; sourceTree = "<group>"; };
+		F2946C9B1A267BD400635A18 /* vrpn_Event_Analog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Event_Analog.h; path = vrpn/vrpn_Event_Analog.h; sourceTree = "<group>"; };
+		F2946C9C1A267BD400635A18 /* vrpn_Event_Mouse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Event_Mouse.h; path = vrpn/vrpn_Event_Mouse.h; sourceTree = "<group>"; };
+		F2946C9D1A267BD400635A18 /* vrpn_Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Event.h; path = vrpn/vrpn_Event.h; sourceTree = "<group>"; };
+		F2946C9E1A267BD400635A18 /* vrpn_FileConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_FileConnection.h; path = vrpn/vrpn_FileConnection.h; sourceTree = "<group>"; };
+		F2946C9F1A267BD400635A18 /* vrpn_FileController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_FileController.h; path = vrpn/vrpn_FileController.h; sourceTree = "<group>"; };
+		F2946CA01A267BD400635A18 /* vrpn_Flock_Parallel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Flock_Parallel.h; path = vrpn/vrpn_Flock_Parallel.h; sourceTree = "<group>"; };
+		F2946CA11A267BD400635A18 /* vrpn_Flock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Flock.h; path = vrpn/vrpn_Flock.h; sourceTree = "<group>"; };
+		F2946CA21A267BD400635A18 /* vrpn_ForceDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_ForceDevice.h; path = vrpn/vrpn_ForceDevice.h; sourceTree = "<group>"; };
+		F2946CA31A267BD400635A18 /* vrpn_ForceDeviceServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_ForceDeviceServer.h; path = vrpn/vrpn_ForceDeviceServer.h; sourceTree = "<group>"; };
+		F2946CA41A267BD400635A18 /* vrpn_Forwarder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Forwarder.h; path = vrpn/vrpn_Forwarder.h; sourceTree = "<group>"; };
+		F2946CA51A267BD400635A18 /* vrpn_ForwarderController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_ForwarderController.h; path = vrpn/vrpn_ForwarderController.h; sourceTree = "<group>"; };
+		F2946CA61A267BD400635A18 /* vrpn_Freespace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Freespace.h; path = vrpn/vrpn_Freespace.h; sourceTree = "<group>"; };
+		F2946CA71A267BD400635A18 /* vrpn_FunctionGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_FunctionGenerator.h; path = vrpn/vrpn_FunctionGenerator.h; sourceTree = "<group>"; };
+		F2946CA81A267BD400635A18 /* vrpn_Futaba.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Futaba.h; path = vrpn/vrpn_Futaba.h; sourceTree = "<group>"; };
+		F2946CA91A267BD400635A18 /* vrpn_GlobalHapticsOrb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_GlobalHapticsOrb.h; path = vrpn/vrpn_GlobalHapticsOrb.h; sourceTree = "<group>"; };
+		F2946CAA1A267BD400635A18 /* vrpn_Griffin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Griffin.h; path = vrpn/vrpn_Griffin.h; sourceTree = "<group>"; };
+		F2946CAB1A267BD400635A18 /* vrpn_HashST.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_HashST.h; path = vrpn/vrpn_HashST.h; sourceTree = "<group>"; };
+		F2946CAC1A267BD400635A18 /* vrpn_HumanInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_HumanInterface.h; path = vrpn/vrpn_HumanInterface.h; sourceTree = "<group>"; };
+		F2946CAD1A267BD400635A18 /* vrpn_IDEA.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_IDEA.h; path = vrpn/vrpn_IDEA.h; sourceTree = "<group>"; };
+		F2946CAE1A267BD400635A18 /* vrpn_Imager_Stream_Buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Imager_Stream_Buffer.h; path = vrpn/vrpn_Imager_Stream_Buffer.h; sourceTree = "<group>"; };
+		F2946CAF1A267BD400635A18 /* vrpn_Imager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Imager.h; path = vrpn/vrpn_Imager.h; sourceTree = "<group>"; };
+		F2946CB01A267BD400635A18 /* vrpn_ImmersionBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_ImmersionBox.h; path = vrpn/vrpn_ImmersionBox.h; sourceTree = "<group>"; };
+		F2946CB11A267BD400635A18 /* vrpn_inertiamouse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_inertiamouse.h; path = vrpn/vrpn_inertiamouse.h; sourceTree = "<group>"; };
+		F2946CB21A267BD400635A18 /* vrpn_JoyFly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_JoyFly.h; path = vrpn/vrpn_JoyFly.h; sourceTree = "<group>"; };
+		F2946CB31A267BD400635A18 /* vrpn_Joylin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Joylin.h; path = vrpn/vrpn_Joylin.h; sourceTree = "<group>"; };
+		F2946CB41A267BD400635A18 /* vrpn_Joywin32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Joywin32.h; path = vrpn/vrpn_Joywin32.h; sourceTree = "<group>"; };
+		F2946CB51A267BD400635A18 /* vrpn_Keyboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Keyboard.h; path = vrpn/vrpn_Keyboard.h; sourceTree = "<group>"; };
+		F2946CB61A267BD400635A18 /* vrpn_LamportClock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_LamportClock.h; path = vrpn/vrpn_LamportClock.h; sourceTree = "<group>"; };
+		F2946CB71A267BD400635A18 /* vrpn_Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Log.h; path = vrpn/vrpn_Log.h; sourceTree = "<group>"; };
+		F2946CB81A267BD400635A18 /* vrpn_Logitech_Controller_Raw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Logitech_Controller_Raw.h; path = vrpn/vrpn_Logitech_Controller_Raw.h; sourceTree = "<group>"; };
+		F2946CB91A267BD400635A18 /* vrpn_LUDL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_LUDL.h; path = vrpn/vrpn_LUDL.h; sourceTree = "<group>"; };
+		F2946CBA1A267BD400635A18 /* vrpn_Magellan.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Magellan.h; path = vrpn/vrpn_Magellan.h; sourceTree = "<group>"; };
+		F2946CBB1A267BD400635A18 /* vrpn_MainloopContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_MainloopContainer.h; path = vrpn/vrpn_MainloopContainer.h; sourceTree = "<group>"; };
+		F2946CBC1A267BD400635A18 /* vrpn_MainloopObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_MainloopObject.h; path = vrpn/vrpn_MainloopObject.h; sourceTree = "<group>"; };
+		F2946CBD1A267BD400635A18 /* vrpn_MessageMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_MessageMacros.h; path = vrpn/vrpn_MessageMacros.h; sourceTree = "<group>"; };
+		F2946CBE1A267BD400635A18 /* vrpn_Microsoft_Controller_Raw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Microsoft_Controller_Raw.h; path = vrpn/vrpn_Microsoft_Controller_Raw.h; sourceTree = "<group>"; };
+		F2946CBF1A267BD400635A18 /* vrpn_Mouse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Mouse.h; path = vrpn/vrpn_Mouse.h; sourceTree = "<group>"; };
+		F2946CC01A267BD400635A18 /* vrpn_Mutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Mutex.h; path = vrpn/vrpn_Mutex.h; sourceTree = "<group>"; };
+		F2946CC11A267BD400635A18 /* vrpn_NationalInstruments.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_NationalInstruments.h; path = vrpn/vrpn_NationalInstruments.h; sourceTree = "<group>"; };
+		F2946CC21A267BD400635A18 /* vrpn_Nidaq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Nidaq.h; path = vrpn/vrpn_Nidaq.h; sourceTree = "<group>"; };
+		F2946CC31A267BD400635A18 /* vrpn_nikon_controls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_nikon_controls.h; path = vrpn/vrpn_nikon_controls.h; sourceTree = "<group>"; };
+		F2946CC41A267BD400635A18 /* vrpn_OmegaTemperature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_OmegaTemperature.h; path = vrpn/vrpn_OmegaTemperature.h; sourceTree = "<group>"; };
+		F2946CC51A267BD400635A18 /* vrpn_OneEuroFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_OneEuroFilter.h; path = vrpn/vrpn_OneEuroFilter.h; sourceTree = "<group>"; };
+		F2946CC61A267BD400635A18 /* vrpn_Poser_Analog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Poser_Analog.h; path = vrpn/vrpn_Poser_Analog.h; sourceTree = "<group>"; };
+		F2946CC71A267BD400635A18 /* vrpn_Poser_Tek4662.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Poser_Tek4662.h; path = vrpn/vrpn_Poser_Tek4662.h; sourceTree = "<group>"; };
+		F2946CC81A267BD400635A18 /* vrpn_Poser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Poser.h; path = vrpn/vrpn_Poser.h; sourceTree = "<group>"; };
+		F2946CC91A267BD400635A18 /* vrpn_raw_sgibox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_raw_sgibox.h; path = vrpn/vrpn_raw_sgibox.h; sourceTree = "<group>"; };
+		F2946CCA1A267BD400635A18 /* vrpn_RedundantTransmission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_RedundantTransmission.h; path = vrpn/vrpn_RedundantTransmission.h; sourceTree = "<group>"; };
+		F2946CCB1A267BD400635A18 /* vrpn_Retrolink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Retrolink.h; path = vrpn/vrpn_Retrolink.h; sourceTree = "<group>"; };
+		F2946CCC1A267BD400635A18 /* vrpn_Saitek_Controller_Raw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Saitek_Controller_Raw.h; path = vrpn/vrpn_Saitek_Controller_Raw.h; sourceTree = "<group>"; };
+		F2946CCD1A267BD400635A18 /* vrpn_SendTextMessageStreamProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_SendTextMessageStreamProxy.h; path = vrpn/vrpn_SendTextMessageStreamProxy.h; sourceTree = "<group>"; };
+		F2946CCE1A267BD400635A18 /* vrpn_Serial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Serial.h; path = vrpn/vrpn_Serial.h; sourceTree = "<group>"; };
+		F2946CCF1A267BD400635A18 /* vrpn_SerialPort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_SerialPort.h; path = vrpn/vrpn_SerialPort.h; sourceTree = "<group>"; };
+		F2946CD01A267BD400635A18 /* vrpn_sgibox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_sgibox.h; path = vrpn/vrpn_sgibox.h; sourceTree = "<group>"; };
+		F2946CD11A267BD400635A18 /* vrpn_Shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Shared.h; path = vrpn/vrpn_Shared.h; sourceTree = "<group>"; };
+		F2946CD21A267BD400635A18 /* vrpn_SharedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_SharedObject.h; path = vrpn/vrpn_SharedObject.h; sourceTree = "<group>"; };
+		F2946CD31A267BD400635A18 /* vrpn_Sound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Sound.h; path = vrpn/vrpn_Sound.h; sourceTree = "<group>"; };
+		F2946CD41A267BD400635A18 /* vrpn_Spaceball.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Spaceball.h; path = vrpn/vrpn_Spaceball.h; sourceTree = "<group>"; };
+		F2946CD51A267BD400635A18 /* vrpn_Text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Text.h; path = vrpn/vrpn_Text.h; sourceTree = "<group>"; };
+		F2946CD61A267BD400635A18 /* vrpn_Tng3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tng3.h; path = vrpn/vrpn_Tng3.h; sourceTree = "<group>"; };
+		F2946CD71A267BD400635A18 /* vrpn_Tracker_3DMouse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_3DMouse.h; path = vrpn/vrpn_Tracker_3DMouse.h; sourceTree = "<group>"; };
+		F2946CD81A267BD400635A18 /* vrpn_Tracker_AnalogFly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_AnalogFly.h; path = vrpn/vrpn_Tracker_AnalogFly.h; sourceTree = "<group>"; };
+		F2946CD91A267BD400635A18 /* vrpn_Tracker_ButtonFly.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_ButtonFly.h; path = vrpn/vrpn_Tracker_ButtonFly.h; sourceTree = "<group>"; };
+		F2946CDA1A267BD400635A18 /* vrpn_Tracker_Crossbow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_Crossbow.h; path = vrpn/vrpn_Tracker_Crossbow.h; sourceTree = "<group>"; };
+		F2946CDB1A267BD400635A18 /* vrpn_Tracker_DTrack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_DTrack.h; path = vrpn/vrpn_Tracker_DTrack.h; sourceTree = "<group>"; };
+		F2946CDC1A267BD400635A18 /* vrpn_Tracker_Fastrak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_Fastrak.h; path = vrpn/vrpn_Tracker_Fastrak.h; sourceTree = "<group>"; };
+		F2946CDD1A267BD400635A18 /* vrpn_Tracker_Filter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_Filter.h; path = vrpn/vrpn_Tracker_Filter.h; sourceTree = "<group>"; };
+		F2946CDE1A267BD400635A18 /* vrpn_Tracker_GameTrak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_GameTrak.h; path = vrpn/vrpn_Tracker_GameTrak.h; sourceTree = "<group>"; };
+		F2946CDF1A267BD400635A18 /* vrpn_Tracker_GPS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_GPS.h; path = vrpn/vrpn_Tracker_GPS.h; sourceTree = "<group>"; };
+		F2946CE01A267BD400635A18 /* vrpn_Tracker_isense.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_isense.h; path = vrpn/vrpn_Tracker_isense.h; sourceTree = "<group>"; };
+		F2946CE11A267BD400635A18 /* vrpn_Tracker_Isotrak.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_Isotrak.h; path = vrpn/vrpn_Tracker_Isotrak.h; sourceTree = "<group>"; };
+		F2946CE21A267BD400635A18 /* vrpn_Tracker_JsonNet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_JsonNet.h; path = vrpn/vrpn_Tracker_JsonNet.h; sourceTree = "<group>"; };
+		F2946CE31A267BD400635A18 /* vrpn_Tracker_Liberty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_Liberty.h; path = vrpn/vrpn_Tracker_Liberty.h; sourceTree = "<group>"; };
+		F2946CE41A267BD400635A18 /* vrpn_Tracker_LibertyHS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_LibertyHS.h; path = vrpn/vrpn_Tracker_LibertyHS.h; sourceTree = "<group>"; };
+		F2946CE51A267BD400635A18 /* vrpn_Tracker_MotionNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_MotionNode.h; path = vrpn/vrpn_Tracker_MotionNode.h; sourceTree = "<group>"; };
+		F2946CE61A267BD400635A18 /* vrpn_Tracker_NDI_Polaris.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_NDI_Polaris.h; path = vrpn/vrpn_Tracker_NDI_Polaris.h; sourceTree = "<group>"; };
+		F2946CE71A267BD400635A18 /* vrpn_Tracker_NovintFalcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_NovintFalcon.h; path = vrpn/vrpn_Tracker_NovintFalcon.h; sourceTree = "<group>"; };
+		F2946CE81A267BD400635A18 /* vrpn_Tracker_PDI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_PDI.h; path = vrpn/vrpn_Tracker_PDI.h; sourceTree = "<group>"; };
+		F2946CE91A267BD400635A18 /* vrpn_Tracker_PhaseSpace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_PhaseSpace.h; path = vrpn/vrpn_Tracker_PhaseSpace.h; sourceTree = "<group>"; };
+		F2946CEA1A267BD400635A18 /* vrpn_Tracker_RazerHydra.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_RazerHydra.h; path = vrpn/vrpn_Tracker_RazerHydra.h; sourceTree = "<group>"; };
+		F2946CEB1A267BD400635A18 /* vrpn_Tracker_SpacePoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_SpacePoint.h; path = vrpn/vrpn_Tracker_SpacePoint.h; sourceTree = "<group>"; };
+		F2946CEC1A267BD400635A18 /* vrpn_Tracker_TrivisioColibri.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_TrivisioColibri.h; path = vrpn/vrpn_Tracker_TrivisioColibri.h; sourceTree = "<group>"; };
+		F2946CED1A267BD400635A18 /* vrpn_Tracker_ViewPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_ViewPoint.h; path = vrpn/vrpn_Tracker_ViewPoint.h; sourceTree = "<group>"; };
+		F2946CEE1A267BD400635A18 /* vrpn_Tracker_WiimoteHead.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_WiimoteHead.h; path = vrpn/vrpn_Tracker_WiimoteHead.h; sourceTree = "<group>"; };
+		F2946CEF1A267BD400635A18 /* vrpn_Tracker_Wintracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_Wintracker.h; path = vrpn/vrpn_Tracker_Wintracker.h; sourceTree = "<group>"; };
+		F2946CF01A267BD400635A18 /* vrpn_Tracker_zSight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker_zSight.h; path = vrpn/vrpn_Tracker_zSight.h; sourceTree = "<group>"; };
+		F2946CF11A267BD400635A18 /* vrpn_Tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Tracker.h; path = vrpn/vrpn_Tracker.h; sourceTree = "<group>"; };
+		F2946CF21A267BD400635A18 /* vrpn_Types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Types.h; path = vrpn/vrpn_Types.h; sourceTree = "<group>"; };
+		F2946CF31A267BD400635A18 /* vrpn_UNC_Joystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_UNC_Joystick.h; path = vrpn/vrpn_UNC_Joystick.h; sourceTree = "<group>"; };
+		F2946CF41A267BD400635A18 /* vrpn_VPJoystick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_VPJoystick.h; path = vrpn/vrpn_VPJoystick.h; sourceTree = "<group>"; };
+		F2946CF51A267BD400635A18 /* vrpn_Wanda.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Wanda.h; path = vrpn/vrpn_Wanda.h; sourceTree = "<group>"; };
+		F2946CF61A267BD400635A18 /* vrpn_WiiMote.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_WiiMote.h; path = vrpn/vrpn_WiiMote.h; sourceTree = "<group>"; };
+		F2946CF71A267BD400635A18 /* vrpn_XInputGamepad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_XInputGamepad.h; path = vrpn/vrpn_XInputGamepad.h; sourceTree = "<group>"; };
+		F2946CF81A267BD400635A18 /* vrpn_Xkeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Xkeys.h; path = vrpn/vrpn_Xkeys.h; sourceTree = "<group>"; };
+		F2946CF91A267BD400635A18 /* vrpn_YEI_3Space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_YEI_3Space.h; path = vrpn/vrpn_YEI_3Space.h; sourceTree = "<group>"; };
+		F2946CFA1A267BD400635A18 /* vrpn_Zaber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Zaber.h; path = vrpn/vrpn_Zaber.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F28D99D91A1556F100070B2D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F26BEDF61A23C9E5003075C7 /* AVFoundation.framework in Frameworks */,
+				F2929A341A1D713F006390EC /* libicucore.dylib in Frameworks */,
+				F2929A321A1D7128006390EC /* CFNetwork.framework in Frameworks */,
+				F2929A301A1D7121006390EC /* Security.framework in Frameworks */,
+				F2929A2E1A1D7119006390EC /* Foundation.framework in Frameworks */,
+				F2946C791A26798F00635A18 /* libvrpn.a in Frameworks */,
+				F223C26C1A1BD37900D3245A /* CoreGraphics.framework in Frameworks */,
+				F223C26B1A1BD36E00D3245A /* QuartzCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F223C26A1A1BD35200D3245A /* framework */ = {
+			isa = PBXGroup;
+			children = (
+				F2946C781A26798F00635A18 /* libvrpn.a */,
+				F26BEDF51A23C9E5003075C7 /* AVFoundation.framework */,
+				F2929A331A1D713F006390EC /* libicucore.dylib */,
+				F2929A311A1D7128006390EC /* CFNetwork.framework */,
+				F2929A2F1A1D7121006390EC /* Security.framework */,
+				F2929A2D1A1D7119006390EC /* Foundation.framework */,
+				F28D9A1A1A15856500070B2D /* QuartzCore.framework */,
+				F223C2681A1BD34200D3245A /* CoreGraphics.framework */,
+			);
+			name = framework;
+			sourceTree = "<group>";
+		};
+		F223C2751A1BF03600D3245A /* MDRadialProgress */ = {
+			isa = PBXGroup;
+			children = (
+				F223C2761A1BF03600D3245A /* MDRadialProgressLabel.h */,
+				F223C2771A1BF03600D3245A /* MDRadialProgressLabel.m */,
+				F223C2781A1BF03600D3245A /* MDRadialProgressTheme.h */,
+				F223C2791A1BF03600D3245A /* MDRadialProgressTheme.m */,
+				F223C27A1A1BF03600D3245A /* MDRadialProgressView.h */,
+				F223C27B1A1BF03600D3245A /* MDRadialProgressView.m */,
+			);
+			path = MDRadialProgress;
+			sourceTree = "<group>";
+		};
+		F26BEDED1A23BBEB003075C7 /* SoundManager */ = {
+			isa = PBXGroup;
+			children = (
+				F26BEDEE1A23BC01003075C7 /* SoundManager.h */,
+				F26BEDEF1A23BC01003075C7 /* SoundManager.m */,
+			);
+			name = SoundManager;
+			sourceTree = "<group>";
+		};
+		F28D99D31A1556F100070B2D = {
+			isa = PBXGroup;
+			children = (
+				F28D99DE1A1556F100070B2D /* Curvature */,
+				F223C26A1A1BD35200D3245A /* framework */,
+				F28D99FE1A1556F300070B2D /* CurvatureTests */,
+				F28D99DD1A1556F100070B2D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F28D99DD1A1556F100070B2D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F28D99DC1A1556F100070B2D /* Curvature.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F28D99DE1A1556F100070B2D /* Curvature */ = {
+			isa = PBXGroup;
+			children = (
+				F26BEDED1A23BBEB003075C7 /* SoundManager */,
+				F28D9A311A15B38100070B2D /* Model */,
+				F28D9A0E1A15676800070B2D /* Utils */,
+				F28D99E31A1556F200070B2D /* AppDelegate.h */,
+				F28D99E41A1556F200070B2D /* AppDelegate.m */,
+				F28D9A0B1A15667000070B2D /* UserViewController.h */,
+				F28D9A0C1A15667000070B2D /* UserViewController.m */,
+				F28D99E91A1556F300070B2D /* MasterViewController.h */,
+				F28D99EA1A1556F300070B2D /* MasterViewController.m */,
+				F28D99EC1A1556F300070B2D /* DetailViewController.h */,
+				F28D99ED1A1556F300070B2D /* DetailViewController.m */,
+				F28D99EF1A1556F300070B2D /* Main.storyboard */,
+				F28D99F21A1556F300070B2D /* Images.xcassets */,
+				F28D99DF1A1556F100070B2D /* Supporting Files */,
+				F26BEDE81A23AAE1003075C7 /* Telephone.h */,
+				F26BEDE91A23AAE1003075C7 /* Telephone.mm */,
+			);
+			path = Curvature;
+			sourceTree = "<group>";
+		};
+		F28D99DF1A1556F100070B2D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F2946BBC1A23EBFD00635A18 /* drum.caf */,
+				F2946BBD1A23EBFD00635A18 /* duck.caf */,
+				F2946BC61A23ED8A00635A18 /* ding.caf */,
+				F2946BC01A23EBFD00635A18 /* tong.caf */,
+				F26BEE021A23CFE0003075C7 /* track3.caf */,
+				F26BEDF71A23CD2C003075C7 /* sound1.caf */,
+				F26BEDF81A23CD2C003075C7 /* sound2.caf */,
+				F26BEDF91A23CD2C003075C7 /* track1.caf */,
+				F26BEDFA1A23CD2C003075C7 /* track2.caf */,
+				F2929A2B1A1D6AA6006390EC /* Settings.bundle */,
+				F28D99E01A1556F100070B2D /* Info.plist */,
+				F28D99E11A1556F100070B2D /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F28D99FE1A1556F300070B2D /* CurvatureTests */ = {
+			isa = PBXGroup;
+			children = (
+				F28D9A011A1556F300070B2D /* CurvatureTests.m */,
+				F28D99FF1A1556F300070B2D /* Supporting Files */,
+			);
+			path = CurvatureTests;
+			sourceTree = "<group>";
+		};
+		F28D99FF1A1556F300070B2D /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F28D9A001A1556F300070B2D /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F28D9A0E1A15676800070B2D /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				F2946CFB1A2684F400635A18 /* vprn client */,
+				F2946C7A1A267BC200635A18 /* vrpn header */,
+				F2929A351A1D72AE006390EC /* SocketRocket */,
+				F223C2751A1BF03600D3245A /* MDRadialProgress */,
+				F223C2651A1BD1B100D3245A /* HorizontalTableView.h */,
+				F223C2661A1BD1B100D3245A /* HorizontalTableView.m */,
+				F28D9A251A15A20200070B2D /* Matrix.h */,
+				F28D9A261A15A20200070B2D /* Matrix.m */,
+				F28D9A121A1567A100070B2D /* UICustom.h */,
+				F28D9A131A1567A100070B2D /* UICustom.m */,
+				F28D9A151A1584EA00070B2D /* Curvature-Bridging-Header.h */,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
+		F28D9A311A15B38100070B2D /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				F28D99E61A1556F300070B2D /* Curvature.xcdatamodeld */,
+				F23F73C91A22290300C814BE /* Trial.h */,
+				F23F73CA1A22290300C814BE /* Trial.m */,
+				F23F73C61A22290200C814BE /* User.h */,
+				F23F73C71A22290200C814BE /* User.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		F2929A351A1D72AE006390EC /* SocketRocket */ = {
+			isa = PBXGroup;
+			children = (
+				F2929A361A1D72AE006390EC /* SocketRocket-Prefix.pch */,
+				F2929A371A1D72AE006390EC /* SRWebSocket.h */,
+				F2929A381A1D72AE006390EC /* SRWebSocket.m */,
+			);
+			path = SocketRocket;
+			sourceTree = "<group>";
+		};
+		F2946C7A1A267BC200635A18 /* vrpn header */ = {
+			isa = PBXGroup;
+			children = (
+				F2946C7B1A267BD400635A18 /* jni_layer.h */,
+				F2946C7C1A267BD400635A18 /* vrpn_3DConnexion.h */,
+				F2946C7D1A267BD400635A18 /* vrpn_3DMicroscribe.h */,
+				F2946C7E1A267BD400635A18 /* vrpn_3Space.h */,
+				F2946C7F1A267BD400635A18 /* vrpn_5DT16.h */,
+				F2946C801A267BD400635A18 /* vrpn_ADBox.h */,
+				F2946C811A267BD400635A18 /* vrpn_Analog_5dt.h */,
+				F2946C821A267BD400635A18 /* vrpn_Analog_5dtUSB.h */,
+				F2946C831A267BD400635A18 /* vrpn_Analog_Output.h */,
+				F2946C841A267BD400635A18 /* vrpn_Analog_Radamec_SPI.h */,
+				F2946C851A267BD400635A18 /* vrpn_Analog_USDigital_A2.h */,
+				F2946C861A267BD400635A18 /* vrpn_Analog.h */,
+				F2946C871A267BD400635A18 /* vrpn_Android.h */,
+				F2946C881A267BD400635A18 /* vrpn_Atmel.h */,
+				F2946C891A267BD400635A18 /* vrpn_Auxiliary_Logger.h */,
+				F2946C8A1A267BD400635A18 /* vrpn_BaseClass.h */,
+				F2946C8B1A267BD400635A18 /* vrpn_BiosciencesTools.h */,
+				F2946C8C1A267BD400635A18 /* vrpn_Button_NI_DIO24.h */,
+				F2946C8D1A267BD400635A18 /* vrpn_Button_USB.h */,
+				F2946C8E1A267BD400635A18 /* vrpn_Button.h */,
+				F2946C8F1A267BD400635A18 /* vrpn_CerealBox.h */,
+				F2946C901A267BD400635A18 /* vrpn_CHProducts_Controller_Raw.h */,
+				F2946C911A267BD400635A18 /* vrpn_Configure.h */,
+				F2946C921A267BD400635A18 /* vrpn_Connection.h */,
+				F2946C931A267BD400635A18 /* vrpn_ConnectionPtr.h */,
+				F2946C941A267BD400635A18 /* vrpn_Contour.h */,
+				F2946C951A267BD400635A18 /* vrpn_DevInput.h */,
+				F2946C961A267BD400635A18 /* vrpn_Dial.h */,
+				F2946C971A267BD400635A18 /* vrpn_DirectXFFJoystick.h */,
+				F2946C981A267BD400635A18 /* vrpn_DirectXRumblePad.h */,
+				F2946C991A267BD400635A18 /* vrpn_DreamCheeky.h */,
+				F2946C9A1A267BD400635A18 /* vrpn_Dyna.h */,
+				F2946C9B1A267BD400635A18 /* vrpn_Event_Analog.h */,
+				F2946C9C1A267BD400635A18 /* vrpn_Event_Mouse.h */,
+				F2946C9D1A267BD400635A18 /* vrpn_Event.h */,
+				F2946C9E1A267BD400635A18 /* vrpn_FileConnection.h */,
+				F2946C9F1A267BD400635A18 /* vrpn_FileController.h */,
+				F2946CA01A267BD400635A18 /* vrpn_Flock_Parallel.h */,
+				F2946CA11A267BD400635A18 /* vrpn_Flock.h */,
+				F2946CA21A267BD400635A18 /* vrpn_ForceDevice.h */,
+				F2946CA31A267BD400635A18 /* vrpn_ForceDeviceServer.h */,
+				F2946CA41A267BD400635A18 /* vrpn_Forwarder.h */,
+				F2946CA51A267BD400635A18 /* vrpn_ForwarderController.h */,
+				F2946CA61A267BD400635A18 /* vrpn_Freespace.h */,
+				F2946CA71A267BD400635A18 /* vrpn_FunctionGenerator.h */,
+				F2946CA81A267BD400635A18 /* vrpn_Futaba.h */,
+				F2946CA91A267BD400635A18 /* vrpn_GlobalHapticsOrb.h */,
+				F2946CAA1A267BD400635A18 /* vrpn_Griffin.h */,
+				F2946CAB1A267BD400635A18 /* vrpn_HashST.h */,
+				F2946CAC1A267BD400635A18 /* vrpn_HumanInterface.h */,
+				F2946CAD1A267BD400635A18 /* vrpn_IDEA.h */,
+				F2946CAE1A267BD400635A18 /* vrpn_Imager_Stream_Buffer.h */,
+				F2946CAF1A267BD400635A18 /* vrpn_Imager.h */,
+				F2946CB01A267BD400635A18 /* vrpn_ImmersionBox.h */,
+				F2946CB11A267BD400635A18 /* vrpn_inertiamouse.h */,
+				F2946CB21A267BD400635A18 /* vrpn_JoyFly.h */,
+				F2946CB31A267BD400635A18 /* vrpn_Joylin.h */,
+				F2946CB41A267BD400635A18 /* vrpn_Joywin32.h */,
+				F2946CB51A267BD400635A18 /* vrpn_Keyboard.h */,
+				F2946CB61A267BD400635A18 /* vrpn_LamportClock.h */,
+				F2946CB71A267BD400635A18 /* vrpn_Log.h */,
+				F2946CB81A267BD400635A18 /* vrpn_Logitech_Controller_Raw.h */,
+				F2946CB91A267BD400635A18 /* vrpn_LUDL.h */,
+				F2946CBA1A267BD400635A18 /* vrpn_Magellan.h */,
+				F2946CBB1A267BD400635A18 /* vrpn_MainloopContainer.h */,
+				F2946CBC1A267BD400635A18 /* vrpn_MainloopObject.h */,
+				F2946CBD1A267BD400635A18 /* vrpn_MessageMacros.h */,
+				F2946CBE1A267BD400635A18 /* vrpn_Microsoft_Controller_Raw.h */,
+				F2946CBF1A267BD400635A18 /* vrpn_Mouse.h */,
+				F2946CC01A267BD400635A18 /* vrpn_Mutex.h */,
+				F2946CC11A267BD400635A18 /* vrpn_NationalInstruments.h */,
+				F2946CC21A267BD400635A18 /* vrpn_Nidaq.h */,
+				F2946CC31A267BD400635A18 /* vrpn_nikon_controls.h */,
+				F2946CC41A267BD400635A18 /* vrpn_OmegaTemperature.h */,
+				F2946CC51A267BD400635A18 /* vrpn_OneEuroFilter.h */,
+				F2946CC61A267BD400635A18 /* vrpn_Poser_Analog.h */,
+				F2946CC71A267BD400635A18 /* vrpn_Poser_Tek4662.h */,
+				F2946CC81A267BD400635A18 /* vrpn_Poser.h */,
+				F2946CC91A267BD400635A18 /* vrpn_raw_sgibox.h */,
+				F2946CCA1A267BD400635A18 /* vrpn_RedundantTransmission.h */,
+				F2946CCB1A267BD400635A18 /* vrpn_Retrolink.h */,
+				F2946CCC1A267BD400635A18 /* vrpn_Saitek_Controller_Raw.h */,
+				F2946CCD1A267BD400635A18 /* vrpn_SendTextMessageStreamProxy.h */,
+				F2946CCE1A267BD400635A18 /* vrpn_Serial.h */,
+				F2946CCF1A267BD400635A18 /* vrpn_SerialPort.h */,
+				F2946CD01A267BD400635A18 /* vrpn_sgibox.h */,
+				F2946CD11A267BD400635A18 /* vrpn_Shared.h */,
+				F2946CD21A267BD400635A18 /* vrpn_SharedObject.h */,
+				F2946CD31A267BD400635A18 /* vrpn_Sound.h */,
+				F2946CD41A267BD400635A18 /* vrpn_Spaceball.h */,
+				F2946CD51A267BD400635A18 /* vrpn_Text.h */,
+				F2946CD61A267BD400635A18 /* vrpn_Tng3.h */,
+				F2946CD71A267BD400635A18 /* vrpn_Tracker_3DMouse.h */,
+				F2946CD81A267BD400635A18 /* vrpn_Tracker_AnalogFly.h */,
+				F2946CD91A267BD400635A18 /* vrpn_Tracker_ButtonFly.h */,
+				F2946CDA1A267BD400635A18 /* vrpn_Tracker_Crossbow.h */,
+				F2946CDB1A267BD400635A18 /* vrpn_Tracker_DTrack.h */,
+				F2946CDC1A267BD400635A18 /* vrpn_Tracker_Fastrak.h */,
+				F2946CDD1A267BD400635A18 /* vrpn_Tracker_Filter.h */,
+				F2946CDE1A267BD400635A18 /* vrpn_Tracker_GameTrak.h */,
+				F2946CDF1A267BD400635A18 /* vrpn_Tracker_GPS.h */,
+				F2946CE01A267BD400635A18 /* vrpn_Tracker_isense.h */,
+				F2946CE11A267BD400635A18 /* vrpn_Tracker_Isotrak.h */,
+				F2946CE21A267BD400635A18 /* vrpn_Tracker_JsonNet.h */,
+				F2946CE31A267BD400635A18 /* vrpn_Tracker_Liberty.h */,
+				F2946CE41A267BD400635A18 /* vrpn_Tracker_LibertyHS.h */,
+				F2946CE51A267BD400635A18 /* vrpn_Tracker_MotionNode.h */,
+				F2946CE61A267BD400635A18 /* vrpn_Tracker_NDI_Polaris.h */,
+				F2946CE71A267BD400635A18 /* vrpn_Tracker_NovintFalcon.h */,
+				F2946CE81A267BD400635A18 /* vrpn_Tracker_PDI.h */,
+				F2946CE91A267BD400635A18 /* vrpn_Tracker_PhaseSpace.h */,
+				F2946CEA1A267BD400635A18 /* vrpn_Tracker_RazerHydra.h */,
+				F2946CEB1A267BD400635A18 /* vrpn_Tracker_SpacePoint.h */,
+				F2946CEC1A267BD400635A18 /* vrpn_Tracker_TrivisioColibri.h */,
+				F2946CED1A267BD400635A18 /* vrpn_Tracker_ViewPoint.h */,
+				F2946CEE1A267BD400635A18 /* vrpn_Tracker_WiimoteHead.h */,
+				F2946CEF1A267BD400635A18 /* vrpn_Tracker_Wintracker.h */,
+				F2946CF01A267BD400635A18 /* vrpn_Tracker_zSight.h */,
+				F2946CF11A267BD400635A18 /* vrpn_Tracker.h */,
+				F2946CF21A267BD400635A18 /* vrpn_Types.h */,
+				F2946CF31A267BD400635A18 /* vrpn_UNC_Joystick.h */,
+				F2946CF41A267BD400635A18 /* vrpn_VPJoystick.h */,
+				F2946CF51A267BD400635A18 /* vrpn_Wanda.h */,
+				F2946CF61A267BD400635A18 /* vrpn_WiiMote.h */,
+				F2946CF71A267BD400635A18 /* vrpn_XInputGamepad.h */,
+				F2946CF81A267BD400635A18 /* vrpn_Xkeys.h */,
+				F2946CF91A267BD400635A18 /* vrpn_YEI_3Space.h */,
+				F2946CFA1A267BD400635A18 /* vrpn_Zaber.h */,
+			);
+			name = "vrpn header";
+			sourceTree = "<group>";
+		};
+		F2946CFB1A2684F400635A18 /* vprn client */ = {
+			isa = PBXGroup;
+			children = (
+				F2946C751A26710900635A18 /* VRPN.h */,
+				F2946C761A26710900635A18 /* VRPN.mm */,
+			);
+			name = "vprn client";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F28D99DB1A1556F100070B2D /* Curvature */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F28D9A051A1556F300070B2D /* Build configuration list for PBXNativeTarget "Curvature" */;
+			buildPhases = (
+				F28D99D81A1556F100070B2D /* Sources */,
+				F28D99D91A1556F100070B2D /* Frameworks */,
+				F28D99DA1A1556F100070B2D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Curvature;
+			productName = Curvature;
+			productReference = F28D99DC1A1556F100070B2D /* Curvature.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F28D99D41A1556F100070B2D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = MyOxygen;
+				TargetAttributes = {
+					F28D99DB1A1556F100070B2D = {
+						CreatedOnToolsVersion = 6.1;
+						DevelopmentTeam = 8QEG3MSMSE;
+					};
+				};
+			};
+			buildConfigurationList = F28D99D71A1556F100070B2D /* Build configuration list for PBXProject "Curvature" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F28D99D31A1556F100070B2D;
+			productRefGroup = F28D99DD1A1556F100070B2D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F28D99DB1A1556F100070B2D /* Curvature */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F28D99DA1A1556F100070B2D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F2946BC51A23EBFD00635A18 /* tong.caf in Resources */,
+				F2946BC11A23EBFD00635A18 /* drum.caf in Resources */,
+				F26BEDFE1A23CD93003075C7 /* track2.caf in Resources */,
+				F26BEDFD1A23CD90003075C7 /* track1.caf in Resources */,
+				F2946BC21A23EBFD00635A18 /* duck.caf in Resources */,
+				F26BEE031A23CFE0003075C7 /* track3.caf in Resources */,
+				F2946BC71A23ED8A00635A18 /* ding.caf in Resources */,
+				F26BEDFC1A23CD8D003075C7 /* sound2.caf in Resources */,
+				F26BEDFB1A23CD8B003075C7 /* sound1.caf in Resources */,
+				F28D99F11A1556F300070B2D /* Main.storyboard in Resources */,
+				F2929A2C1A1D6AA6006390EC /* Settings.bundle in Resources */,
+				F28D99F31A1556F300070B2D /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F28D99D81A1556F100070B2D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F223C2671A1BD1B100D3245A /* HorizontalTableView.m in Sources */,
+				F28D99EE1A1556F300070B2D /* DetailViewController.m in Sources */,
+				F28D99EB1A1556F300070B2D /* MasterViewController.m in Sources */,
+				F2946C771A26710900635A18 /* VRPN.mm in Sources */,
+				F28D99E81A1556F300070B2D /* Curvature.xcdatamodeld in Sources */,
+				F2929A391A1D72AE006390EC /* SRWebSocket.m in Sources */,
+				F28D9A0D1A15667000070B2D /* UserViewController.m in Sources */,
+				F28D9A291A15A20200070B2D /* Matrix.m in Sources */,
+				F28D99E51A1556F200070B2D /* AppDelegate.m in Sources */,
+				F26BEDF01A23BC01003075C7 /* SoundManager.m in Sources */,
+				F23F73C81A22290200C814BE /* User.m in Sources */,
+				F223C27D1A1BF03600D3245A /* MDRadialProgressTheme.m in Sources */,
+				F26BEDEA1A23AAE1003075C7 /* Telephone.mm in Sources */,
+				F28D9A141A1567A100070B2D /* UICustom.m in Sources */,
+				F28D99E21A1556F100070B2D /* main.m in Sources */,
+				F23F73CB1A22290300C814BE /* Trial.m in Sources */,
+				F223C27C1A1BF03600D3245A /* MDRadialProgressLabel.m in Sources */,
+				F223C27E1A1BF03600D3245A /* MDRadialProgressView.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F28D99EF1A1556F300070B2D /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F28D99F01A1556F300070B2D /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F28D9A031A1556F300070B2D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		F28D9A041A1556F300070B2D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F28D9A061A1556F300070B2D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon3;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage2;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Curvature/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Curvature/vrpn",
+					"$(PROJECT_DIR)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F28D9A071A1556F300070B2D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon3;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage2;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Curvature/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Curvature/vrpn",
+					"$(PROJECT_DIR)",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F28D99D71A1556F100070B2D /* Build configuration list for PBXProject "Curvature" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F28D9A031A1556F300070B2D /* Debug */,
+				F28D9A041A1556F300070B2D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F28D9A051A1556F300070B2D /* Build configuration list for PBXNativeTarget "Curvature" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F28D9A061A1556F300070B2D /* Debug */,
+				F28D9A071A1556F300070B2D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		F28D99E61A1556F300070B2D /* Curvature.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				F28D99E71A1556F300070B2D /* Curvature.xcdatamodel */,
+			);
+			currentVersion = F28D99E71A1556F300070B2D /* Curvature.xcdatamodel */;
+			path = Curvature.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = F28D99D41A1556F100070B2D /* Project object */;
+}
