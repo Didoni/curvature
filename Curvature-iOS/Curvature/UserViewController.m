@@ -12,9 +12,10 @@
 #import "MDRadialProgressTheme.h"
 #import "AppDelegate.h"
 #import "SoundManager.h"
+#import "VRPN.h"
 
 #define MAX_TRAILS 30
-
+#define MAX_TRIAL (trialType!=2?maxTrials:maxTrialsType3)
 @interface TCMessage : NSObject
 
 - (id)initWithMessage:(NSString *)message fromMe:(BOOL)fromMe;
@@ -31,9 +32,10 @@
     NSTimer *perSecTimer;
     
     NSUInteger maxTrials;
+    NSUInteger maxTrialsType3;
+    NSUInteger totalTrials;
     NSUInteger maxTimerVal;
     NSUInteger trialType;
-    AVAudioPlayer *player;
     User *currentUser;
     
     BOOL isCurrentModelA;
@@ -71,19 +73,16 @@
     [_container refreshData];
     [self.trialHistory registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
     maxTrials = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial"];
+    maxTrialsType3 = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial_type_3"];
     maxTimerVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_time"];
-    if (maxTrials == 0) {
-        [[NSUserDefaults standardUserDefaults] setInteger:24 forKey:@"max_trial"];
-        [[NSUserDefaults standardUserDefaults] setInteger:20 forKey:@"trial_time"];
-        maxTrials = 12;
-        maxTimerVal = 20;
-    }
+    totalTrials = maxTrialsType3+maxTrials*2;
     [self makeDial];
+    ((AppDelegate *)[UIApplication sharedApplication].delegate).vrpnUpdater = self.tableHeader;
     currentUser = ((User *)self.fetchedResultsController.fetchedObjects.lastObject);
     if (currentUser.trials.count) {
         [self changeTrialType:((Trial *)currentUser.trials.lastObject).trialType];
     }
-    if (currentUser.trials.count >= maxTrials * 3) {
+    if (currentUser.trials.count >= totalTrials) {
         [self changeUser];
     }
     isCurrentModelA = YES;
@@ -106,7 +105,7 @@
 - (void)changeTrialType:(int)ltrialType {
     if (ltrialType != trialType) {
         if (ltrialType) {
-            [[SoundManager sharedManager] playSound:@"ding"];
+            [[SoundManager sharedManager] playSound:@"ding.mp3"];
         }
         trialType = ltrialType;
         _trialType.image = [UIImage imageNamed:trialType ? (trialType == 1 ? @"servoWhite" : @"joint") : @"tap"];
@@ -162,7 +161,7 @@
     if (runTimer) {
         _timerView.progressCounter += 1;
         if (_timerView.progressCounter == _timerView.progressTotal) {
-            [[SoundManager sharedManager] playSound:@"tong"];
+            [[SoundManager sharedManager] playSound:@"tong.mp3"];
             [self doneCounting];
             [self stopTimer];
         }
@@ -211,6 +210,9 @@
 
 - (void)showTrialHistory {
     if (!rightSideOpen) {
+        if (rx == 0) {
+            _tableHeader.text = @"Ongoing Trials";
+        }
         [_trialHistory reloadData];
         [_trialHistory scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentUser.trials.count - 1 inSection:0]
                              atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
@@ -236,7 +238,7 @@
 }
 
 - (IBAction)startTimer:(UIButton *)btn {
-    [[SoundManager sharedManager] playSound:@"ding"];
+    [[SoundManager sharedManager] playSound:@"ding.mp3"];
     btn.hidden = YES;
     runTimer = YES;
     uint cur = (uint)_container.currentPageIndex;
@@ -418,7 +420,7 @@
             }
             else {
                 [self addTrial:!buttonIndex];
-                if (currentUser.trials.count >= (maxTrials * 3)) {
+                if (currentUser.trials.count >= totalTrials) {
                     NSUInteger userType = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_user"];
                     [self changeTrialType:0];
                     if (userType) {
@@ -431,8 +433,10 @@
                     }
                 }
                 else {
-                    [self changeTrialType:(int)(currentUser.trials.count / maxTrials)];
-                    [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", (currentUser.trials.count % maxTrials) + 1] forState:UIControlStateNormal];
+                    int type = (int)currentUser.trials.count - 1;
+                    type = type<2*maxTrials?(type<maxTrials?0:1):2;
+                    [self changeTrialType:type];
+                    [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", (currentUser.trials.count % MAX_TRIAL) + 1] forState:UIControlStateNormal];
                 }
             }
         }
@@ -491,7 +495,7 @@
     if ([_views indexOfObject:[_timerViewContainer superview]] == 8) {
         NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
         NSUInteger userTrialCount = currentUser.trials.count;
-        if (!currentUser || userTrialCount == 3 * maxTrials) {
+        if (!currentUser || userTrialCount == totalTrials) {
             newUser = YES;
             currentUser = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:context];
             currentUser.userId = currentUser.userId + 1;
@@ -502,7 +506,7 @@
         
         Trial *trial = [NSEntityDescription insertNewObjectForEntityForName:@"Trial" inManagedObjectContext:context];
         trial.timeStamp = [[NSDate date] timeIntervalSinceReferenceDate];
-        uint index = (uint)((userTrialCount) % (maxTrials * 3));
+        uint index = (uint)((userTrialCount) % totalTrials);
         trial.trial = index + 1;
         trial.trialType = trialType;
         trial.selectedLeft = selctedLeft;
@@ -627,9 +631,6 @@
     _right.layer.cornerRadius = CGRectGetWidth(_right.frame) / 2;
     _right.layer.borderColor = _right.textColor.CGColor;
     _right.layer.borderWidth = 0.5;
-    
-    int ltrialType = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"trial_type"];
-    [self changeTrialType:ltrialType];
 }
 
 #pragma mark - Segues
@@ -672,7 +673,7 @@
     if (cur != 4) {
         isCurrentModelA = YES;
         _timerView.theme.incompletedColor = [UICustom appColor:AppColorBlue];
-        [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", (cur == 8) ? (currentUser.trials.count % maxTrials) + 1 : 1] forState:UIControlStateNormal];
+        [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", (cur == 8) ? (currentUser.trials.count % MAX_TRIAL) + 1 : 1] forState:UIControlStateNormal];
         if (cur == 8) {
             shouldShowDemo = YES;
         }
@@ -774,7 +775,7 @@
 }
 #pragma mark - Trial history Tableview
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return tableView == _trialHistory ? maxTrials * 3 : 4 + files.count;
+    return tableView == _trialHistory ? totalTrials : 4 + files.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -792,7 +793,7 @@
         else {
             cell.textLabel.textColor = [UIColor darkTextColor];
             cell.backgroundColor = [UIColor whiteColor];
-            type = row / maxTrials;
+            type = row<2*maxTrials?(row<maxTrials?0:1):2;
             cell.imageView.image = [UIImage imageNamed:type ? (type == 1 ? @"servo" : @"joint") : @"hand"];
         }
         cell.textLabel.text = [NSString stringWithFormat:@"%d, %d", trialsPlates[row][0], trialsPlates[row][1]];
@@ -842,14 +843,17 @@
 - (void)appDidBecomeActive:(NSNotification *)notification {
     NSUInteger lmaxrials = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial"];
     NSUInteger lmaxTimerVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_time"];
+    NSUInteger lmaxTrialsType3 = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial_type_3"];
     BOOL reset = [[NSUserDefaults standardUserDefaults] boolForKey:@"reset"];
     if (reset) {
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"reset"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    if (lmaxrials > 0 && lmaxTimerVal > 0 && (lmaxrials != maxTimerVal || lmaxrials != maxTrials)) {
+    if (lmaxrials != maxTimerVal || lmaxrials != maxTrials || lmaxTrialsType3 != maxTrialsType3) {
+        maxTrialsType3 = lmaxTrialsType3;
         maxTrials = lmaxrials;
         maxTimerVal = lmaxTimerVal;
+        totalTrials = maxTrialsType3+maxTrials*2;
         _container.currentPageIndex = 0;
     }
     BOOL userType = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_user"];
@@ -863,26 +867,27 @@
     if (userType != 0 && _container.currentPageIndex != 8) {
         _container.currentPageIndex = 8;
     }
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) checkVRPN];
     if (trialsPlates[0][0] == 0) {
-        uint st = arc4random() % (maxTrials + 1);
+        uint st = arc4random() % (MAX_TRIAL + 1);
         NSMutableArray *array = [NSMutableArray new];
-        for (int i = 0; i < maxTrials + 1; i++) {
+        for (int i = 0; i < MAX_TRIAL + 1; i++) {
             if (i != st) {
                 [array addObject:@(i)];
             }
         }
         
-        for (int i = 0; i < maxTrials; i++) {
+        for (int i = 0; i < MAX_TRIAL; i++) {
             uint r = arc4random() % array.count;
             uint val = [[array objectAtIndex:r] intValue] + 1;
             uint val2 = st + 1;
             BOOL lr = arc4random() % 2;
             trialsPlates[i][lr] = val2;
             trialsPlates[i][1 - lr] = val;
-            trialsPlates[i + maxTrials][lr] = val2;
-            trialsPlates[i + maxTrials][1 - lr] = val;
-            trialsPlates[i + maxTrials * 2][lr] = val2;
-            trialsPlates[i + maxTrials * 2][1 - lr] = val;
+            trialsPlates[i + MAX_TRIAL][lr] = val2;
+            trialsPlates[i + MAX_TRIAL][1 - lr] = val;
+            trialsPlates[i + MAX_TRIAL * 2][lr] = val2;
+            trialsPlates[i + MAX_TRIAL * 2][1 - lr] = val;
             [array removeObject:[array objectAtIndex:r]];
         }
     }

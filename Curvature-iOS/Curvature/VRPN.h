@@ -11,7 +11,9 @@
 //
 
 #import <Foundation/Foundation.h>
-
+static float radius;
+static float rx;
+static float ry;
 
 @interface VRPN : NSObject
 {

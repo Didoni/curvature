@@ -25,7 +25,7 @@ static VRPN *vrpnClient = NULL;
     // Override point for customization after application launch.
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"ding.caf"];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"ding.mp3"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     if (![fileManager fileExistsAtPath:path]) {
@@ -35,22 +35,23 @@ static VRPN *vrpnClient = NULL;
         [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"track2" ofType:@"caf"] toPath:[documentsDirectory stringByAppendingPathComponent:@"track2.caf"] error:NULL];
         [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"track3" ofType:@"caf"] toPath:[documentsDirectory stringByAppendingPathComponent:@"track3.caf"] error:NULL];
         [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"drum" ofType:@"caf"] toPath:[documentsDirectory stringByAppendingPathComponent:@"drum.caf"] error:NULL];
-        [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"ding" ofType:@"caf"] toPath:[documentsDirectory stringByAppendingPathComponent:@"ding.caf"] error:NULL];
+        [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"ding" ofType:@"mp3"] toPath:[documentsDirectory stringByAppendingPathComponent:@"ding.mp3"] error:NULL];
         [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"duck" ofType:@"caf"] toPath:[documentsDirectory stringByAppendingPathComponent:@"duck.caf"] error:NULL];
-        [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"tong" ofType:@"caf"] toPath:[documentsDirectory stringByAppendingPathComponent:@"tong.caf"] error:NULL];
+        [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"tong" ofType:@"mp3"] toPath:[documentsDirectory stringByAppendingPathComponent:@"tong.mp3"] error:NULL];
     }
     
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     BOOL set = [[NSUserDefaults standardUserDefaults] boolForKey:version];
     if (!set) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:version];
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"reset"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"reset"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sound"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_user"];
         [[NSUserDefaults standardUserDefaults] setInteger:20 forKey:@"trial_time"];
         [[NSUserDefaults standardUserDefaults] setInteger:8 forKey:@"max_trial"];
+        [[NSUserDefaults standardUserDefaults] setInteger:4 forKey:@"max_trial_type_3"];
         [[NSUserDefaults standardUserDefaults] setInteger:100 forKey:@"vrpn_refresh"];
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"vrpn"];
+        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"vrpn"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
     UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
@@ -59,17 +60,22 @@ static VRPN *vrpnClient = NULL;
     //[navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"orangeStrip"]                                                   forBarMetrics:UIBarMetricsDefault];
     navigationController.navigationController.navigationBar.translucent = YES;
     [UIApplication sharedApplication].idleTimerDisabled = YES;
+    [self checkVRPN];
+    return YES;
+}
+
+- (void)checkVRPN {
     BOOL vrpn = [[NSUserDefaults standardUserDefaults] boolForKey:@"vrpn"];
     if (vrpn) {
-        vrpnClient = [[VRPN alloc] initWithHost:[[NSUserDefaults standardUserDefaults] stringForKey:@"remote_vrpn_host"]
-                                andRefreshRate :[[NSUserDefaults standardUserDefaults] integerForKey:@"vrpn_refresh"]];
+        if (!vrpnClient) {
+            vrpnClient = [[VRPN alloc] initWithHost:[[NSUserDefaults standardUserDefaults] stringForKey:@"remote_vrpn_host"]
+                                    andRefreshRate :[[NSUserDefaults standardUserDefaults] integerForKey:@"vrpn_refresh"]];
+        }
         [vrpnClient startListening];
     }
     else if (vrpnClient) {
         [vrpnClient stopListening];
-        vrpnClient = nil;
     }
-    return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

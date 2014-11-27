@@ -11,7 +11,7 @@
 //
 
 #import "VRPN.h"
-
+#import "AppDelegate.h"
 #import "vrpn_Tracker.h"
 
 // This function is called once for every incoming VRPN tracker update
@@ -21,6 +21,7 @@ void VRPN_CALLBACK handle_tracker(void *userData, const vrpn_TRACKERCB a);
     NSString *host;
     NSUInteger refreshRateInMillisec;
 }
+
 // Tracker listener reference
 vrpn_Tracker_Remote *vrpnTracker;
 
@@ -28,14 +29,31 @@ vrpn_Tracker_Remote *vrpnTracker;
 - (id)initWithHost:(NSString *)_host andRefreshRate:(NSUInteger)_refreshRateInMillisec {
     host = _host;
     refreshRateInMillisec = MAX(10, MIN(60000, _refreshRateInMillisec));
-    dispatchSource = nil;
+    dispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
+                                            dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
+    // Setup params for creation of a recurring timer
+    double interval = refreshRateInMillisec;
+    dispatch_time_t startTime = dispatch_time(DISPATCH_TIME_NOW, 0);
+    uint64_t intervalTime = (int64_t)(interval * NSEC_PER_MSEC);
+    dispatch_source_set_timer(dispatchSource, startTime, intervalTime, 0);
+    // Attach the block you want to run on the timer fire
+    dispatch_source_set_event_handler(dispatchSource, ^{
+        // Your code here
+        vrpnTracker->mainloop();
+        static float x = 0, y = 0;
+        if (x != rx | y != ry) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                ((AppDelegate *)[UIApplication sharedApplication].delegate).vrpnUpdater.text = [NSString stringWithFormat:@"(r,θ,φ) (%.2f, %.2f,%.2f)", radius, rx, ry];
+            });
+        }
+    });
     return self;
 }
 
 // Starts polling for events
 - (void)startListening {
     // Avoid problems when the programmer tries to listen twice at the same VRPN device
-    if (dispatchSource != nil) {
+    if (vrpnTracker != NULL) {
         NSLog(@"Client is already listening for VRPN events.");
         return;
     }
@@ -43,19 +61,6 @@ vrpn_Tracker_Remote *vrpnTracker;
         vrpnTracker = new vrpn_Tracker_Remote([host cStringUsingEncoding:NSUTF8StringEncoding]);
         if (vrpnTracker != NULL) {
             vrpnTracker->register_change_handler(0, handle_tracker);
-            
-            dispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
-                                                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
-            // Setup params for creation of a recurring timer
-            double interval = refreshRateInMillisec;
-            dispatch_time_t startTime = dispatch_time(DISPATCH_TIME_NOW, 0);
-            uint64_t intervalTime = (int64_t)(interval * NSEC_PER_MSEC);
-            dispatch_source_set_timer(dispatchSource, startTime, intervalTime, 0);
-            // Attach the block you want to run on the timer fire
-            dispatch_source_set_event_handler(dispatchSource, ^{
-                // Your code here
-                vrpnTracker->mainloop();
-            });
             dispatch_resume(dispatchSource);
             NSLog(@"Client is now listening for VRPN events.");
         }
@@ -65,12 +70,11 @@ vrpn_Tracker_Remote *vrpnTracker;
 // Stops polling for events
 - (void)stopListening {
     // Avoid trying to stop listening the same VRPN device twice.
-    if (dispatchSource == nil)
+    if (vrpnTracker == NULL)
         return;
     
     // First, invalidate the timer so it triggers no more.
     dispatch_suspend(dispatchSource);
-    dispatchSource = nil;
     // Unregister the VRPN callback so we receive no further notifications
     vrpnTracker->unregister_change_handler(0, handle_tracker);
     delete vrpnTracker;
@@ -218,9 +222,6 @@ void VRPN_CALLBACK handle_tracker(void *userData, const vrpn_TRACKERCB t) {
     findCurve(coordinateZ, coordinateX, curvatureNum);
 #endif
 }
-
-static float rx;
-static float ry;
 
 void findCurve(float coordinateX, float coordinateZ, int curvature) {
     float thetaAngle, phiAngle;

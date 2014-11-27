@@ -41,10 +41,10 @@
 		F2929A391A1D72AE006390EC /* SRWebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = F2929A381A1D72AE006390EC /* SRWebSocket.m */; };
 		F2946BC11A23EBFD00635A18 /* drum.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BBC1A23EBFD00635A18 /* drum.caf */; };
 		F2946BC21A23EBFD00635A18 /* duck.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BBD1A23EBFD00635A18 /* duck.caf */; };
-		F2946BC51A23EBFD00635A18 /* tong.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BC01A23EBFD00635A18 /* tong.caf */; };
-		F2946BC71A23ED8A00635A18 /* ding.caf in Resources */ = {isa = PBXBuildFile; fileRef = F2946BC61A23ED8A00635A18 /* ding.caf */; };
 		F2946C771A26710900635A18 /* VRPN.mm in Sources */ = {isa = PBXBuildFile; fileRef = F2946C761A26710900635A18 /* VRPN.mm */; };
 		F2946C791A26798F00635A18 /* libvrpn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F2946C781A26798F00635A18 /* libvrpn.a */; };
+		F2946D001A26B61800635A18 /* tong.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F2946CFF1A26B61800635A18 /* tong.mp3 */; };
+		F2946D021A26B66C00635A18 /* ding.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F2946D011A26B66C00635A18 /* ding.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -103,8 +103,6 @@
 		F2929A381A1D72AE006390EC /* SRWebSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SRWebSocket.m; sourceTree = "<group>"; };
 		F2946BBC1A23EBFD00635A18 /* drum.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = drum.caf; sourceTree = SOURCE_ROOT; };
 		F2946BBD1A23EBFD00635A18 /* duck.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = duck.caf; sourceTree = SOURCE_ROOT; };
-		F2946BC01A23EBFD00635A18 /* tong.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = tong.caf; sourceTree = SOURCE_ROOT; };
-		F2946BC61A23ED8A00635A18 /* ding.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = ding.caf; sourceTree = SOURCE_ROOT; };
 		F2946C751A26710900635A18 /* VRPN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VRPN.h; sourceTree = "<group>"; };
 		F2946C761A26710900635A18 /* VRPN.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VRPN.mm; sourceTree = "<group>"; };
 		F2946C781A26798F00635A18 /* libvrpn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libvrpn.a; sourceTree = "<group>"; };
@@ -236,6 +234,8 @@
 		F2946CF81A267BD400635A18 /* vrpn_Xkeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Xkeys.h; path = vrpn/vrpn_Xkeys.h; sourceTree = "<group>"; };
 		F2946CF91A267BD400635A18 /* vrpn_YEI_3Space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_YEI_3Space.h; path = vrpn/vrpn_YEI_3Space.h; sourceTree = "<group>"; };
 		F2946CFA1A267BD400635A18 /* vrpn_Zaber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vrpn_Zaber.h; path = vrpn/vrpn_Zaber.h; sourceTree = "<group>"; };
+		F2946CFF1A26B61800635A18 /* tong.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = tong.mp3; sourceTree = SOURCE_ROOT; };
+		F2946D011A26B66C00635A18 /* ding.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ding.mp3; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,12 +243,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2946C791A26798F00635A18 /* libvrpn.a in Frameworks */,
 				F26BEDF61A23C9E5003075C7 /* AVFoundation.framework in Frameworks */,
 				F2929A341A1D713F006390EC /* libicucore.dylib in Frameworks */,
 				F2929A321A1D7128006390EC /* CFNetwork.framework in Frameworks */,
 				F2929A301A1D7121006390EC /* Security.framework in Frameworks */,
 				F2929A2E1A1D7119006390EC /* Foundation.framework in Frameworks */,
-				F2946C791A26798F00635A18 /* libvrpn.a in Frameworks */,
 				F223C26C1A1BD37900D3245A /* CoreGraphics.framework in Frameworks */,
 				F223C26B1A1BD36E00D3245A /* QuartzCore.framework in Frameworks */,
 			);
@@ -338,10 +338,10 @@
 		F28D99DF1A1556F100070B2D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				F2946D011A26B66C00635A18 /* ding.mp3 */,
+				F2946CFF1A26B61800635A18 /* tong.mp3 */,
 				F2946BBC1A23EBFD00635A18 /* drum.caf */,
 				F2946BBD1A23EBFD00635A18 /* duck.caf */,
-				F2946BC61A23ED8A00635A18 /* ding.caf */,
-				F2946BC01A23EBFD00635A18 /* tong.caf */,
 				F26BEE021A23CFE0003075C7 /* track3.caf */,
 				F26BEDF71A23CD2C003075C7 /* sound1.caf */,
 				F26BEDF81A23CD2C003075C7 /* sound2.caf */,
@@ -613,16 +613,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F2946BC51A23EBFD00635A18 /* tong.caf in Resources */,
 				F2946BC11A23EBFD00635A18 /* drum.caf in Resources */,
 				F26BEDFE1A23CD93003075C7 /* track2.caf in Resources */,
+				F2946D001A26B61800635A18 /* tong.mp3 in Resources */,
 				F26BEDFD1A23CD90003075C7 /* track1.caf in Resources */,
 				F2946BC21A23EBFD00635A18 /* duck.caf in Resources */,
 				F26BEE031A23CFE0003075C7 /* track3.caf in Resources */,
-				F2946BC71A23ED8A00635A18 /* ding.caf in Resources */,
 				F26BEDFC1A23CD8D003075C7 /* sound2.caf in Resources */,
 				F26BEDFB1A23CD8B003075C7 /* sound1.caf in Resources */,
 				F28D99F11A1556F300070B2D /* Main.storyboard in Resources */,
+				F2946D021A26B66C00635A18 /* ding.mp3 in Resources */,
 				F2929A2C1A1D6AA6006390EC /* Settings.bundle in Resources */,
 				F28D99F31A1556F300070B2D /* Images.xcassets in Resources */,
 			);
@@ -765,6 +765,7 @@
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VALID_ARCHS = arm64;
 			};
 			name = Debug;
 		};
@@ -786,6 +787,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
+				VALID_ARCHS = arm64;
 			};
 			name = Release;
 		};

@@ -367,7 +367,7 @@ NSString *const SoundDidFinishPlayingNotification = @"SoundDidFinishPlayingNotif
 - (void)prepareToPlay {
     @autoreleasepool
     {
-        [self prepareToPlayWithSound:@"ding.caf"];
+        [self prepareToPlayWithSound:@"ding.mp3"];
     }
 }
 

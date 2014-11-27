@@ -126,7 +126,7 @@
 			<key>Type</key>
 			<string>PSMultiValueSpecifier</string>
 			<key>Title</key>
-			<string>Max Trial</string>
+			<string>Max Trial for type 1&amp;2</string>
 			<key>Key</key>
 			<string>max_trial</string>
 			<key>DefaultValue</key>
@@ -144,6 +144,30 @@
 				<string>12 Trials</string>
 				<string>20 Trials</string>
 				<string>24  Trials</string>
+			</array>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSMultiValueSpecifier</string>
+			<key>Title</key>
+			<string>Max Trials for type 3</string>
+			<key>Key</key>
+			<string>max_trial_type_3</string>
+			<key>DefaultValue</key>
+			<integer>4</integer>
+			<key>Values</key>
+			<array>
+				<string>2</string>
+				<string>4</string>
+				<string>8</string>
+				<string>12</string>
+			</array>
+			<key>Titles</key>
+			<array>
+				<string>2 Trials</string>
+				<string>4 Trials</string>
+				<string>8 Trials</string>
+				<string>12  Trials</string>
 			</array>
 		</dict>
 		<dict>

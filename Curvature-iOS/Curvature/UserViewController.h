@@ -25,6 +25,7 @@
 @property (strong, nonatomic) IBOutlet UIButton *trialBtn;
 @property (strong, nonatomic) IBOutlet UILabel *left;
 @property (strong, nonatomic) IBOutlet UILabel *right;
+@property (strong, nonatomic) IBOutlet UILabel *tableHeader;
 @property (strong, nonatomic) IBOutlet UIButton *start;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *rewind;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *forward;
