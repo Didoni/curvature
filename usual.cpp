@@ -24,12 +24,17 @@
 using namespace std;
 using namespace cv;
 
-#define EXPERIMENT_1 1
+//#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
-//#define EXPERIMENT_3 1
+#define EXPERIMENT_3 1
+
+//#define EXPERIMENT_KEYBOARD 1
 
 //#ifdef EXPERIMENT_3
-static MultiVariableInterp2D* mInterp;
+static MultiVariableInterp2D* mInterpMars;
+static MultiVariableInterp2D* mInterpEarth;
+static MultiVariableInterp2D* mInterpJupiter;
+static MultiVariableInterp2D* mInterpSaturn;
 //#endif
 
 bool stopped=true;
@@ -41,6 +46,8 @@ int x;
 int trial;
 int y;
 int atstart = 0;
+long startmilis=0;
+float coordinateX, coordinateZ;
 
 
 class Instruction{
@@ -100,24 +107,16 @@ void sendBytesTest(short theta, short fi) {
 	//cout<<"size "<<sizeof(mapping)<<endl;
 	//cout<<"second ";
 	
-	short key = 255;
-	COMToolkit::sendByte(key & 255);
 	COMToolkit::sendByte((theta >>8) & 255);
-	//cout<<"first ";
 	COMToolkit::sendByte(theta & 255);
-	//cout<<"fourth ";
 	COMToolkit::sendByte((fi >>8) & 255);
-	//cout<<"third ";
 	COMToolkit::sendByte(fi & 255);
-	//cout<<"fourth ";
 }
 
 
 void handshake () {
 	short key = 255;
 	COMToolkit::sendByte(key & 255);
-	short initServo = 90;
-	sendBytesTest(initServo, initServo);
 
 }
 
@@ -127,7 +126,7 @@ void handshake () {
 static float rx;
 static float ry;
 
-void findCurve(float coordinateX, float coordinateZ,int curvature) {
+void findCurve() {
 	float thetaAngle, phiAngle;
 	float r = 500;
 	int x = floor(1000*(coordinateX)+0.5);
@@ -138,22 +137,42 @@ void findCurve(float coordinateX, float coordinateZ,int curvature) {
 	if(z <-90) z = -90;
 
 
-	if(z<0) thetaAngle = 0+angleArray[abs(x)][-z][curvature].getTheta();
+	/*if(z<0) thetaAngle = 0+angleArray[abs(x)][-z][curvature].getTheta();
 	else thetaAngle = 0-angleArray[abs(x)][z][curvature].getTheta();
 	if(x<0) phiAngle = 0+angleArray[-x][abs(z)][curvature].getPhi();
-	else phiAngle = 0-angleArray[x][abs(z)][curvature].getPhi();
+	else phiAngle = 0-angleArray[x][abs(z)][curvature].getPhi(); */
 
+	const float curv = 1;
+	const float radious = 1.0f / curv;
+	const float rxy = sqrtf(radious*radious - coordinateX*coordinateX - coordinateZ*coordinateZ);
+
+	phiAngle = -atanf( -coordinateX / rxy ) * 180.f / PI;
+	thetaAngle = atanf( -coordinateZ / rxy ) * 180.f / PI;
+	
 	rx = thetaAngle;
 	ry = phiAngle;
-	int offsetTheta = 4;
-	int offsetPhi = 11;
+	int offsetTheta = 0;
+	int offsetPhi = 0;
 	thetaAngle = thetaAngle + offsetTheta;
 	phiAngle = phiAngle + offsetPhi;
 
-	int sx,sy;
-	mInterp->query(thetaAngle,phiAngle, sx,sy);
-	cout<<"x "<<x<<" z "<<z<<" Theta "<<(thetaAngle-offsetTheta)<<" phi "<<(phiAngle-offsetPhi)<<" Sx"<<sx<<" Sy "<<sy<<endl;
-	sendBytesTest((short)sy,(short)sx);
+	if (thetaAngle > 20) { thetaAngle = 20;}
+	else if (thetaAngle < -20) { thetaAngle = -20;}
+	if (phiAngle > 20) { phiAngle = 20;}
+	else if (phiAngle < -20) { phiAngle = -20;}
+	int sxJ,syJ, sxE,syE, sxM,syM, sxS,syS;
+	
+	mInterpJupiter->query(phiAngle,thetaAngle, sxJ,syJ);
+	mInterpMars->query(phiAngle,thetaAngle, sxM,syM);
+	mInterpSaturn->query(phiAngle,thetaAngle, sxS,syS);
+	mInterpEarth->query(phiAngle,thetaAngle, sxE,syE);
+	//cout<<"x "<<x<<" z "<<z<<" Theta "<<(thetaAngle-offsetTheta)<<" phi "<<(phiAngle-offsetPhi)<<" Sx"<<sxJ<<" Sy "<<syJ<<endl;
+
+	handshake();
+	sendBytesTest((short)sxJ,(short)syJ);
+	sendBytesTest((short)sxM,(short)syM);
+	sendBytesTest((short)sxS,(short)syS);
+	sendBytesTest((short)sxE,(short)syE);
 	
 }
 
@@ -346,11 +365,13 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 	mYaw = yaw;
 
 #ifdef EXPERIMENT_3
-	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-
-	float coordinateX = t.pos[0]-0.0084;
-	float coordinateZ = t.pos[2]+ 0.0107;
-	findCurve(coordinateZ,coordinateX,curvatureNum);
+	if(startmilis==0) startmilis = getMillisTime();
+	if(getMillisTime()-startmilis < 30000) {
+		fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+		printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	}
+	coordinateX = t.pos[0]-0.0084;
+	coordinateZ = t.pos[2]+ 0.0107;
 #endif
 
 }
@@ -511,10 +532,12 @@ int main(int argc, char* argv[])
 	//first experiment
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
-	int N = 19;
-	char fileName[] = "saturn_Shuffled1.csv";
+	int N = 39;
+	char fileName[] = "Jupiter_Shuffled1_18_18.csv";
 	const int minX = 1250, maxX = 1750;
 	const int minY = 1250, maxY = 1750;
+	//const int minX = 1397, maxX = 1635;
+	//const int minY = 1346, maxY = 1506;
 
 	//generate the grid with the values to send to the arduino (sx,sy)
 	std::vector<Point2D> points;
@@ -548,8 +571,8 @@ int main(int argc, char* argv[])
 	const int N = 400;
 	
 	MultiVariableInterp2D* interpolator;
-	char calibFile[] = "mars_calib.csv";
-	char outputFile[] = "marsDelunay.csv";
+	char calibFile[] = "earth_calib_18.csv";
+	char outputFile[] = "earth_delunay_18.csv";
 	
 	FILE* f = fopen(outputFile, "w");
 	//interpolator = new MVILinear(calibFile);
@@ -561,10 +584,19 @@ int main(int argc, char* argv[])
 #endif
 
 #ifdef EXPERIMENT_3
-	char calibFile[] = "mars_calib.csv";
-	mInterp = new MVIDelunayLinear(calibFile);
-	char fileName[] = "mars_MedMed.csv";
-	curvatureNum = 8;
+	char calibFileJupiter[] = "jupiter_calib_18.csv";
+	char calibFileMars[] = "mars_calib_18.csv";
+	char calibFileEarth[] = "earth_calib_18.csv";
+	char calibFileSaturn[] = "saturn_calib_18.csv";
+	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
+	mInterpMars = new MVIDelunayLinear(calibFileMars);
+	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
+	mInterpSaturn = new MVIDelunayLinear(calibFileSaturn);
+	char fileName[] = "sytem_HighMed_18.csv";
+	curvatureNum = 6;
+
+	coordinateX = 0; 
+	coordinateZ = 0;
 
 	fileExp3 = fopen(fileName, "w");
 	//init time
@@ -578,7 +610,8 @@ int main(int argc, char* argv[])
     {
 		tracker->mainloop();
 		connection->mainloop();
-        Sleep(5);
+		findCurve();
+        Sleep(50);
     }
 
 
@@ -592,19 +625,20 @@ int main(int argc, char* argv[])
 	connection->mainloop();
 
 #ifdef EXPERIMENT_1
-	
+	Sleep(1200);
 	for(int i = 0; i < points.size() ; ++i )
     {
 		
 		const int permIndex = permutations[i];
 		const Point2D& pointToSend = points[ permIndex ];
-
+#ifdef EXPERIMENT_KEYBOARD
 		int sx,sy;
 		printf("input sx sy you ugly twat: ");
 		scanf("%d %d", &sx, &sy);
-
-		//sendBytesTest(pointToSend.x, pointToSend.y);
 		sendBytesTest(sx, sy);
+#else
+		sendBytesTest(pointToSend.x, pointToSend.y);
+#endif		
         Sleep(600);
 		tracker->mainloop(); 
 		connection->mainloop();
@@ -614,16 +648,25 @@ int main(int argc, char* argv[])
 		const float rx = mPitch;
 		const float ry = mRoll;
 		fprintf(f, "%d,%d,%d,%f,%f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
-		//printf("Index %d, servoX %d, servoY %d, Pitch %f,Roll %f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
+		
+#ifdef EXPERIMENT_KEYBOARD
 		printf("Index %d, servoX %d, servoY %d, Pitch %.4f,Roll %.4f\n", permIndex, sx, sy, rx, ry);
+#else
+		printf("Index %d, servoX %d, servoY %d, Pitch %f,Roll %f\n", permIndex, pointToSend.x, pointToSend.y, rx, ry);
+#endif
     }
 #endif
 
 #ifdef EXPERIMENT_2
+	Sleep(1200);
 	for(int i = 0; i < N ; ++i )
     {
 		const float targetRX = rangeRandom(minrX, maxrX);
 		const float targetRY = rangeRandom(minrY, maxrY);
+#ifdef EXPERIMENT_KEYBOARD
+		printf("enter rx ry you ugly twat: ");
+		scanf("%f %f", &targetRX, &targetRY);
+#endif
 		int sx, sy;
 		interpolator->query(targetRX, targetRY, sx, sy);
 		sendBytesTest(sx, sy);
