@@ -126,53 +126,60 @@ void handshake () {
 static float rx;
 static float ry;
 
-void findCurve() {
-	float thetaAngle, phiAngle;
-	float r = 500;
-	int x = floor(1000*(coordinateX)+0.5);
-	int z = floor(1000*(coordinateZ)+0.5);
-	if(x >90) x =90;
-	if(x <-90) x =-90;
-	if(z > 90) z =90;
-	if(z <-90) z = -90;
+void findAngles(float coordX, float coordZ, float& phi, float& theta, float radious) {
+	const float rxy = sqrtf(radious*radious - coordX*coordX - coordZ*coordZ);
 
+	phi = -atanf( -coordX / rxy ) * 180.f / PI;
+	theta = atanf( -coordZ / rxy ) * 180.f / PI;
 
-	/*if(z<0) thetaAngle = 0+angleArray[abs(x)][-z][curvature].getTheta();
-	else thetaAngle = 0-angleArray[abs(x)][z][curvature].getTheta();
-	if(x<0) phiAngle = 0+angleArray[-x][abs(z)][curvature].getPhi();
-	else phiAngle = 0-angleArray[x][abs(z)][curvature].getPhi(); */
-
-	const float curv = 1;
-	const float radious = 1.0f / curv;
-	const float rxy = sqrtf(radious*radious - coordinateX*coordinateX - coordinateZ*coordinateZ);
-
-	phiAngle = -atanf( -coordinateX / rxy ) * 180.f / PI;
-	thetaAngle = atanf( -coordinateZ / rxy ) * 180.f / PI;
-	
-	rx = thetaAngle;
-	ry = phiAngle;
 	int offsetTheta = 0;
 	int offsetPhi = 0;
-	thetaAngle = thetaAngle + offsetTheta;
-	phiAngle = phiAngle + offsetPhi;
+	theta = theta + offsetTheta;
+	phi = phi + offsetPhi;
 
-	if (thetaAngle > 20) { thetaAngle = 20;}
-	else if (thetaAngle < -20) { thetaAngle = -20;}
-	if (phiAngle > 20) { phiAngle = 20;}
-	else if (phiAngle < -20) { phiAngle = -20;}
+	if (theta > 20) { theta = 20;}
+	else if (theta < -20) { theta = -20;}
+	if (phi > 20) { phi = 20;}
+	else if (phi < -20) { phi = -20;}
+}
+
+void findCurve() {
+	float thetaAngle, phiAngle;
+	const float curv = 2;
+	const float radious = 1.0f / curv;
+
+	float xTemp; 
+	float zTemp;
+	float thetaPlanets[4];//Sat, Mars, Earth, Jup
+	float phiPlanets[4];
+	float zoffsets[4] = {0.025, 0.0, -0.025, -0.05};
+	float xoffsets[4] ={ -0.01, 0.0, -0.01, -0.03};
+
+	coordinateX = coordinateX - 0.1;
+	for (int i=0; i<4; i++) {
+		xTemp = coordinateX + xoffsets[i];
+		zTemp = coordinateZ + zoffsets[i];
+		findAngles(xTemp, zTemp, phiPlanets[i], thetaPlanets[i], radious);
+	}
+
+	//findAngles(coordinateX, coordinateZ, phiAngle, thetaAngle, radious);
+	rx = thetaPlanets[1];
+	ry = phiPlanets[1];
+
 	int sxJ,syJ, sxE,syE, sxM,syM, sxS,syS;
 	
-	mInterpJupiter->query(phiAngle,thetaAngle, sxJ,syJ);
-	mInterpMars->query(phiAngle,thetaAngle, sxM,syM);
-	mInterpSaturn->query(phiAngle,thetaAngle, sxS,syS);
-	mInterpEarth->query(phiAngle,thetaAngle, sxE,syE);
-	//cout<<"x "<<x<<" z "<<z<<" Theta "<<(thetaAngle-offsetTheta)<<" phi "<<(phiAngle-offsetPhi)<<" Sx"<<sxJ<<" Sy "<<syJ<<endl;
+	mInterpJupiter->query(phiPlanets[3],thetaPlanets[3], sxJ,syJ);
+	mInterpEarth->query(phiPlanets[2],thetaPlanets[2], sxE,syE);
+	mInterpMars->query(phiPlanets[1],thetaPlanets[1], sxM,syM);
+	mInterpSaturn->query(phiPlanets[0],thetaPlanets[0], sxS,syS);
+	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<" Theta "<<(thetaAngle-offsetTheta)<<" phi "<<(phiAngle-offsetPhi)<<" Sx"<<sxJ<<" Sy "<<syJ<<endl;
+	cout<<"tt "<<phiPlanets[1]<<" "<<thetaPlanets[1]<<"Jup "<<sxJ<<" "<<syJ<<" Earth "<<sxE<<" "<<syE<<" Mars "<<sxM<<" "<<syM<<" Sat "<<sxS<<" "<<syS<<endl;
 
 	handshake();
 	sendBytesTest((short)sxJ,(short)syJ);
+	sendBytesTest((short)sxE,(short)syE);
 	sendBytesTest((short)sxM,(short)syM);
 	sendBytesTest((short)sxS,(short)syS);
-	sendBytesTest((short)sxE,(short)syE);
 	
 }
 
@@ -365,13 +372,10 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 	mYaw = yaw;
 
 #ifdef EXPERIMENT_3
-	if(startmilis==0) startmilis = getMillisTime();
-	if(getMillisTime()-startmilis < 30000) {
-		fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-		printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-	}
-	coordinateX = t.pos[0]-0.0084;
-	coordinateZ = t.pos[2]+ 0.0107;
+	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	coordinateZ = t.pos[0]-0.0084;
+	coordinateX = t.pos[2]+ 0.0107;
 #endif
 
 }
@@ -610,8 +614,8 @@ int main(int argc, char* argv[])
     {
 		tracker->mainloop();
 		connection->mainloop();
+        Sleep(30);
 		findCurve();
-        Sleep(50);
     }
 
 
