@@ -24,6 +24,8 @@
 using namespace std;
 using namespace cv;
 
+#define MAX_ANGLE 15
+
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
 #define EXPERIMENT_3 1
@@ -126,40 +128,55 @@ void handshake () {
 static float rx;
 static float ry;
 
-void findAngles(float coordX, float coordZ, float& phi, float& theta, float radious) {
+void findAngles(float coordX, float coordZ, float& phi, float& theta, float curvature) {
+	float sign = 1.0f;
+
+	if (curvature == 0.0f){
+		phi = 0.0f;
+		theta = 0.0f;
+		return;
+	}else if(curvature < 0.0f){
+		curvature = -curvature;
+		sign = -1.0f;
+	}
+
+	const float radious = 1.0f / curvature;
+
+	
 	const float rxy = sqrtf(radious*radious - coordX*coordX - coordZ*coordZ);
 
-	phi = -atanf( -coordX / rxy ) * 180.f / PI;
-	theta = atanf( -coordZ / rxy ) * 180.f / PI;
+	phi = sign * -atanf( -coordX / rxy ) * 180.f / PI;
+	theta = sign * atanf( -coordZ / rxy ) * 180.f / PI;
 
 	int offsetTheta = 0;
 	int offsetPhi = 0;
 	theta = theta + offsetTheta;
 	phi = phi + offsetPhi;
 
-	if (theta > 20) { theta = 20;}
-	else if (theta < -20) { theta = -20;}
-	if (phi > 20) { phi = 20;}
-	else if (phi < -20) { phi = -20;}
+	if (theta > MAX_ANGLE) { theta = MAX_ANGLE;}
+	else if (theta < -MAX_ANGLE) { theta = -MAX_ANGLE;}
+	if (phi > MAX_ANGLE) { phi = MAX_ANGLE;}
+	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
 }
 
 void findCurve() {
 	float thetaAngle, phiAngle;
-	const float curv = 2;
-	const float radious = 1.0f / curv;
+	const float curv =2;
 
 	float xTemp; 
 	float zTemp;
-	float thetaPlanets[4];//Sat, Mars, Earth, Jup
-	float phiPlanets[4];
+	float thetaPlanets[4]= {0,0,0,0};//Sat, Mars, Earth, Jup
+	float phiPlanets[4] = {0,0,0,0};
 	float zoffsets[4] = {0.025, 0.0, -0.025, -0.05};
 	float xoffsets[4] ={ -0.01, 0.0, -0.01, -0.03};
 
-	coordinateX = coordinateX - 0.1;
-	for (int i=0; i<4; i++) {
-		xTemp = coordinateX + xoffsets[i];
-		zTemp = coordinateZ + zoffsets[i];
-		findAngles(xTemp, zTemp, phiPlanets[i], thetaPlanets[i], radious);
+	if(curv != 0) {
+		coordinateX = coordinateX - 0.1;
+		for (int i=0; i<4; i++) {
+			xTemp = coordinateX + xoffsets[i];
+			zTemp = coordinateZ + zoffsets[i];
+			findAngles(xTemp, zTemp, phiPlanets[i], thetaPlanets[i], curv);
+		}
 	}
 
 	//findAngles(coordinateX, coordinateZ, phiAngle, thetaAngle, radious);
@@ -172,8 +189,10 @@ void findCurve() {
 	mInterpEarth->query(phiPlanets[2],thetaPlanets[2], sxE,syE);
 	mInterpMars->query(phiPlanets[1],thetaPlanets[1], sxM,syM);
 	mInterpSaturn->query(phiPlanets[0],thetaPlanets[0], sxS,syS);
-	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<" Theta "<<(thetaAngle-offsetTheta)<<" phi "<<(phiAngle-offsetPhi)<<" Sx"<<sxJ<<" Sy "<<syJ<<endl;
-	cout<<"tt "<<phiPlanets[1]<<" "<<thetaPlanets[1]<<"Jup "<<sxJ<<" "<<syJ<<" Earth "<<sxE<<" "<<syE<<" Mars "<<sxM<<" "<<syM<<" Sat "<<sxS<<" "<<syS<<endl;
+	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<" Theta "<<thetaPlanets[2]<<" phi "<<phiPlanets[2]<<" Sx"<<sxE<<" Sy "<<syE<<endl;
+	cout<<"x "<<coordinateX<<" z "<<coordinateZ<<endl;
+	cout<<"Sx "<<sxJ<<" , "<<sxE<<" , "<<sxM<<" , "<<sxS<<" Sz "<<syJ<<" , "<<syE<<" , "<<syM<<" , "<<syS<<endl;
+	//cout<<"tt "<<phiPlanets[1]<<" "<<thetaPlanets[1]<<"Jup "<<sxJ<<" "<<syJ<<" Earth "<<sxE<<" "<<syE<<" Mars "<<sxM<<" "<<syM<<" Sat "<<sxS<<" "<<syS<<endl;
 
 	handshake();
 	sendBytesTest((short)sxJ,(short)syJ);
@@ -372,10 +391,11 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 	mYaw = yaw;
 
 #ifdef EXPERIMENT_3
-	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	//fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
 	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
 	coordinateZ = t.pos[0]-0.0084;
 	coordinateX = t.pos[2]+ 0.0107;
+	//cout<<" cZ "<<coordinateZ<<" cX "<<coordinateX<<endl;
 #endif
 
 }
@@ -508,6 +528,7 @@ float rangeRandom (float fLow, float fHigh){
 	 int x,y;
 	 inline Point2D(int px, int py) : x(px), y(py) { }
 };
+
 
 
 
@@ -668,7 +689,7 @@ int main(int argc, char* argv[])
 		const float targetRX = rangeRandom(minrX, maxrX);
 		const float targetRY = rangeRandom(minrY, maxrY);
 #ifdef EXPERIMENT_KEYBOARD
-		printf("Enter the rx ry: ");
+		printf("enter rx ry you ugly twat: ");
 		scanf("%f %f", &targetRX, &targetRY);
 #endif
 		int sx, sy;
