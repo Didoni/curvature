@@ -8,6 +8,7 @@ package marionettesim.renderer;
 
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL2;
+import marionettesim.gui.MainForm;
 import marionettesim.math.Matrix4f;
 import marionettesim.scene.MeshEntity;
 import marionettesim.scene.Scene;
@@ -17,19 +18,24 @@ import marionettesim.simulation.Simulation;
  *
  * @author Asier
  */
-public class StaticSurfaceShader extends Shader{
+public class DinamicSurfaceShader extends Shader{
     int colouring;
     int minColor, maxColor;
     int gain;
+    int time;
    
-    public StaticSurfaceShader(String vProgram, String fProgram) {
+    private MainForm mf;
+    
+    public DinamicSurfaceShader(String vProgram, String fProgram, MainForm mf) {
         super(vProgram, fProgram, ORDER_OPAQUE);
+        this.mf = mf;
     }
 
     @Override
     void getUniforms(GL2 gl) {
         super.getUniforms(gl);
  
+        time = gl.glGetUniformLocation(shaderProgramID, "t");
         gain = gl.glGetUniformLocation(shaderProgramID, "heightGain");
         minColor = gl.glGetUniformLocation(shaderProgramID, "minColor");
         maxColor = gl.glGetUniformLocation(shaderProgramID, "maxColor");
@@ -47,10 +53,18 @@ public class StaticSurfaceShader extends Shader{
     void bindUniforms(GL2 gl, Scene scene, Renderer renderer,Simulation s, MeshEntity me, Matrix4f projectionViewModel, Matrix4f viewModel, Matrix4f model, FloatBuffer fb) {
        super.bindUniforms(gl, scene, renderer, s, me, projectionViewModel, viewModel, model, fb);
         
+       gl.glUniform1f(time, renderer.getForm().surfacePanel.getTime());
        gl.glUniform1f(gain, renderer.getForm().surfacePanel.getGain());
        gl.glUniform1f(minColor, renderer.getForm().surfacePanel.getMinColor());
        gl.glUniform1f(maxColor, renderer.getForm().surfacePanel.getMaxColor());
        gl.glUniform1i(colouring, renderer.getForm().surfacePanel.getColorGradient());
+    }
+
+    @Override
+    protected String preProcessVertex(String sourceCode) {
+        sourceCode = super.preProcessVertex(sourceCode);
+        sourceCode = sourceCode.replaceAll("//TEMPLATE MYFUNC", mf.surfacePanel.getGlslScript());
+        return sourceCode;
     }
 
     

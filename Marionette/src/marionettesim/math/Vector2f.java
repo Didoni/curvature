@@ -743,8 +743,10 @@ public final class Vector2f implements Cloneable, java.io.Serializable {
 
 
     public void rotateAroundOrigin(float angle) {
-        float newX = FastMath.cos(angle) * x - FastMath.sin(angle) * y;
-        float newY = FastMath.sin(angle) * x + FastMath.cos(angle) * y;
+        final float cos = FastMath.cos(angle);
+        final float sin = FastMath.sin(angle);
+        final float newX = cos * x - sin * y;
+        final float newY = sin * x + cos * y;
         x = newX;
         y = newY;
     }

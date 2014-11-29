@@ -33,6 +33,7 @@ public class Renderer {
     private boolean writeColor;
 
     private boolean needToReloadShaders;
+    private boolean needToReloadDinamicSurface;
 
     public MainForm getForm() {
         return form;
@@ -40,6 +41,7 @@ public class Renderer {
     
     public Renderer(Scene scene, MainForm form) {
         needToReloadShaders = false;
+        needToReloadDinamicSurface = false;
         this.scene = scene;
         this.form = form;
     }
@@ -48,9 +50,12 @@ public class Renderer {
         needToReloadShaders = true;
     }
     
+    public void reloadDinamicSurface(){
+        needToReloadDinamicSurface = true;
+    }
     
     public void init(GL2 gl, int w, int h){
-        Resources.init(gl);
+        Resources.init(gl, form);
         
         gl.glClearColor(0, 0, 0.0f, 1);
         
@@ -83,6 +88,11 @@ public class Renderer {
             Resources.get().reloadShaders(gl);
         }
 
+        if (needToReloadDinamicSurface){
+            needToReloadDinamicSurface = false;
+            Resources.get().getShader(Resources.SHADER_DINAMIC_SURFACE).reload(gl);
+        }
+        
         form.simulation.tick( form );
     }
 

@@ -43,7 +43,7 @@ import java.nio.FloatBuffer;
  * @version $Revision: 4131 $, $Date: 2009-03-19 16:15:28 -0400 (Thu, 19 Mar 2009) $
  */
 public class Box extends Mesh {
-    public final Vector3f center = new Vector3f(0f, 0f, 0f);
+    public Vector3f center;
     public float xExtent, yExtent, zExtent;
     
     private static final short[] GEOMETRY_INDICES_DATA = {
@@ -86,6 +86,7 @@ public class Box extends Mesh {
      */
     public Box(float x, float y, float z) {
         super();
+        center = new Vector3f(0f, 0f, 0f);
         xExtent = x;
         yExtent = y;
         zExtent = z;
@@ -93,6 +94,14 @@ public class Box extends Mesh {
     }
     
 
+    public Box(float x, float y, float z, float cx, float cy, float cz) {
+        super();
+        center = new Vector3f(cx, cy, cz);
+        xExtent = x;
+        yExtent = y;
+        zExtent = z;
+        updateGeometry();
+    }
 
     /**
      * Empty constructor for serialization only. Do not use.
@@ -106,6 +115,7 @@ public class Box extends Mesh {
      * <p>
      * The cloned box will have '_clone' appended to it's name, but all other
      * properties will be the same as this box.
+     * @return 
      */
     @Override
     public Box clone() {

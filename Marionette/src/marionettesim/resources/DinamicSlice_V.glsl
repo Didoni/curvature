@@ -15,9 +15,18 @@ uniform mat4 modelMatrix;
 #define PI 3.1415926535897932384626433832795
 
 uniform int colouring;
+uniform float t;
 uniform float heightGain;
 uniform float minColor;
 uniform float maxColor;
+
+//TEMPLATE MYFUNC
+
+/*
+float myFunc(vec3 p){
+    return sin(p.x + t);
+}
+*/
 
 vec3 hsv2rgb(vec3 c){
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -25,14 +34,37 @@ vec3 hsv2rgb(vec3 c){
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+vec3 getNormalAt(vec3 px0, vec3 px1, vec3 py0, vec3 py1){
+    
+    float x = (myFunc(px0) - myFunc(px1)) * heightGain;
+    float y = (myFunc(py0) - myFunc(py1)) * heightGain;
+
+    vec3 vx = normalize ( vec3( distance(px0, px1) , 0 , x) );
+    vec3 vy = normalize ( vec3(0.0, distance(py0, py1), y) );
+    return cross(vx,vy);
+}
+
 void main()
 {
     wPos = modelMatrix * vertexPosition;
-    gl_Position = modelViewProjectionMatrix * vertexPosition;
-    normal = modelMatrix * vec4(vertexNormal.xyz, 0.0);
-    
-    float value =  -vertexPosition.z / heightGain;
+    vec3 w = vec3(vertexPosition);
 
+    float value =  myFunc(w);
+    float divL = 1.0 / heightDiv;
+
+    vec3 px0 = vec3( modelMatrix * (vertexPosition + vec4(-divL, 0.0, 0.0, 0.0)) );
+    vec3 px1 = vec3( modelMatrix * (vertexPosition + vec4(divL,  0.0, 0.0, 0.0)) );
+    vec3 py0 = vec3( modelMatrix * (vertexPosition + vec4(0.0, -divL, 0.0, 0.0)) );
+    vec3 py1 = vec3( modelMatrix * (vertexPosition + vec4(0.0, divL, 0.0, 0.0)) );
+
+    vec3 valueNormal = getNormalAt(px0, px1, py0, py1);
+
+    vec4 modVertexPosition = vertexPosition;
+    modVertexPosition.z = value * heightGain;
+
+    gl_Position = modelViewProjectionMatrix * modVertexPosition;
+    normal = modelMatrix * vec4( valueNormal , 0.0);
+    
     vec3 colNoAlpha;
     float col = (value-minColor)/(maxColor-minColor);
     if(colouring == 1){ //fire&ice

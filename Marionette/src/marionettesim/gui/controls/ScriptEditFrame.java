@@ -22,6 +22,7 @@ import javax.script.ScriptException;
  */
 public class ScriptEditFrame extends javax.swing.JFrame {
     MainForm father;
+    
     ScriptEngineManager manager;
     ScriptEngine engine;
     
@@ -32,7 +33,6 @@ public class ScriptEditFrame extends javax.swing.JFrame {
             manager = new ScriptEngineManager();
             engine = manager.getEngineByName("js");
             engine.put("math", new FastMath());
-            engine.put("trans", new Transform());
             okButtonActionPerformed( null );
         }catch(Exception ex){
             Logger.getLogger(ScriptEditFrame.class.getName()).log(Level.SEVERE, null, ex);
@@ -48,61 +48,103 @@ public class ScriptEditFrame extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        area = new javax.swing.JTextArea();
         okButton = new javax.swing.JButton();
         errorText = new javax.swing.JTextField();
         cancelButton = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jsArea = new javax.swing.JTextArea();
+        jPanel2 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        glslArea = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Move script");
 
-        area.setColumns(20);
-        area.setRows(5);
-        area.setTabSize(4);
-        area.setText("//diagonal\nfunction calc(){\n\tvar a = math.sin(t * math.PI * 2.0);\n\tv.x = a;\n\tv.y = a;\n\tv.z = a;\n}\n\n//rose\n/*\nfunction calc(){\n\tvar k = 6.0/4.0;\n\tvar s = t * math.PI * 2.0;\n\tvar cosKS = math.cos(k*s);\n\t\n\tv.x = cosKS * math.cos(s);\n\tv.y = 0;\n\tv.z = cosKS * math.sin(s);\n}\n*/\n\n//lissajous\n/*\nfunction calc(){\n\tvar s = t * math.PI * 2.0;\n\t\n\tv.x = math.cos(s * 3.0);\n\tv.y = math.sin(s * 7.0);\n\tv.z = math.sin(s * 2.0);\n}\n*/\n\n//superhelix\n/*\nfunction calc(){\n\t\n\tvar t1 = trans.create();\n\tvar t2 = trans.create();\n\tvar t3 = trans.create();\n\t\n\tt1.translation.y = 0.4;\n\tt2.rotation.rotate(0,0, t*30);\n\tt2.translation.x = 0.6;\n\tt3.rotation.rotate(0, t, 0);\n\t\n\tt1.combineWithParent(t2);\n\tt1.combineWithParent(t3);\n\t\n\tt1.transformPoint(v,v);\n}\n*/");
-        jScrollPane1.setViewportView(area);
-
-        okButton.setText("OK");
+        okButton.setText("Compile");
         okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 okButtonActionPerformed(evt);
             }
         });
 
-        cancelButton.setText("Cancel");
+        cancelButton.setText("OK");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
             }
         });
 
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "function 1", "function 2", "function 3" }));
+
+        jsArea.setColumns(20);
+        jsArea.setRows(5);
+        jsArea.setTabSize(4);
+        jScrollPane2.setViewportView(jsArea);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("Java script", jPanel1);
+
+        glslArea.setColumns(20);
+        glslArea.setRows(5);
+        glslArea.setTabSize(4);
+        glslArea.setText("float myFunc(vec3 p){\n    return sin(p.x + t);\n}");
+        jScrollPane1.setViewportView(glslArea);
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 381, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 219, Short.MAX_VALUE)
+        );
+
+        jTabbedPane1.addTab("GLSL", jPanel2);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 386, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jTabbedPane1)
+                    .addComponent(errorText, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(okButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(errorText)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(cancelButton)))
+                        .addGap(18, 18, 18)
+                        .addComponent(cancelButton)
+                        .addGap(18, 18, 18)
+                        .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(errorText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(okButton)
-                    .addComponent(errorText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cancelButton))
+                    .addComponent(cancelButton)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
 
@@ -116,8 +158,8 @@ public class ScriptEditFrame extends javax.swing.JFrame {
     private void okButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_okButtonActionPerformed
         if(engine != null){
             try {
-                engine.put("calc", null);
-                engine.eval( area.getText() );
+                engine.put("myFunc", null);
+                engine.eval( jsArea.getText() );
                 errorText.setText("OK :)");
             } catch (ScriptException ex) {
                 errorText.setText( ex.getLineNumber() + ":" + ex.getColumnNumber() + " " + ex.getMessage());
@@ -130,16 +172,22 @@ public class ScriptEditFrame extends javax.swing.JFrame {
         if (engine != null){
                 engine.put("t", t);
                 engine.put("v", v);
-                engine.eval("calc()");
+                engine.eval("myFunc()");
         }
         return v;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextArea area;
     private javax.swing.JButton cancelButton;
     private javax.swing.JTextField errorText;
+    private javax.swing.JTextArea glslArea;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTextArea jsArea;
     private javax.swing.JButton okButton;
     // End of variables declaration//GEN-END:variables
 }

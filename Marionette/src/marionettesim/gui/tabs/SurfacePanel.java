@@ -10,27 +10,33 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import marionettesim.gui.MainForm;
+import marionettesim.gui.controls.ScriptEditFrame;
 import marionettesim.scene.MeshEntity;
 import marionettesim.scene.Resources;
 import marionettesim.shapes.Quad;
 import marionettesim.simulation.Function2D;
 import marionettesim.simulation.functions.CurvatureFunction;
 import marionettesim.simulation.functions.HapticImage;
-import marionettesim.simulation.functions.ZeroFunction;
 import marionettesim.utils.FileUtils;
 import marionettesim.utils.Parse;
+import marionettesim.workers.PlayerThread;
 
 /**
  *
  * @author Asier
  */
 public class SurfacePanel extends javax.swing.JPanel {
-    MainForm mf;
+    public MainForm mf;
+    private PlayerThread player;
+    private ScriptEditFrame scriptFrame;
     
     public SurfacePanel(MainForm mf) {
         this.mf = mf;
         
         initComponents();
+        scriptFrame = new ScriptEditFrame(mf);
+        player = new PlayerThread(this);
+        player.start();
     }
 
     public float getGain(){
@@ -44,6 +50,20 @@ public class SurfacePanel extends javax.swing.JPanel {
     }
     public int getColorGradient(){
         return colouringCombo.getSelectedIndex();
+    }
+    public boolean isPlaying(){
+        return enableDinamicCheck.isSelected();
+    }
+    public float getFPS(){
+        return Parse.stringToFloat( fpsText.getText() );
+    }
+    
+    public float getTime() {
+        return 0.0f;
+    }
+    
+    public String getGlslScript() {
+        return "";
     }
     
     /**
@@ -79,7 +99,9 @@ public class SurfacePanel extends javax.swing.JPanel {
         filterCombo = new javax.swing.JComboBox();
         imageApplyButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
+        editScriptsButton = new javax.swing.JButton();
+        enableDinamicCheck = new javax.swing.JCheckBox();
+        fpsText = new javax.swing.JTextField();
         colouringCombo = new javax.swing.JComboBox();
         jLabel11 = new javax.swing.JLabel();
         colAmpMinText = new javax.swing.JTextField();
@@ -156,7 +178,7 @@ public class SurfacePanel extends javax.swing.JPanel {
                     .addComponent(curvatureText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(applyCurvatureButton)
-                .addContainerGap(129, Short.MAX_VALUE))
+                .addContainerGap(82, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Curvature", jPanel1);
@@ -222,38 +244,58 @@ public class SurfacePanel extends javax.swing.JPanel {
                 .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(imageApplyButton)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Image", jPanel2);
+
+        editScriptsButton.setText("Edit scripts");
+        editScriptsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                editScriptsButtonActionPerformed(evt);
+            }
+        });
+
+        enableDinamicCheck.setText("enable");
+        enableDinamicCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                enableDinamicCheckActionPerformed(evt);
+            }
+        });
+
+        fpsText.setText("30");
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 247, Short.MAX_VALUE)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(editScriptsButton)
+                        .addGap(0, 142, Short.MAX_VALUE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(enableDinamicCheck)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fpsText)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 189, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(enableDinamicCheck)
+                    .addComponent(fpsText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
+                .addComponent(editScriptsButton)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("JS+GLSL", jPanel3);
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 247, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 189, Short.MAX_VALUE)
-        );
-
-        jTabbedPane1.addTab("Kinect", jPanel4);
-
-        colouringCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "fire&ice", "hue", "brown to blue", "test1" }));
+        colouringCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "red", "fire", "hue", "brown to blue", "test1", " " }));
         colouringCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 colouringComboActionPerformed(evt);
@@ -386,24 +428,6 @@ public class SurfacePanel extends javax.swing.JPanel {
        updateSurfaceSize();
     }//GEN-LAST:event_sizeYTextActionPerformed
 
-    private void applyCurvatureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyCurvatureButtonActionPerformed
-        final float gain = getGain();
-        final float curvature = Parse.stringToFloat( curvatureText.getText() );
-        final float width = mf.simulation.getSurfaceWidth();
-        
-        Function2D f = new CurvatureFunction(curvature, width);
-        mf.simulation.applyNewFunction(f, gain);
-        
-        mf.needUpdate();
-    }//GEN-LAST:event_applyCurvatureButtonActionPerformed
-
-    private void selectFileTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFileTextActionPerformed
-        String path = FileUtils.selectFile(this, "open", "", null);
-        if(path != null){
-            pathText.setText(path);
-        }
-    }//GEN-LAST:event_selectFileTextActionPerformed
-
     private void imageApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imageApplyButtonActionPerformed
         final String path = pathText.getText();
         final int size = Parse.stringToInt( resizeText.getText() );
@@ -411,7 +435,7 @@ public class SurfacePanel extends javax.swing.JPanel {
         final float w = mf.simulation.getSurfaceWidth();
         final float h = mf.simulation.getSurfaceHeight();
         final float gain = getGain();
-        
+
         HapticImage image = new HapticImage(path, w, h);
         try {
             final float topHeight = mf.simulation.getBoundaryMax().y;
@@ -421,9 +445,34 @@ public class SurfacePanel extends javax.swing.JPanel {
         } catch (IOException ex) {
             Logger.getLogger(SurfacePanel.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+
     }//GEN-LAST:event_imageApplyButtonActionPerformed
+
+    private void selectFileTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectFileTextActionPerformed
+        String path = FileUtils.selectFile(this, "open", "", null);
+        if(path != null){
+            pathText.setText(path);
+        }
+    }//GEN-LAST:event_selectFileTextActionPerformed
+
+    private void applyCurvatureButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_applyCurvatureButtonActionPerformed
+        final float gain = getGain();
+        final float curvature = Parse.stringToFloat( curvatureText.getText() );
+        final float width = mf.simulation.getSurfaceWidth();
+
+        Function2D f = new CurvatureFunction(curvature, width);
+        mf.simulation.applyNewFunction(f, gain);
+
+        mf.needUpdate();
+    }//GEN-LAST:event_applyCurvatureButtonActionPerformed
+
+    private void enableDinamicCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableDinamicCheckActionPerformed
+        player.playOrPause();
+    }//GEN-LAST:event_enableDinamicCheckActionPerformed
+
+    private void editScriptsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_editScriptsButtonActionPerformed
+        scriptFrame.setVisible(true);
+    }//GEN-LAST:event_editScriptsButtonActionPerformed
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -432,7 +481,10 @@ public class SurfacePanel extends javax.swing.JPanel {
     private javax.swing.JTextField colAmpMinText;
     private javax.swing.JComboBox colouringCombo;
     private javax.swing.JTextField curvatureText;
+    private javax.swing.JButton editScriptsButton;
+    private javax.swing.JCheckBox enableDinamicCheck;
     private javax.swing.JComboBox filterCombo;
+    private javax.swing.JTextField fpsText;
     private javax.swing.JTextField gainText;
     private javax.swing.JTextField gridDivsText;
     private javax.swing.JButton imageApplyButton;
@@ -448,7 +500,6 @@ public class SurfacePanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton okButton;
     private javax.swing.JTextField pathText;
@@ -457,4 +508,8 @@ public class SurfacePanel extends javax.swing.JPanel {
     private javax.swing.JTextField sizeXText;
     private javax.swing.JTextField sizeYText;
     // End of variables declaration//GEN-END:variables
+
+    
+
+    
 }

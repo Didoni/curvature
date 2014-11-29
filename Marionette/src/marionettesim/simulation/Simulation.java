@@ -14,6 +14,7 @@ import marionettesim.math.Vector3f;
 import marionettesim.scene.Entity;
 import marionettesim.scene.MeshEntity;
 import marionettesim.scene.Resources;
+import static marionettesim.scene.Resources.MESH_BOX_UP;
 import marionettesim.scene.Scene;
 import marionettesim.shapes.Quad;
 import marionettesim.simulation.functions.ZeroFunction;
@@ -165,7 +166,7 @@ public class Simulation {
         //fingers
         fingers = new MeshEntity[N_FINGERS];
         for(int i = 0; i < N_FINGERS; ++i){
-            final MeshEntity finger = new MeshEntity(Resources.MESH_BOX, null, Resources.SHADER_SOLID_SPEC);
+            final MeshEntity finger = new MeshEntity(Resources.MESH_BOX_UP, null, Resources.SHADER_SOLID_SPEC);
             finger.setColor( Color.GREEN );
             finger.setTag( EntityTag.FINGER );
             finger.getTransform().getScale().set( 0.02f, 0.003f, 0.03f ); //20x3x30mm
@@ -174,7 +175,7 @@ public class Simulation {
         }
         
         //hand
-        handCenter = new MeshEntity(Resources.MESH_BOX, null, Resources.SHADER_SOLID_SPEC);
+        handCenter = new MeshEntity(Resources.MESH_BOX_UP, null, Resources.SHADER_SOLID_SPEC);
         handCenter.setColor( Color.BLUE );
         handCenter.setTag( EntityTag.HAND );
         handCenter.getTransform().getScale().set( 0.005f );
@@ -187,6 +188,10 @@ public class Simulation {
         surface.setTag( EntityTag.SURFACE );
         surface.getTransform().getScale().set( 0.2f, 0.2f, 1.0f );
         surface.getTransform().getRotation().rotate(FastMath.degToRad( -90 ), 0, 0);
+        surface.getMaterial().setAmbient( 0.4f );
+        surface.getMaterial().setDiffuse( 0.5f );
+        surface.getMaterial().setSpecular( 0.5f );
+        surface.getMaterial().setShininess( 15.0f );
         scene.getEntities().add( surface );
     }
     
@@ -257,7 +262,15 @@ public class Simulation {
     }
     
     public void applyNewFunction(Function2D f, float gain){
+        surface.setShader( Resources.SHADER_STATIC_SURFACE );
+        surface.setMesh( Resources.MESH_CUSTOM );
         f.applyToGrid(getSurfaceWidth(), getSurfaceHeight(), gain, surface.customMesh);
+        currentFunction = f;
+    }
+    
+    public void applyNewDinamicFunction(Function2D f, float gain){
+        surface.setShader( Resources.SHADER_DINAMIC_SURFACE );
+        surface.setMesh( Resources.MESH_GRID );
         currentFunction = f;
     }
     

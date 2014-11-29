@@ -135,7 +135,8 @@ public class MainForm extends javax.swing.JFrame {
         mainTabPanel.addTab("Misc", miscPanel);
         
         initSimulation();
-        
+        miscPanel.surfaceToGUI();
+         
         animationThread = new BehavioursThread(scene, this);
         //animationThread.start();
    
