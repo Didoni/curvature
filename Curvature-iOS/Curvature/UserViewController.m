@@ -13,21 +13,14 @@
 #import "AppDelegate.h"
 #import "SoundManager.h"
 #import "VRPN.h"
+#include "CoreWebSocket.h"
 
 #define MAX_TRAILS 30
 #define MAX_TRIAL (trialType!=2?maxTrials:maxTrialsType3)
-@interface TCMessage : NSObject
 
-- (id)initWithMessage:(NSString *)message fromMe:(BOOL)fromMe;
-
-@property (nonatomic, retain, readonly) NSString *message;
-@property (nonatomic, readonly)  BOOL fromMe;
-
-@end
 @interface UserViewController () {
     NSString *noiseFile;
-    SRWebSocket *_webSocket;
-    int trialsPlates[MAX_TRAILS * 3][2];
+    WebSocketRef _webSocket;
     UIFont *font;
     NSTimer *perSecTimer;
     
@@ -36,27 +29,33 @@
     NSUInteger totalTrials;
     NSUInteger maxTimerVal;
     NSUInteger trialType;
-    User *currentUser;
     
     BOOL isCurrentModelA;
     BOOL runTimer;
     BOOL alertTimer;
-    BOOL paused;
     BOOL shouldShowDemo;
     BOOL dualDemo;
     BOOL leftSideOpen;
     BOOL rightSideOpen;
     UILabel *trialCounter;
     NSArray *files;
+    BOOL _suspendInBackground;
+    UIBackgroundTaskIdentifier _backgroundTask;
+    
 }
 @property (nonatomic, retain) NSArray *views;
 @end
 
 @implementation UserViewController
 @synthesize start;
+BOOL paused;
+int trialsPlates[MAX_TRAILS * 3][2];
+User *currentUser;
+static UserViewController *_THIS;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _THIS = self;
     shouldShowDemo = YES;
     _rewind.enabled = NO;
     _refresh.enabled = NO;
@@ -92,14 +91,12 @@
     font = [UIFont systemFontOfSize:42.0f];
     start.titleLabel.font = font;
     start.titleLabel.frame = start.frame;
-    [self _reconnect];
     [self appDidBecomeActive:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeInactive:) name:UIApplicationWillResignActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillInactive:) name:UIApplicationWillResignActiveNotification object:nil];
     [SoundManager sharedManager].allowsBackgroundMusic = YES;
     [[SoundManager sharedManager] prepareToPlay];
-    [SoundManager sharedManager].musicVolume = 1;
-    //[SoundManager sharedManager].soundVolume = 1;
+    [self restartSocket];
 }
 
 - (void)changeTrialType:(int)ltrialType {
@@ -135,25 +132,6 @@
             _right.alpha = 0;
             _trialType.transform = (single ? CGAffineTransformMakeTranslation(-10, 0) : CGAffineTransformIdentity);
         }];
-    }
-}
-
-- (void)_reconnect;
-{
-    BOOL canConnect = [[NSUserDefaults standardUserDefaults] objectForKey:@"connect"];
-    NSString *server = [[NSUserDefaults standardUserDefaults] objectForKey:@"remote_host_url"];
-    if (canConnect && server.length) {
-        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"ws://%@", server]];
-        if (url) {
-            _webSocket.delegate = nil;
-            [_webSocket close];
-            _webSocket = [[SRWebSocket alloc] initWithURLRequest:[NSURLRequest requestWithURL:url]];
-            _webSocket.delegate = self;
-            [_webSocket open];
-        }
-        else {
-            [[[UIAlertView alloc] initWithTitle:@"Server settings are wrong!" message:nil delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Model Left", @"Model Right", nil] show];
-        }
     }
 }
 
@@ -238,6 +216,7 @@
 }
 
 - (IBAction)startTimer:(UIButton *)btn {
+    [self emitEvent:CEventStartTrial];
     [[SoundManager sharedManager] playSound:@"ding.mp3"];
     btn.hidden = YES;
     runTimer = YES;
@@ -279,6 +258,7 @@
 }
 
 - (void)stopTimer {
+    [self emitEvent:CEventStopTrial];
     _pause.enabled = NO;
     start.hidden = NO;
     _left.alpha = 0;
@@ -367,6 +347,7 @@
     start.hidden = YES;
     runTimer = !paused;
     [self resetPause:btn];
+    [self emitEvent:paused?CEventPauseTrial:CEventResumeTrial];
 }
 
 - (void)resetPause:(UIBarButtonItem *)btn {
@@ -512,7 +493,7 @@
         trial.selectedLeft = selctedLeft;
         trial.left = trialsPlates[index][0];
         trial.right = trialsPlates[index][1];
-        
+        [self emitEvent:CEventUserTrialEnded withData:selctedLeft];
         NSMutableOrderedSet *tempSet = [NSMutableOrderedSet orderedSetWithOrderedSet:currentUser.trials];
         [tempSet addObject:trial];
         currentUser.trials = tempSet;
@@ -746,33 +727,6 @@
 
 #pragma mark - SRWebSocketDelegate
 
-- (void)webSocketDidOpen:(SRWebSocket *)webSocket;
-{
-    NSLog(@"Websocket Connected");
-}
-
-- (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;
-{
-    NSLog(@":( Websocket Failed With Error %@", error);
-    _webSocket = nil;
-}
-
-- (void)webSocket:(SRWebSocket *)webSocket didReceiveMessage:(id)message;
-{
-    [[[UIAlertView alloc] initWithTitle:@"Server says!" message:message delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
-    NSLog(@"Received \"%@\"", message);
-}
-
-- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean;
-{
-    NSLog(@"WebSocket closed");
-    _webSocket = nil;
-}
-
-- (void)webSocket:(SRWebSocket *)webSocket didReceivePong:(NSData *)pongPayload;
-{
-    NSLog(@"Websocket received pong");
-}
 #pragma mark - Trial history Tableview
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return tableView == _trialHistory ? totalTrials : 4 + files.count;
@@ -841,6 +795,7 @@
 
 #pragma mark - detecting app state
 - (void)appDidBecomeActive:(NSNotification *)notification {
+    BOOL changed = NO;
     NSUInteger lmaxrials = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial"];
     NSUInteger lmaxTimerVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_time"];
     NSUInteger lmaxTrialsType3 = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial_type_3"];
@@ -855,6 +810,7 @@
         maxTimerVal = lmaxTimerVal;
         totalTrials = maxTrialsType3+maxTrials*2;
         _container.currentPageIndex = 0;
+        changed = YES;
     }
     BOOL userType = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_user"];
     _showList.enabled = userType;
@@ -866,8 +822,9 @@
     }
     if (userType != 0 && _container.currentPageIndex != 8) {
         _container.currentPageIndex = 8;
+        changed = YES;
     }
-    [((AppDelegate *)[UIApplication sharedApplication].delegate) checkVRPN];
+    [VRPN instance];
     if (trialsPlates[0][0] == 0) {
         uint st = arc4random() % (MAX_TRIAL + 1);
         NSMutableArray *array = [NSMutableArray new];
@@ -892,17 +849,31 @@
         }
     }
     [_trialHistory reloadData];
-    [self _reconnect];
-    [perSecTimer invalidate];
-    perSecTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(perSecondUpdate) userInfo:nil repeats:YES];
+    if(!perSecTimer || changed){
+        [perSecTimer invalidate];
+        perSecTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(perSecondUpdate) userInfo:nil repeats:YES];
+        //runTimer = YES;
+    }
     [self searchForMusic];
     [_audioFiles reloadData];
 }
 
-- (void)appDidBecomeInactive:(NSNotification *)notification {
-    paused = YES;
+- (void)appWillInactive:(NSNotification *)notification {
+    paused = runTimer?YES:NO;
+    if([NSThread isMainThread] &&_backgroundTask == UIBackgroundTaskInvalid) {
+        _backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^{
+            [self endBackgroundTask];
+        }];
+    }
 }
-
+- (void)endBackgroundTask {
+    if([NSThread isMainThread] &&_backgroundTask != UIBackgroundTaskInvalid && [[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
+        paused = NO;
+        [perSecTimer invalidate];
+        perSecTimer = nil;
+        runTimer = NO;
+    }
+}
 - (void)searchForMusic {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -917,23 +888,88 @@
         files = [NSArray arrayWithArray:array];
     }
 }
-
-@end
-
-@implementation TCMessage
-
-@synthesize message = _message;
-@synthesize fromMe = _fromMe;
-
-- (id)initWithMessage:(NSString *)message fromMe:(BOOL)fromMe;
+-(void)restartSocket
 {
-    self = [super init];
-    if (self) {
-        _fromMe = fromMe;
-        _message = message;
+    if(_webSocket){
+        WebSocketRelease(_webSocket);
     }
-    
-    return self;
+    _webSocket = WebSocketCreateWithHostAndPort(NULL, kWebSocketHostAny, 6001, NULL);
+    _webSocket->callbacks.didClientReadCallback = remote_action;
+    if (_webSocket) {
+        NSLog(@"Running on %@", WebSocketGetIpAddress(_webSocket));
+    }else{
+        WebSocketRelease(_webSocket);
+    }
+}
+-(void)emitEvent:(CEvent)event{
+    [self emitEvent:event withData:nil];
+}
+-(void)emitEvent:(CEvent)event withData:(bool)data
+{
+    NSUInteger userTrialCount = currentUser.trials.count;
+    char index = (uint)((userTrialCount) % totalTrials);
+    index = trialsPlates[index][isCurrentModelA?0:1];
+    char type = (char)trialType;
+    char leftOrRight;
+    WebSocketRef websocket = _webSocket;
+    for (CFIndex i = 0; i < WebSocketGetClientCount(websocket); ++i) {
+        WebSocketClientRef client = WebSocketGetClientAtIndex(websocket, i);
+        switch (event) {
+            case CEventUserTrialEnded:
+                leftOrRight = (char)data;
+                WebSocketClientWriteWithFormat(client, CFSTR("%d,%d,%d,%d"), event,type,index,leftOrRight);
+                break;
+            default:
+                leftOrRight = (char)isCurrentModelA;
+                WebSocketClientWriteWithFormat(client, CFSTR("%d,%d,%d,%d"), event,type,index,leftOrRight);
+                break;
+        }
+    }
+    NSLog(@"sending data: %d%d%d", event,(char)trialType,trialsPlates[index][isCurrentModelA?0:1]);
 }
 
+void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef value) {
+    if (value) {
+        CFIndex length = CFStringGetLength(value);
+        CFIndex maxSize = CFStringGetMaximumSizeForEncoding(length,
+                                                            kCFStringEncodingUTF8);
+        char *buffer = (char *)malloc(maxSize);
+        if (maxSize && CFStringGetCString(value, buffer, maxSize,
+                                          kCFStringEncodingUTF8)) {
+            char action = buffer[0];
+            if(!action){
+                
+            }else{
+                switch (action & 7) {
+                    case CEventStartTrial: [_THIS startTimer:nil];break;
+                    case CEventStopTrial: [_THIS stopTimer];break;
+                    case CEventPauseTrial: if(!paused)[_THIS pause:_THIS.pause]; break;
+                    case CEventResumeTrial: if(paused)[_THIS pause:_THIS.pause]; break;
+                    case CEventReStartTrial: [_THIS refresh];  break;
+                    case CEventEndUserTrial:[_THIS  changeUser]; break;
+                }
+                if (action & CEventSendTrialList) {
+                    NSMutableString *csv = [NSMutableString new];
+                    [csv appendFormat:@"%d,",CEventSendTrialList];
+                    for (Trial *trial in currentUser.trials) {
+                        [csv appendFormat:@"\n%d,%d,%d,%d",trial.trialType,trial.left,trial.right,trial.selectedLeft];
+                    }
+                    WebSocketClientWriteWithFormat(client, (__bridge CFStringRef)[csv stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]]);
+                }
+                if (action & CEventUpdateTrialList && maxSize > 1 &&maxSize > buffer[1] + 1) {
+                    char size = buffer[1];
+                    for (int i = 0; i < size; i++) {
+                        char val = buffer[i+2];
+                        char index = (i - 2) / 2;
+                        char subIndex = (i - 2) %2;
+                        trialsPlates[index][subIndex] = val;
+                    }
+                }
+                if (action & CEventSendAllUserTrials) {
+                    
+                }
+            }
+        }
+    }
+}
 @end

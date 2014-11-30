@@ -7,22 +7,31 @@
 //
 
 #import "AppDelegate.h"
+#import <AVFoundation/AVAudioSession.h>
+#include <CoreGraphics/CGGeometry.h>
+#include <dispatch/dispatch.h>
 #import "DetailViewController.h"
 #import "UserViewController.h"
-#import <AVFoundation/AVAudioSession.h>
+
+
 @interface AppDelegate ()
 
 @end
 
 @implementation AppDelegate
-
-static VRPN *vrpnClient = NULL;
-- (VRPN *)vrpn_client {
-    return vrpnClient;
-}
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [self checkDocuments];
+    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
+    UserViewController *controller = (UserViewController *)navigationController.topViewController;
+    controller.managedObjectContext = self.managedObjectContext;
+    //[navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"orangeStrip"]                                                   forBarMetrics:UIBarMetricsDefault];
+    navigationController.navigationController.navigationBar.translucent = YES;
+    [UIApplication sharedApplication].idleTimerDisabled = YES;
+    return YES;
+}
+
+- (void)checkDocuments {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *path = [documentsDirectory stringByAppendingPathComponent:@"ding.mp3"];
@@ -53,28 +62,6 @@ static VRPN *vrpnClient = NULL;
         [[NSUserDefaults standardUserDefaults] setInteger:100 forKey:@"vrpn_refresh"];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"vrpn"];
         [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    UINavigationController *navigationController = (UINavigationController *)self.window.rootViewController;
-    UserViewController *controller = (UserViewController *)navigationController.topViewController;
-    controller.managedObjectContext = self.managedObjectContext;
-    //[navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"orangeStrip"]                                                   forBarMetrics:UIBarMetricsDefault];
-    navigationController.navigationController.navigationBar.translucent = YES;
-    [UIApplication sharedApplication].idleTimerDisabled = YES;
-    [self checkVRPN];
-    return YES;
-}
-
-- (void)checkVRPN {
-    BOOL vrpn = [[NSUserDefaults standardUserDefaults] boolForKey:@"vrpn"];
-    if (vrpn) {
-        if (!vrpnClient) {
-            vrpnClient = [[VRPN alloc] initWithHost:[[NSUserDefaults standardUserDefaults] stringForKey:@"remote_vrpn_host"]
-                                    andRefreshRate :[[NSUserDefaults standardUserDefaults] integerForKey:@"vrpn_refresh"]];
-        }
-        [vrpnClient startListening];
-    }
-    else if (vrpnClient) {
-        [vrpnClient stopListening];
     }
 }
 

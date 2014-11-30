@@ -1,0 +1,122 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8" /> 
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <title>Curvature example</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+        
+    </head>
+    <body>
+        <div>
+        <table id="container" style="margin:auto;width: 50%;"  class="table table-striped table-bordered">
+            <th><td>Event</td><td>Trial Type</td><td>Model</td></th>
+            </table>
+            </div>
+        <div style="width:50%;margin:auto" id="status">Connecting...<br/></div>        
+
+        <script type="text/javascript" charset="utf-8">
+
+            var box = document.getElementById('container')
+            var box2 = document.getElementById('status')
+function checkConnection(socket){
+        setTimeout(
+            function(){
+                if (socket.readyState === 1) {
+                    box2.innerHTML = 'Connected';
+                    ws.send(String.fromCharCode(16));
+                    return;
+                } else {
+                    checkConnection(socket);
+                }
+            }, 5);
+    };
+    
+    function tryConnection(){
+        setTimeout(
+            function(){
+                if(!ws){
+                	ws = new WebSocket('ws://192.168.0.8:6001');
+                	tryConnection();
+                }
+            }, 5);
+    };
+            if ("WebSocket" in window) {
+                ws = new WebSocket('ws://192.168.0.8:6001');
+checkConnection(ws);
+                ws.onerror = function(e) {
+                    console.log('error', e)
+                }
+
+                ws.onopen = function(e) {
+                    console.log('open', e)
+                    box2
+                }
+
+                ws.onmessage = function(e) {
+                    var data = e.data.split(",");
+                    
+                	if(parseInt(data[0]) == 16){
+                    var data = e.data.split("\n");
+                    var htmlData = '';
+                		for(var i = 1; i < data.length; i++){
+                			var row = data[i].split(",");
+                			var color = parseInt(row[3]) == 1?'#0000ff':'#00ff00';
+                			switch(parseInt(row[0])){
+                	case 0: trialType='Gesture';break;
+                	case 1: trialType='Servo';break;
+                	case 2: trialType='Simulation';break;
+                	}
+                			htmlData += '<tr><td bgcolor="'+color+'">'+'</td><td>Past trials</td><td>'+trialType+'</td><td>'+row[1]+', '+row[2]+'</td></tr>';
+                		}
+                		box.innerHTML =  '<table id="container" style="margin:auto;width: 50%;"  class="table table-striped table-bordered"><th><td>Event</td><td>Trial Type</td><td>Model</td></th>'+htmlData+'</table>';
+                	}else{
+                    if(data.length >= 4){
+                	var eventName = '';
+                	var lr = parseInt(data[3]) == 0?'R':'L';
+                	var color = '#ffffff';
+                	switch(parseInt(data[0]) & 7){
+                	case 1: eventName='Start';break;
+                	case 2: eventName='Stop';break;
+                	case 3: eventName='Pause';break;
+                	case 4: eventName='Resume';break;
+                	case 5: eventName='Restart';break;
+                	case 6: eventName='End Trial';
+                	lr = '';
+                	color = parseInt(data[3]) == 1?'#0000ff':'#00ff00';
+                		break;
+                	}
+                	var trialType = '';
+                	switch(parseInt(data[1])){
+                	case 0: trialType='Gesture';break;
+                	case 1: trialType='Servo';break;
+                	case 2: trialType='Simulation';break;
+                	}
+                	var leftRight = '';
+                	switch(parseInt(data[1])){
+                	case 0: trialType='Gesture';break;
+                	case 1: trialType='Servo';break;
+                	case 2: trialType='Simulation';break;
+                	}
+                    box.innerHTML =  box.innerHTML + '<tr><td bgcolor="'+color+'">'+lr+'</td><td>'+eventName+'</td><td>'+trialType+'</td><td>'+data[2]+'</td></tr>';
+                    }
+                    }
+                    
+                }
+
+                ws.onclose = function(e) {
+                    box2.innerHTML = 'DisConnected';
+                    console.log('close', e);
+                    tryConnection();
+                }
+                
+                document.onmousemove = function(e) {
+                	//ws.send([e.pageX, e.pageY].join(" "))
+                }
+            }
+        </script>
+    </body>
+</html>

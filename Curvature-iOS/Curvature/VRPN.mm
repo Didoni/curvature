@@ -11,7 +11,6 @@
 //
 
 #import "VRPN.h"
-#import "AppDelegate.h"
 #import "vrpn_Tracker.h"
 
 // This function is called once for every incoming VRPN tracker update
@@ -20,6 +19,31 @@ void VRPN_CALLBACK handle_tracker(void *userData, const vrpn_TRACKERCB a);
 @implementation VRPN {
     NSString *host;
     NSUInteger refreshRateInMillisec;
+}
+
+static VRPN *vrpnClient = NULL;
+- (VRPN *)vrpn_client {
+    return vrpnClient;
+}
+
+- (void)checkVRPN {
+}
+
++ (VRPN *)instance {
+    if (!vrpnClient) {
+        BOOL vrpn = [[NSUserDefaults standardUserDefaults] boolForKey:@"vrpn"];
+        if (vrpn) {
+            if (!vrpnClient) {
+                vrpnClient = [[VRPN alloc] initWithHost:[[NSUserDefaults standardUserDefaults] stringForKey:@"remote_vrpn_host"]
+                                        andRefreshRate :[[NSUserDefaults standardUserDefaults] integerForKey:@"vrpn_refresh"]];
+            }
+            [vrpnClient startListening];
+        }
+        else if (vrpnClient) {
+            [vrpnClient stopListening];
+        }
+    }
+    return vrpnClient;
 }
 
 // Tracker listener reference
@@ -43,7 +67,6 @@ vrpn_Tracker_Remote *vrpnTracker;
         static float x = 0, y = 0;
         if (x != rx | y != ry) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                ((AppDelegate *)[UIApplication sharedApplication].delegate).vrpnUpdater.text = [NSString stringWithFormat:@"(r,θ,φ) (%.2f, %.2f,%.2f)", radius, rx, ry];
             });
         }
     });

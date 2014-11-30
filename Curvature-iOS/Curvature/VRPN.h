@@ -11,6 +11,7 @@
 //
 
 #import <Foundation/Foundation.h>
+
 static float radius;
 static float rx;
 static float ry;
@@ -19,7 +20,7 @@ static float ry;
 {
     dispatch_source_t dispatchSource;
 }
-
++ (VRPN *)instance;
 // Default initiaizer
 - (id)initWithHost:(NSString *)host andRefreshRate:(NSUInteger)refreshRateInMillisec;
 
