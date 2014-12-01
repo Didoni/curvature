@@ -11,6 +11,7 @@
 #include <opencv\cv.h>
 #include <opencv\highgui.h>
 #include "COMToolkit.h"
+#include "winhttp.h" // add this line
 #include <string.h>
 #include "vrpn_Connection.h"
 #include "quat\quat.h"
@@ -23,8 +24,8 @@
 #define PI 3.14159265
 using namespace std;
 using namespace cv;
-
 #define MAX_ANGLE 15
+#define DIFFERENCE_H 0.001
 
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
@@ -50,6 +51,13 @@ int y;
 int atstart = 0;
 long startmilis=0;
 float coordinateX, coordinateZ;
+
+static float mPitch = 0;
+static float mRoll = 0;
+static float mYaw = 0;
+static FILE* fileExp3;
+static float rx;
+static float ry;
 
 
 class Instruction{
@@ -84,7 +92,10 @@ Instruction angleArray[91][91][13];
 Trial sequenceArray[40];
 
 
-
+ void wsconnect()
+{
+    
+}
 //== Callback prototype ==--
 
 // Arduino
@@ -99,7 +110,14 @@ long getMillisTime(){
 }
 
 
-
+void rotateAroundOrigin(float angle, float& x, float& y) {
+	const float cos = cosf(angle);
+	const float sin = sinf(angle);
+	const float newX = cos * x - sin * y;
+	const float newY = sin * x + cos * y;
+	x = newX;
+	y = newY;
+}
 
 
 //== Main entry point ==--
@@ -125,8 +143,67 @@ void handshake () {
 
 
 
-static float rx;
-static float ry;
+
+float sphereFunction(float coordX, float coordZ, float curvature){
+	const float radious = 1.0f / curvature;
+	const float r2 = radious*radious;
+	
+	return sqrtf(r2 - coordX*coordX - coordZ*coordZ);
+}
+
+float calcFiniteDiference(float coordX, float coordZ, float rotation, float xOffset, float zOffset, float param, float(*func)(float, float, float ) ){
+	
+	float p0x = xOffset;
+	float p0y = zOffset;
+	float p1x =  - xOffset;
+	float p1y =  - zOffset;
+
+	rotateAroundOrigin(rotation, p0x, p0y);
+	rotateAroundOrigin(rotation, p1x, p1y);
+
+	 p0x += coordX ;
+	 p0y += coordZ ;
+	 p1x += coordX ;
+	 p1y += coordZ ;
+
+	const float p0 = func(p0x, p0y, param);
+	const float p1 = func(p1x, p1y, param);
+	return (p0 - p1) / (xOffset+zOffset) / 2.0f;
+	
+	/*
+	const float p0 = func(coordX + xOffset*2, coordZ + zOffset*2, param);
+	const float p1 = func(coordX + xOffset, coordZ + zOffset, param);
+	const float p2 = func(coordX - xOffset, coordZ - zOffset, param);
+	const float p3 = func(coordX - xOffset*2, coordZ - zOffset*2, param);
+	return (-p0 + 8*p1 - 8*p2 + p3) / (xOffset+zOffset) / 12.0f;
+	*/
+}
+
+void findAnglesFinite(float coordX, float coordZ, float rotation, float& phi, float& theta, float curvature) {
+	float sign = 1.0f;
+
+	if (curvature == 0.0f){
+		phi = 0.0f;
+		theta = 0.0f;
+		return;
+	}else if(curvature < 0.0f){
+		curvature = -curvature;
+		sign = -1.0f;
+	}
+
+	phi = sign * -atanf( calcFiniteDiference(coordX,coordZ, rotation, DIFFERENCE_H,0, curvature, sphereFunction) ) * 180.f / PI;
+	theta = sign * atanf(calcFiniteDiference(coordX,coordZ, rotation, 0,DIFFERENCE_H, curvature, sphereFunction) ) * 180.f / PI;
+
+	int offsetTheta = 0;
+	int offsetPhi = 0;
+	theta = theta + offsetTheta;
+	phi = phi + offsetPhi;
+
+	if (theta > MAX_ANGLE) { theta = MAX_ANGLE;}
+	else if (theta < -MAX_ANGLE) { theta = -MAX_ANGLE;}
+	if (phi > MAX_ANGLE) { phi = MAX_ANGLE;}
+	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
+}
 
 void findAngles(float coordX, float coordZ, float& phi, float& theta, float curvature) {
 	float sign = 1.0f;
@@ -159,23 +236,32 @@ void findAngles(float coordX, float coordZ, float& phi, float& theta, float curv
 	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
 }
 
+
+
 void findCurve() {
 	float thetaAngle, phiAngle;
-	const float curv =2;
+	const float curv = 3;
 
 	float xTemp; 
 	float zTemp;
 	float thetaPlanets[4]= {0,0,0,0};//Sat, Mars, Earth, Jup
 	float phiPlanets[4] = {0,0,0,0};
+
 	float zoffsets[4] = {0.025, 0.0, -0.025, -0.05};
-	float xoffsets[4] ={ -0.01, 0.0, -0.01, -0.03};
+	float xoffsets[4] ={-0.11, -0.1, -0.11, -0.13};
+
+	const float rotRad = mYaw / 180.0f * PI;
 
 	if(curv != 0) {
-		coordinateX = coordinateX - 0.1;
+		//coordinateX = coordinateX - 0.1;
 		for (int i=0; i<4; i++) {
-			xTemp = coordinateX + xoffsets[i];
-			zTemp = coordinateZ + zoffsets[i];
-			findAngles(xTemp, zTemp, phiPlanets[i], thetaPlanets[i], curv);
+			xTemp = xoffsets[i];
+			zTemp = zoffsets[i];
+			rotateAroundOrigin(rotRad, xTemp , zTemp);
+			xTemp += coordinateX;
+			zTemp += coordinateZ;
+
+			findAnglesFinite(xTemp, zTemp, rotRad, phiPlanets[i], thetaPlanets[i], curv);
 		}
 	}
 
@@ -200,100 +286,6 @@ void findCurve() {
 	sendBytesTest((short)sxM,(short)syM);
 	sendBytesTest((short)sxS,(short)syS);
 	
-}
-
-
-void readFromMyFile(int curvature) {
-
-	stringstream nameA, nameB;
-	nameA<<"theta"<<curvature;
-	nameB<<"phi"<<curvature;
-	std::ifstream thetafile (nameA.str());
-	std::ifstream phifile (nameB.str());
-
-	string phi, theta;
-	for( int i=0; i<91; i++) {
-		getline(thetafile, theta);
-		getline(phifile, phi);
-		istringstream thetastream(theta);
-		istringstream phistream(phi);
-		for(int j=0; j< 91; j++) {
-			string subtheta,subphi;
-			thetastream >> subtheta;
-			phistream >> subphi;
-			angleArray[i][j][curvature].setTheta(atof(subtheta.c_str()));
-			angleArray[i][j][curvature].setPhi(atof(subphi.c_str()));
-		}
-	}
-}
-
-void writeToFile(int curvature) {
-	
-	//write to file
-	stringstream nameA,nameB;
-	nameA<<"theta"<<curvature;
-	nameB<<"phi"<<curvature;
-	ofstream thetaFile, phiFile;
-    thetaFile.open (nameA.str());
-    phiFile.open (nameB.str());
-	stringstream thetaVal,phiVal;
-
-	for( int i=0; i<91; i++) {
-		for(int j=0; j< 91; j++) {
-			thetaVal<<angleArray[i][j][curvature].getTheta()<<" ";
-			phiVal<<angleArray[i][j][curvature].getPhi()<<" ";
-		}
-		thetaVal<<"\n";
-		phiVal<<"\n";
-	}
-	thetaFile<<thetaVal.str();
-    thetaFile.close();
-	phiFile<<phiVal.str();
-    phiFile.close();
-	//write to file
-}
-
-void mapCurve(float radius, int curvature) {
-
-	float r = radius;
-	if(r == 0) {
-		for( int i=0; i<91; i++) {
-			for(int j=0; j< 91; j++) {
-				angleArray[i][j][curvature].setTheta((float) 0.0);
-				angleArray[i][j][curvature].setPhi((float) 0.0);
-			}
-		}
-	}
-	else {
-		for( int i=0; i<91; i++) {
-		  for(int j=0; j< 91; j++) {
-		
-			float y = sqrt(r*r - i*i -j*j);
-
-			float theta = asin(j/r)*180/PI;
-			float tempCos = cos(theta*PI/180);
-			float temp = tempCos*y/r;
-			float phi = acos(y/(r*tempCos))*180/PI;
-			float tempSin = asin(-i/(r*tempCos))*180/PI;
-	
-			float mappingTheta = (float) theta;
-			float mappingPhi = (float) tempSin;
-			//cout<<"mapX "<<x<<" map Y "<<y<<" map Z "<<z<<" temp "<< temp<<"tempcos "<<tempCos<<" Theta is "<<theta<<" phi is "<<phi<<" phi2check "<<tempSin<<" map "<<mapping<<" mapB "<<mappingB<<endl;
-			cout<<"x "<<i<<" y "<<y<<" z "<<j<<" Theta "<<theta<<" phi "<<tempSin<<" map "<<mappingTheta<<" mapB "<<mappingPhi<<endl;
-			if(mappingTheta <-20) mappingTheta=-20;
-			if(mappingTheta > 20) mappingTheta =20;
-			if (mappingPhi <-20) mappingPhi =-20;
-			if(mappingPhi > 20) mappingPhi = 20;
-
-
-			angleArray[i][j][curvature].setTheta((float)mappingTheta);
-			angleArray[i][j][curvature].setPhi((float)mappingPhi);
-	
-		  }
-		}
-	}
-	writeToFile(curvature);
-
 }
 
 
@@ -372,10 +364,6 @@ static float getYaw(float x, float y, float z, float w,  bool reprojectAxis)
 		}
 	}
 
-static float mPitch = 0;
-static float mRoll = 0;
-static float mYaw = 0;
-static FILE* fileExp3;
 
 void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 {
@@ -447,50 +435,6 @@ void initializeSequence() {
 	}
 }
 
-void initializeLookupTable() {
-	readFromMyFile(6);
-	readFromMyFile(5);
-	readFromMyFile(4);
-	readFromMyFile(3);
-	readFromMyFile(2);
-	readFromMyFile(1);
-	readFromMyFile(0);
-
-	//Experiment 2
-	readFromMyFile(7);
-	readFromMyFile(8);
-	readFromMyFile(9);
-	readFromMyFile(10);
-	readFromMyFile(11);
-	readFromMyFile(12);
-	
-	//mapCurve(714.286,6); // 1.4 
-	//mapCurve(1666.667,5); // 0.6
-	//mapCurve(2500,4); //0.4
-	//mapCurve(0,3); //0
-	//mapCurve(-2500,2); //-0.4
-	//mapCurve(-1666.667,1); //- 0.6
-	//mapCurve(-714.286,0); // -1.4
-
-	//mapCurve(555.556,7); //1.8
-	//mapCurve(500,8); //2
-	//mapCurve(454.545,9); //2.2
-	//mapCurve(384.615,10); //2.6
-	//mapCurve(-294.117,12); // 3.4
-
-	/*findCurve(70, 70);
-	findCurve(-70, 70);
-	findCurve(70, -70);
-	findCurve(-70, -70);
-	findCurve(0, 90);
-	findCurve(0, -90);
-	findCurve(90, 0);
-	findCurve(-90, 0);
-	findCurve(0, 0);
-	int test;
-	cout<<"enter "<<endl;
-	cin>>test;*/
-}
 
 void fitCurve(float coordX, float coordY, float rotX, float rotY) {
 	//calibrate input
@@ -542,13 +486,6 @@ int main(int argc, char* argv[])
     connection = vrpn_get_connection_by_name(connectionName);
     vrpn_Tracker_Remote *tracker = new vrpn_Tracker_Remote("testingSlope", connection);
   	tracker->register_change_handler(NULL, handle_pos);
-
-	//Library init
-	initializeLookupTable();
-	//initializeSequence();
-	//Library
-
-
 
 	// Arduino port
 	COMToolkit::connect(L"\\\\.\\COM15");
@@ -635,7 +572,7 @@ int main(int argc, char* argv[])
     {
 		tracker->mainloop();
 		connection->mainloop();
-        Sleep(30);
+        Sleep(1);
 		findCurve();
     }
 
