@@ -11,6 +11,7 @@
 #include <opencv\cv.h>
 #include <opencv\highgui.h>
 #include "COMToolkit.h"
+#include "winhttp.h" // add this line
 #include <string.h>
 #include "vrpn_Connection.h"
 #include "quat\quat.h"
@@ -19,18 +20,21 @@
 #include "vrpn_Tracker.h"    //    ftp://ftp.cs.unc.edu/pub/packages/GRIP/vrpn
 //F#include <glm/glm.hpp>
 //#include "conio.h"           // for kbhit()
-#define DEGREES_PER_RADIAN (180 / acos(-1.0))
+
 #define PI 3.14159265
 using namespace std;
 using namespace cv;
 
 #define MAX_ANGLE 15
+#define DIFFERENCE_H 0.001
+#define MIN_SERVO_VALUE 1250
 
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
 #define EXPERIMENT_3 1
 
 //#define EXPERIMENT_KEYBOARD 1
+//#define EXPERIMENT_SCREENOUTPUT 1
 
 //#ifdef EXPERIMENT_3
 static MultiVariableInterp2D* mInterpMars;
@@ -50,6 +54,13 @@ int y;
 int atstart = 0;
 long startmilis=0;
 float coordinateX, coordinateZ;
+
+static float mPitch = 0;
+static float mRoll = 0;
+static float mYaw = 0;
+static FILE* fileExp3;
+static float rx;
+static float ry;
 
 
 class Instruction{
@@ -84,7 +95,10 @@ Instruction angleArray[91][91][13];
 Trial sequenceArray[40];
 
 
-
+ void wsconnect()
+{
+    
+}
 //== Callback prototype ==--
 
 // Arduino
@@ -99,22 +113,70 @@ long getMillisTime(){
 }
 
 
+void rotateAroundOrigin(float angle, float& x, float& y) {
+	const float cos = cosf(angle);
+	const float sin = sinf(angle);
+	const float newX = cos * x - sin * y;
+	const float newY = sin * x + cos * y;
+	x = newX;
+	y = newY;
+}
 
 
-
-//== Main entry point ==--
-
-void sendBytesTest(short theta, short fi) {
-	//cout<<"mapping "<<theta<<" mapping Z "<<fi<<endl;
-	//cout<<"size "<<sizeof(mapping)<<endl;
-	//cout<<"second ";
-	
+void sendBytesTest(short theta, short fi) {	
 	COMToolkit::sendByte((theta >>8) & 255);
 	COMToolkit::sendByte(theta & 255);
 	COMToolkit::sendByte((fi >>8) & 255);
 	COMToolkit::sendByte(fi & 255);
 }
 
+void send4ServosPackedIn9Bytes(short t0, short f0,short t1, short f1,short t2, short f2,short t3, short f3) {	
+	//printf("Values before %d %d %d %d %d %d %d %d\n", t0, f0, t1, f1, t2, f2, t3, f3);
+
+	t0 -= MIN_SERVO_VALUE; f0 -= MIN_SERVO_VALUE;
+	t1 -= MIN_SERVO_VALUE; f1 -= MIN_SERVO_VALUE;
+	t2 -= MIN_SERVO_VALUE; f2 -= MIN_SERVO_VALUE;
+	t3 -= MIN_SERVO_VALUE; f3 -= MIN_SERVO_VALUE;
+
+	unsigned char significantBits = 0;
+	significantBits |= (t0 & (1<<8)) >> 8;
+	significantBits |= (f0 & (1<<8)) >> 7;
+	significantBits |= (t1 & (1<<8)) >> 6;
+	significantBits |= (f1 & (1<<8)) >> 5;
+	significantBits |= (t2 & (1<<8)) >> 4;
+	significantBits |= (f2 & (1<<8)) >> 3;
+	significantBits |= (t3 & (1<<8)) >> 2;
+	significantBits |= (f3 & (1<<8)) >> 1;
+
+	/*
+	//decode
+	t0 = (t0 & 255) + ((significantBits & (1<<0)) ? 256 : 0 );
+	f0 = (f0 & 255) + ((significantBits & (1<<1)) ? 256 : 0 );
+	t1 = (t1 & 255) + ((significantBits & (1<<2)) ? 256 : 0 );
+	f1 = (f1 & 255) + ((significantBits & (1<<3)) ? 256 : 0 );
+	t2 = (t2 & 255) + ((significantBits & (1<<4)) ? 256 : 0 );
+	f2 = (f2 & 255) + ((significantBits & (1<<5)) ? 256 : 0 );
+	t3 = (t3 & 255) + ((significantBits & (1<<6)) ? 256 : 0 );
+	f3 = (f3 & 255) + ((significantBits & (1<<7)) ? 256 : 0 );
+
+	t0 += MIN_SERVO_VALUE; f0 += MIN_SERVO_VALUE;
+	t1 += MIN_SERVO_VALUE; f1 += MIN_SERVO_VALUE;
+	t2 += MIN_SERVO_VALUE; f2 += MIN_SERVO_VALUE;
+	t3 += MIN_SERVO_VALUE; f3 += MIN_SERVO_VALUE;
+
+	printf("Values after %d %d %d %d %d %d %d %d\n", t0, f0, t1, f1, t2, f2, t3, f3);
+
+	printf("\n");
+	*/
+
+
+	COMToolkit::sendByte( t0 & 255 ); COMToolkit::sendByte( f0 & 255 );
+	COMToolkit::sendByte( t1 & 255 ); COMToolkit::sendByte( f1 & 255 );
+	COMToolkit::sendByte( t2 & 255 ); COMToolkit::sendByte( f2 & 255 );
+	COMToolkit::sendByte( t3 & 255 ); COMToolkit::sendByte( f3 & 255 );
+	COMToolkit::sendByte( significantBits );
+
+}
 
 void handshake () {
 	short key = 255;
@@ -122,11 +184,75 @@ void handshake () {
 
 }
 
+/*
+void send8ShortsPacked(short t[4], short f[4]){
+
+	COMToolkit::sendByte( t0 & 255);
+
+}
+*/
 
 
+float sphereFunction(float coordX, float coordZ, float curvature){
+	const float radious = 1.0f / curvature;
+	const float r2 = radious*radious;
+	
+	return sqrtf(r2 - coordX*coordX - coordZ*coordZ);
+}
 
-static float rx;
-static float ry;
+float calcFiniteDiference(float coordX, float coordZ, float rotation, float xOffset, float zOffset, float param, float(*func)(float, float, float ) ){
+	
+	float p0x = xOffset;
+	float p0y = zOffset;
+	float p1x =  - xOffset;
+	float p1y =  - zOffset;
+
+	rotateAroundOrigin(rotation, p0x, p0y);
+	rotateAroundOrigin(rotation, p1x, p1y);
+
+	 p0x += coordX ;
+	 p0y += coordZ ;
+	 p1x += coordX ;
+	 p1y += coordZ ;
+
+	const float p0 = func(p0x, p0y, param);
+	const float p1 = func(p1x, p1y, param);
+	return (p0 - p1) / (xOffset+zOffset) / 2.0f;
+	
+	/*
+	const float p0 = func(coordX + xOffset*2, coordZ + zOffset*2, param);
+	const float p1 = func(coordX + xOffset, coordZ + zOffset, param);
+	const float p2 = func(coordX - xOffset, coordZ - zOffset, param);
+	const float p3 = func(coordX - xOffset*2, coordZ - zOffset*2, param);
+	return (-p0 + 8*p1 - 8*p2 + p3) / (xOffset+zOffset) / 12.0f;
+	*/
+}
+
+void findAnglesFinite(float coordX, float coordZ, float rotation, float& phi, float& theta, float curvature) {
+	float sign = 1.0f;
+
+	if (curvature == 0.0f){
+		phi = 0.0f;
+		theta = 0.0f;
+		return;
+	}else if(curvature < 0.0f){
+		curvature = -curvature;
+		sign = -1.0f;
+	}
+
+	phi = sign * -atanf( calcFiniteDiference(coordX,coordZ, rotation, DIFFERENCE_H,0, curvature, sphereFunction) ) * 180.f / PI;
+	theta = sign * atanf(calcFiniteDiference(coordX,coordZ, rotation, 0,DIFFERENCE_H, curvature, sphereFunction) ) * 180.f / PI;
+
+	int offsetTheta = 0;
+	int offsetPhi = 0;
+	theta = theta + offsetTheta;
+	phi = phi + offsetPhi;
+
+	if (theta > MAX_ANGLE) { theta = MAX_ANGLE;}
+	else if (theta < -MAX_ANGLE) { theta = -MAX_ANGLE;}
+	if (phi > MAX_ANGLE) { phi = MAX_ANGLE;}
+	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
+}
 
 void findAngles(float coordX, float coordZ, float& phi, float& theta, float curvature) {
 	float sign = 1.0f;
@@ -159,23 +285,32 @@ void findAngles(float coordX, float coordZ, float& phi, float& theta, float curv
 	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
 }
 
+
+
 void findCurve() {
 	float thetaAngle, phiAngle;
-	const float curv =2;
+	const float curv = 3;
 
 	float xTemp; 
 	float zTemp;
 	float thetaPlanets[4]= {0,0,0,0};//Sat, Mars, Earth, Jup
 	float phiPlanets[4] = {0,0,0,0};
+
 	float zoffsets[4] = {0.025, 0.0, -0.025, -0.05};
-	float xoffsets[4] ={ -0.01, 0.0, -0.01, -0.03};
+	float xoffsets[4] ={-0.11, -0.1, -0.11, -0.13};
+
+	const float rotRad = mYaw / 180.0f * PI;
 
 	if(curv != 0) {
-		coordinateX = coordinateX - 0.1;
+		//coordinateX = coordinateX - 0.1;
 		for (int i=0; i<4; i++) {
-			xTemp = coordinateX + xoffsets[i];
-			zTemp = coordinateZ + zoffsets[i];
-			findAngles(xTemp, zTemp, phiPlanets[i], thetaPlanets[i], curv);
+			xTemp = xoffsets[i];
+			zTemp = zoffsets[i];
+			rotateAroundOrigin(rotRad, xTemp , zTemp);
+			xTemp += coordinateX;
+			zTemp += coordinateZ;
+
+			findAnglesFinite(xTemp, zTemp, rotRad, phiPlanets[i], thetaPlanets[i], curv);
 		}
 	}
 
@@ -190,110 +325,18 @@ void findCurve() {
 	mInterpMars->query(phiPlanets[1],thetaPlanets[1], sxM,syM);
 	mInterpSaturn->query(phiPlanets[0],thetaPlanets[0], sxS,syS);
 	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<" Theta "<<thetaPlanets[2]<<" phi "<<phiPlanets[2]<<" Sx"<<sxE<<" Sy "<<syE<<endl;
-	cout<<"x "<<coordinateX<<" z "<<coordinateZ<<endl;
-	cout<<"Sx "<<sxJ<<" , "<<sxE<<" , "<<sxM<<" , "<<sxS<<" Sz "<<syJ<<" , "<<syE<<" , "<<syM<<" , "<<syS<<endl;
+	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<endl;
+	//cout<<"Sx "<<sxJ<<" , "<<sxE<<" , "<<sxM<<" , "<<sxS<<" Sz "<<syJ<<" , "<<syE<<" , "<<syM<<" , "<<syS<<endl;
 	//cout<<"tt "<<phiPlanets[1]<<" "<<thetaPlanets[1]<<"Jup "<<sxJ<<" "<<syJ<<" Earth "<<sxE<<" "<<syE<<" Mars "<<sxM<<" "<<syM<<" Sat "<<sxS<<" "<<syS<<endl;
 
 	handshake();
+	/*
 	sendBytesTest((short)sxJ,(short)syJ);
 	sendBytesTest((short)sxE,(short)syE);
 	sendBytesTest((short)sxM,(short)syM);
 	sendBytesTest((short)sxS,(short)syS);
-	
-}
-
-
-void readFromMyFile(int curvature) {
-
-	stringstream nameA, nameB;
-	nameA<<"theta"<<curvature;
-	nameB<<"phi"<<curvature;
-	std::ifstream thetafile (nameA.str());
-	std::ifstream phifile (nameB.str());
-
-	string phi, theta;
-	for( int i=0; i<91; i++) {
-		getline(thetafile, theta);
-		getline(phifile, phi);
-		istringstream thetastream(theta);
-		istringstream phistream(phi);
-		for(int j=0; j< 91; j++) {
-			string subtheta,subphi;
-			thetastream >> subtheta;
-			phistream >> subphi;
-			angleArray[i][j][curvature].setTheta(atof(subtheta.c_str()));
-			angleArray[i][j][curvature].setPhi(atof(subphi.c_str()));
-		}
-	}
-}
-
-void writeToFile(int curvature) {
-	
-	//write to file
-	stringstream nameA,nameB;
-	nameA<<"theta"<<curvature;
-	nameB<<"phi"<<curvature;
-	ofstream thetaFile, phiFile;
-    thetaFile.open (nameA.str());
-    phiFile.open (nameB.str());
-	stringstream thetaVal,phiVal;
-
-	for( int i=0; i<91; i++) {
-		for(int j=0; j< 91; j++) {
-			thetaVal<<angleArray[i][j][curvature].getTheta()<<" ";
-			phiVal<<angleArray[i][j][curvature].getPhi()<<" ";
-		}
-		thetaVal<<"\n";
-		phiVal<<"\n";
-	}
-	thetaFile<<thetaVal.str();
-    thetaFile.close();
-	phiFile<<phiVal.str();
-    phiFile.close();
-	//write to file
-}
-
-void mapCurve(float radius, int curvature) {
-
-	float r = radius;
-	if(r == 0) {
-		for( int i=0; i<91; i++) {
-			for(int j=0; j< 91; j++) {
-				angleArray[i][j][curvature].setTheta((float) 0.0);
-				angleArray[i][j][curvature].setPhi((float) 0.0);
-			}
-		}
-	}
-	else {
-		for( int i=0; i<91; i++) {
-		  for(int j=0; j< 91; j++) {
-		
-			float y = sqrt(r*r - i*i -j*j);
-
-			float theta = asin(j/r)*180/PI;
-			float tempCos = cos(theta*PI/180);
-			float temp = tempCos*y/r;
-			float phi = acos(y/(r*tempCos))*180/PI;
-			float tempSin = asin(-i/(r*tempCos))*180/PI;
-	
-			float mappingTheta = (float) theta;
-			float mappingPhi = (float) tempSin;
-			//cout<<"mapX "<<x<<" map Y "<<y<<" map Z "<<z<<" temp "<< temp<<"tempcos "<<tempCos<<" Theta is "<<theta<<" phi is "<<phi<<" phi2check "<<tempSin<<" map "<<mapping<<" mapB "<<mappingB<<endl;
-			cout<<"x "<<i<<" y "<<y<<" z "<<j<<" Theta "<<theta<<" phi "<<tempSin<<" map "<<mappingTheta<<" mapB "<<mappingPhi<<endl;
-			if(mappingTheta <-20) mappingTheta=-20;
-			if(mappingTheta > 20) mappingTheta =20;
-			if (mappingPhi <-20) mappingPhi =-20;
-			if(mappingPhi > 20) mappingPhi = 20;
-
-
-			angleArray[i][j][curvature].setTheta((float)mappingTheta);
-			angleArray[i][j][curvature].setPhi((float)mappingPhi);
-	
-		  }
-		}
-	}
-	writeToFile(curvature);
-
+	*/
+	send4ServosPackedIn9Bytes(sxJ, syJ, sxE, syE, sxM, syM, sxS, syS);
 }
 
 
@@ -372,10 +415,6 @@ static float getYaw(float x, float y, float z, float w,  bool reprojectAxis)
 		}
 	}
 
-static float mPitch = 0;
-static float mRoll = 0;
-static float mYaw = 0;
-static FILE* fileExp3;
 
 void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 {
@@ -398,98 +437,6 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 	//cout<<" cZ "<<coordinateZ<<" cX "<<coordinateX<<endl;
 #endif
 
-}
-
-void initializeSequence() {
-	srand ( time(NULL) );
-	int sizeOfDict = 20;
-	int occurenceMax= 5;
-	const int curvatures[8] = {1,2,4,5,3,3,3,3};
-	int curvatureNum = 8;
-	int referencePosition = 4;
-	int occurances[8];
-	int occurancesVirt[8];
-
-	for(int i=0;i<curvatureNum;i++){
-		occurances[i] =0;
-		occurancesVirt[i] =0;
-	}
-
-	for (int i=0; i<sizeOfDict; i++) {
-		int RealIndex = rand() % curvatureNum;
-		if(occurances[RealIndex] < occurenceMax) {
-			cout<<"yes"<<endl;
-			sequenceArray[i].setReal(curvatures[RealIndex]);
-			occurances[RealIndex] ++;
-		}
-		else { i = i-1; cout<<"no"<<endl;}
-	}
-
-	for (int i=0; i<sizeOfDict; i++) {
-		if (sequenceArray[i].getReal() == curvatures[referencePosition]) {
-			int VirtIndex = rand() % referencePosition;
-			while(occurancesVirt[VirtIndex] >=occurenceMax) {
-				VirtIndex = rand() % referencePosition;
-			}
-			occurancesVirt[VirtIndex]++;
-			sequenceArray[i].setVirt(curvatures[VirtIndex]);
-		}
-		else {
-			sequenceArray[i].setVirt(curvatures[referencePosition]);
-		}
-	}
-
-	for(int i=0; i< sizeOfDict; i++) {
-		cout<<"ARRAY "<<i<<" real "<<sequenceArray[i].getReal()<<" virt "<<sequenceArray[i].getVirt()<<endl;
-	}
-	for(int i=0;i<curvatureNum;i++) {
-		cout<<"Count "<<curvatures[i]<<" - "<<occurances[i]<<" virtual "<<occurancesVirt[i]<<endl;
-	}
-}
-
-void initializeLookupTable() {
-	readFromMyFile(6);
-	readFromMyFile(5);
-	readFromMyFile(4);
-	readFromMyFile(3);
-	readFromMyFile(2);
-	readFromMyFile(1);
-	readFromMyFile(0);
-
-	//Experiment 2
-	readFromMyFile(7);
-	readFromMyFile(8);
-	readFromMyFile(9);
-	readFromMyFile(10);
-	readFromMyFile(11);
-	readFromMyFile(12);
-	
-	//mapCurve(714.286,6); // 1.4 
-	//mapCurve(1666.667,5); // 0.6
-	//mapCurve(2500,4); //0.4
-	//mapCurve(0,3); //0
-	//mapCurve(-2500,2); //-0.4
-	//mapCurve(-1666.667,1); //- 0.6
-	//mapCurve(-714.286,0); // -1.4
-
-	//mapCurve(555.556,7); //1.8
-	//mapCurve(500,8); //2
-	//mapCurve(454.545,9); //2.2
-	//mapCurve(384.615,10); //2.6
-	//mapCurve(-294.117,12); // 3.4
-
-	/*findCurve(70, 70);
-	findCurve(-70, 70);
-	findCurve(70, -70);
-	findCurve(-70, -70);
-	findCurve(0, 90);
-	findCurve(0, -90);
-	findCurve(90, 0);
-	findCurve(-90, 0);
-	findCurve(0, 0);
-	int test;
-	cout<<"enter "<<endl;
-	cin>>test;*/
 }
 
 void fitCurve(float coordX, float coordY, float rotX, float rotY) {
@@ -543,16 +490,10 @@ int main(int argc, char* argv[])
     vrpn_Tracker_Remote *tracker = new vrpn_Tracker_Remote("testingSlope", connection);
   	tracker->register_change_handler(NULL, handle_pos);
 
-	//Library init
-	initializeLookupTable();
-	//initializeSequence();
-	//Library
-
-
-
 	// Arduino port
 	COMToolkit::connect(L"\\\\.\\COM15");
 
+	//initializeSequence();
 
 	//first experiment
 #ifdef EXPERIMENT_1
@@ -635,7 +576,10 @@ int main(int argc, char* argv[])
     {
 		tracker->mainloop();
 		connection->mainloop();
-        Sleep(30);
+        Sleep(5);
+		tracker->mainloop();
+		connection->mainloop();
+        Sleep(5);
 		findCurve();
     }
 

@@ -2,38 +2,58 @@
 #include <DSSerial.h>
 //#include <stdlib.h>
 
-int servoPin = 11;
-int servoPintwo = 9;
-Servo myServo;
-Servo myServotwo;
+#define MINANGLE 1200
+#define MAXANGLE 1800
+
+int servoPin[8] = {2,3,5,4,7,6,12,13};
+//int servoPintwo = 3;
+Servo myServo[8];
+//Servo myServotwo;
 int incomingByte = 0;
 int incomingByte2 = 0;
 int incomingByte3 = 0;
 int angle;
-int oldDegree, oldDegreeTwo;
-int degree, degreetwo;
+int oldDegree[8];
+int degree[8];
 
 DSSerial serial = DSSerial();
 
 void setup()
 {
-  myServo.attach(servoPin,600,2400);
-  myServotwo.attach(servoPintwo,600,2400);
+  myServo[0].attach(servoPin[0],600,2400);
+  myServo[1].attach(servoPin[1],600,2400);
+  myServo[2].attach(servoPin[2],600,2400);
+  myServo[3].attach(servoPin[3],600,2400);
+  myServo[4].attach(servoPin[4],600,2400);
+  myServo[5].attach(servoPin[5],600,2400);
+  myServo[6].attach(servoPin[6],600,2400);
+  myServo[7].attach(servoPin[7],600,2400);
   
-  int ang = 90; //8
-  int angtwo =90;  //6
+  int ang = (MINANGLE + MAXANGLE)/2; //8
+  int angtwo =(MINANGLE + MAXANGLE)/2;  //6
   //ang = map(ang, 72,108,71, 116);
   //ang = map(ang,78,102,77, 106);
   //angtwo = map(angtwo,78,102,75, 103);
   //angtwo = map(angtwo,72,108,70, 110);
   //ang=ang-1;
-  myServo.write(ang);
-  myServotwo.write(angtwo);
+  //for(int i =0; i<8;i++) {
+  //    myServo[i].write(ang);
+ // }
   
   Serial.begin(115200);
-  oldDegree = 0;
-  oldDegreeTwo = 0;
+  for (int i=0;i<8; i++) 
+    oldDegree[i] = 0;
+  //oldDegreeTwo = 0;
   delay(30); 
+}
+
+void writetoServo(int number) {
+  if(oldDegree[number] != degree[number] && degree[number] < MAXANGLE && degree[number] > MINANGLE)
+      {
+          oldDegree[number] = degree[number];
+          myServo[number].writeMicroseconds(degree[number]);
+       }
+  
 }
 
 void loop() 
@@ -45,25 +65,35 @@ void loop()
 
     int key = Serial.read(); 
     if (key == 255) {
-       int degree= serial.readInt();
-       //degree = map(degree,78,102,77, 106);
-       //degree = map(degree,  72,108,71, 116);
-       int degreetwo = serial.readInt();
-       //degreetwo = map(degreetwo,78,102,75, 103);
-       //degreetwo = map(degreetwo, 72,108,69, 110);
+      
+       degree[0]= serial.readInt();
+       degree[1] = serial.readInt();
+       
+       /*
+       degree[2] = degree[0];
+       degree[3] = degree[1];
+       
+       degree[4] = degree[0];
+       degree[5] = degree[1];
+       degree[6] = degree[0];
+       degree[7] = degree[1];
+       */
+       degree[2] = serial.readInt();
+       degree[3] = serial.readInt();
+       degree[4] = serial.readInt();
+       degree[5] = serial.readInt();
+       degree[6] = serial.readInt();
+       degree[7] = serial.readInt();
 
 
-       if(oldDegree != degree) {
-          oldDegree = degree;
-          myServo.writeMicroseconds(600+degree*10);
-          //myServo.write(degree); 
-       }
-       if(oldDegreeTwo != degreetwo) {
-          oldDegreeTwo = degreetwo;
-          //myServotwo.write(degreetwo);
-          myServotwo.writeMicroseconds(600+degreetwo*10);
-         //myServo.writeMicroseconds(600+degreetwo*10); 
-       }
+       writetoServo(0);
+       writetoServo(1);
+       writetoServo(2);
+       writetoServo(3);
+       writetoServo(4);
+       writetoServo(5);
+       writetoServo(6);
+       writetoServo(7);
      }
         
    
