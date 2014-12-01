@@ -20,18 +20,21 @@
 #include "vrpn_Tracker.h"    //    ftp://ftp.cs.unc.edu/pub/packages/GRIP/vrpn
 //F#include <glm/glm.hpp>
 //#include "conio.h"           // for kbhit()
-#define DEGREES_PER_RADIAN (180 / acos(-1.0))
+
 #define PI 3.14159265
 using namespace std;
 using namespace cv;
+
 #define MAX_ANGLE 15
 #define DIFFERENCE_H 0.001
+#define MIN_SERVO_VALUE 1250
 
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
 #define EXPERIMENT_3 1
 
 //#define EXPERIMENT_KEYBOARD 1
+//#define EXPERIMENT_SCREENOUTPUT 1
 
 //#ifdef EXPERIMENT_3
 static MultiVariableInterp2D* mInterpMars;
@@ -120,19 +123,60 @@ void rotateAroundOrigin(float angle, float& x, float& y) {
 }
 
 
-//== Main entry point ==--
-
-void sendBytesTest(short theta, short fi) {
-	//cout<<"mapping "<<theta<<" mapping Z "<<fi<<endl;
-	//cout<<"size "<<sizeof(mapping)<<endl;
-	//cout<<"second ";
-	
+void sendBytesTest(short theta, short fi) {	
 	COMToolkit::sendByte((theta >>8) & 255);
 	COMToolkit::sendByte(theta & 255);
 	COMToolkit::sendByte((fi >>8) & 255);
 	COMToolkit::sendByte(fi & 255);
 }
 
+void send4ServosPackedIn9Bytes(short t0, short f0,short t1, short f1,short t2, short f2,short t3, short f3) {	
+	//printf("Values before %d %d %d %d %d %d %d %d\n", t0, f0, t1, f1, t2, f2, t3, f3);
+
+	t0 -= MIN_SERVO_VALUE; f0 -= MIN_SERVO_VALUE;
+	t1 -= MIN_SERVO_VALUE; f1 -= MIN_SERVO_VALUE;
+	t2 -= MIN_SERVO_VALUE; f2 -= MIN_SERVO_VALUE;
+	t3 -= MIN_SERVO_VALUE; f3 -= MIN_SERVO_VALUE;
+
+	unsigned char significantBits = 0;
+	significantBits |= (t0 & (1<<8)) >> 8;
+	significantBits |= (f0 & (1<<8)) >> 7;
+	significantBits |= (t1 & (1<<8)) >> 6;
+	significantBits |= (f1 & (1<<8)) >> 5;
+	significantBits |= (t2 & (1<<8)) >> 4;
+	significantBits |= (f2 & (1<<8)) >> 3;
+	significantBits |= (t3 & (1<<8)) >> 2;
+	significantBits |= (f3 & (1<<8)) >> 1;
+
+	/*
+	//decode
+	t0 = (t0 & 255) + ((significantBits & (1<<0)) ? 256 : 0 );
+	f0 = (f0 & 255) + ((significantBits & (1<<1)) ? 256 : 0 );
+	t1 = (t1 & 255) + ((significantBits & (1<<2)) ? 256 : 0 );
+	f1 = (f1 & 255) + ((significantBits & (1<<3)) ? 256 : 0 );
+	t2 = (t2 & 255) + ((significantBits & (1<<4)) ? 256 : 0 );
+	f2 = (f2 & 255) + ((significantBits & (1<<5)) ? 256 : 0 );
+	t3 = (t3 & 255) + ((significantBits & (1<<6)) ? 256 : 0 );
+	f3 = (f3 & 255) + ((significantBits & (1<<7)) ? 256 : 0 );
+
+	t0 += MIN_SERVO_VALUE; f0 += MIN_SERVO_VALUE;
+	t1 += MIN_SERVO_VALUE; f1 += MIN_SERVO_VALUE;
+	t2 += MIN_SERVO_VALUE; f2 += MIN_SERVO_VALUE;
+	t3 += MIN_SERVO_VALUE; f3 += MIN_SERVO_VALUE;
+
+	printf("Values after %d %d %d %d %d %d %d %d\n", t0, f0, t1, f1, t2, f2, t3, f3);
+
+	printf("\n");
+	*/
+
+
+	COMToolkit::sendByte( t0 & 255 ); COMToolkit::sendByte( f0 & 255 );
+	COMToolkit::sendByte( t1 & 255 ); COMToolkit::sendByte( f1 & 255 );
+	COMToolkit::sendByte( t2 & 255 ); COMToolkit::sendByte( f2 & 255 );
+	COMToolkit::sendByte( t3 & 255 ); COMToolkit::sendByte( f3 & 255 );
+	COMToolkit::sendByte( significantBits );
+
+}
 
 void handshake () {
 	short key = 255;
@@ -140,8 +184,13 @@ void handshake () {
 
 }
 
+/*
+void send8ShortsPacked(short t[4], short f[4]){
 
+	COMToolkit::sendByte( t0 & 255);
 
+}
+*/
 
 
 float sphereFunction(float coordX, float coordZ, float curvature){
@@ -276,16 +325,18 @@ void findCurve() {
 	mInterpMars->query(phiPlanets[1],thetaPlanets[1], sxM,syM);
 	mInterpSaturn->query(phiPlanets[0],thetaPlanets[0], sxS,syS);
 	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<" Theta "<<thetaPlanets[2]<<" phi "<<phiPlanets[2]<<" Sx"<<sxE<<" Sy "<<syE<<endl;
-	cout<<"x "<<coordinateX<<" z "<<coordinateZ<<endl;
-	cout<<"Sx "<<sxJ<<" , "<<sxE<<" , "<<sxM<<" , "<<sxS<<" Sz "<<syJ<<" , "<<syE<<" , "<<syM<<" , "<<syS<<endl;
+	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<endl;
+	//cout<<"Sx "<<sxJ<<" , "<<sxE<<" , "<<sxM<<" , "<<sxS<<" Sz "<<syJ<<" , "<<syE<<" , "<<syM<<" , "<<syS<<endl;
 	//cout<<"tt "<<phiPlanets[1]<<" "<<thetaPlanets[1]<<"Jup "<<sxJ<<" "<<syJ<<" Earth "<<sxE<<" "<<syE<<" Mars "<<sxM<<" "<<syM<<" Sat "<<sxS<<" "<<syS<<endl;
 
 	handshake();
+	/*
 	sendBytesTest((short)sxJ,(short)syJ);
 	sendBytesTest((short)sxE,(short)syE);
 	sendBytesTest((short)sxM,(short)syM);
 	sendBytesTest((short)sxS,(short)syS);
-	
+	*/
+	send4ServosPackedIn9Bytes(sxJ, syJ, sxE, syE, sxM, syM, sxS, syS);
 }
 
 
@@ -388,54 +439,6 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 
 }
 
-void initializeSequence() {
-	srand ( time(NULL) );
-	int sizeOfDict = 20;
-	int occurenceMax= 5;
-	const int curvatures[8] = {1,2,4,5,3,3,3,3};
-	int curvatureNum = 8;
-	int referencePosition = 4;
-	int occurances[8];
-	int occurancesVirt[8];
-
-	for(int i=0;i<curvatureNum;i++){
-		occurances[i] =0;
-		occurancesVirt[i] =0;
-	}
-
-	for (int i=0; i<sizeOfDict; i++) {
-		int RealIndex = rand() % curvatureNum;
-		if(occurances[RealIndex] < occurenceMax) {
-			cout<<"yes"<<endl;
-			sequenceArray[i].setReal(curvatures[RealIndex]);
-			occurances[RealIndex] ++;
-		}
-		else { i = i-1; cout<<"no"<<endl;}
-	}
-
-	for (int i=0; i<sizeOfDict; i++) {
-		if (sequenceArray[i].getReal() == curvatures[referencePosition]) {
-			int VirtIndex = rand() % referencePosition;
-			while(occurancesVirt[VirtIndex] >=occurenceMax) {
-				VirtIndex = rand() % referencePosition;
-			}
-			occurancesVirt[VirtIndex]++;
-			sequenceArray[i].setVirt(curvatures[VirtIndex]);
-		}
-		else {
-			sequenceArray[i].setVirt(curvatures[referencePosition]);
-		}
-	}
-
-	for(int i=0; i< sizeOfDict; i++) {
-		cout<<"ARRAY "<<i<<" real "<<sequenceArray[i].getReal()<<" virt "<<sequenceArray[i].getVirt()<<endl;
-	}
-	for(int i=0;i<curvatureNum;i++) {
-		cout<<"Count "<<curvatures[i]<<" - "<<occurances[i]<<" virtual "<<occurancesVirt[i]<<endl;
-	}
-}
-
-
 void fitCurve(float coordX, float coordY, float rotX, float rotY) {
 	//calibrate input
 	float phi = rotX;
@@ -490,6 +493,7 @@ int main(int argc, char* argv[])
 	// Arduino port
 	COMToolkit::connect(L"\\\\.\\COM15");
 
+	//initializeSequence();
 
 	//first experiment
 #ifdef EXPERIMENT_1
@@ -572,7 +576,10 @@ int main(int argc, char* argv[])
     {
 		tracker->mainloop();
 		connection->mainloop();
-        Sleep(1);
+        Sleep(5);
+		tracker->mainloop();
+		connection->mainloop();
+        Sleep(5);
 		findCurve();
     }
 
