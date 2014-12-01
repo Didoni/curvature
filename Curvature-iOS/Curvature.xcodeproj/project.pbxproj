@@ -13,8 +13,11 @@
 		F223C27C1A1BF03600D3245A /* MDRadialProgressLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C2771A1BF03600D3245A /* MDRadialProgressLabel.m */; };
 		F223C27D1A1BF03600D3245A /* MDRadialProgressTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C2791A1BF03600D3245A /* MDRadialProgressTheme.m */; };
 		F223C27E1A1BF03600D3245A /* MDRadialProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C27B1A1BF03600D3245A /* MDRadialProgressView.m */; };
+		F23566B11A2B7461007CF3F1 /* curvature_ws_test.html in Resources */ = {isa = PBXBuildFile; fileRef = F23566B01A2B7461007CF3F1 /* curvature_ws_test.html */; };
 		F23F73C81A22290200C814BE /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = F23F73C71A22290200C814BE /* User.m */; };
 		F23F73CB1A22290300C814BE /* Trial.m in Sources */ = {isa = PBXBuildFile; fileRef = F23F73CA1A22290300C814BE /* Trial.m */; };
+		F25CE6DD1A2D017A0081ADF7 /* NSDate+TimeAgo.m in Sources */ = {isa = PBXBuildFile; fileRef = F25CE6DC1A2D017A0081ADF7 /* NSDate+TimeAgo.m */; };
+		F25CE6DF1A2D01A80081ADF7 /* NSDateTimeAgo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F25CE6DE1A2D01A80081ADF7 /* NSDateTimeAgo.bundle */; };
 		F26BEDEA1A23AAE1003075C7 /* Telephone.mm in Sources */ = {isa = PBXBuildFile; fileRef = F26BEDE91A23AAE1003075C7 /* Telephone.mm */; };
 		F26BEDF01A23BC01003075C7 /* SoundManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F26BEDEF1A23BC01003075C7 /* SoundManager.m */; };
 		F26BEDF61A23C9E5003075C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F26BEDF51A23C9E5003075C7 /* AVFoundation.framework */; };
@@ -48,6 +51,8 @@
 		F2A292E21A2A802100F06D36 /* WebSocket.c in Sources */ = {isa = PBXBuildFile; fileRef = F2A292D71A2A802100F06D36 /* WebSocket.c */; };
 		F2A292E31A2A802100F06D36 /* WebSocketClient.c in Sources */ = {isa = PBXBuildFile; fileRef = F2A292D91A2A802100F06D36 /* WebSocketClient.c */; };
 		F2A292E41A2A802100F06D36 /* WebSocketFrame.c in Sources */ = {isa = PBXBuildFile; fileRef = F2A292DB1A2A802100F06D36 /* WebSocketFrame.c */; };
+		F2DF58451A2CFB6E008593E2 /* experiments.csv in Resources */ = {isa = PBXBuildFile; fileRef = F2DF58431A2CFB6E008593E2 /* experiments.csv */; };
+		F2DF58461A2CFB6E008593E2 /* White Noise.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F2DF58441A2CFB6E008593E2 /* White Noise.mp3 */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -60,10 +65,14 @@
 		F223C2791A1BF03600D3245A /* MDRadialProgressTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDRadialProgressTheme.m; sourceTree = "<group>"; };
 		F223C27A1A1BF03600D3245A /* MDRadialProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDRadialProgressView.h; sourceTree = "<group>"; };
 		F223C27B1A1BF03600D3245A /* MDRadialProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDRadialProgressView.m; sourceTree = "<group>"; };
+		F23566B01A2B7461007CF3F1 /* curvature_ws_test.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = curvature_ws_test.html; path = ../../curvature_ws_test.html; sourceTree = "<group>"; };
 		F23F73C61A22290200C814BE /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		F23F73C71A22290200C814BE /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		F23F73C91A22290300C814BE /* Trial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trial.h; sourceTree = "<group>"; };
 		F23F73CA1A22290300C814BE /* Trial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Trial.m; sourceTree = "<group>"; };
+		F25CE6DB1A2D017A0081ADF7 /* NSDate+TimeAgo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+TimeAgo.h"; sourceTree = "<group>"; };
+		F25CE6DC1A2D017A0081ADF7 /* NSDate+TimeAgo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+TimeAgo.m"; sourceTree = "<group>"; };
+		F25CE6DE1A2D01A80081ADF7 /* NSDateTimeAgo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = NSDateTimeAgo.bundle; sourceTree = "<group>"; };
 		F26BEDE81A23AAE1003075C7 /* Telephone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Telephone.h; sourceTree = "<group>"; };
 		F26BEDE91A23AAE1003075C7 /* Telephone.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Telephone.mm; sourceTree = "<group>"; };
 		F26BEDEE1A23BC01003075C7 /* SoundManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SoundManager.h; sourceTree = "<group>"; };
@@ -246,6 +255,8 @@
 		F2A292DB1A2A802100F06D36 /* WebSocketFrame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WebSocketFrame.c; sourceTree = "<group>"; };
 		F2A292DC1A2A802100F06D36 /* WebSocketFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocketFrame.h; sourceTree = "<group>"; };
 		F2A292DD1A2A802100F06D36 /* WebSocketTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocketTypes.h; sourceTree = "<group>"; };
+		F2DF58431A2CFB6E008593E2 /* experiments.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = experiments.csv; sourceTree = "<group>"; };
+		F2DF58441A2CFB6E008593E2 /* White Noise.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "White Noise.mp3"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -348,6 +359,10 @@
 		F28D99DF1A1556F100070B2D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				F25CE6DE1A2D01A80081ADF7 /* NSDateTimeAgo.bundle */,
+				F2DF58431A2CFB6E008593E2 /* experiments.csv */,
+				F2DF58441A2CFB6E008593E2 /* White Noise.mp3 */,
+				F23566B01A2B7461007CF3F1 /* curvature_ws_test.html */,
 				F2946D011A26B66C00635A18 /* ding.mp3 */,
 				F2946CFF1A26B61800635A18 /* tong.mp3 */,
 				F2946BBC1A23EBFD00635A18 /* drum.caf */,
@@ -388,6 +403,8 @@
 				F2946CFB1A2684F400635A18 /* vprn client */,
 				F223C2651A1BD1B100D3245A /* HorizontalTableView.h */,
 				F223C2661A1BD1B100D3245A /* HorizontalTableView.m */,
+				F25CE6DB1A2D017A0081ADF7 /* NSDate+TimeAgo.h */,
+				F25CE6DC1A2D017A0081ADF7 /* NSDate+TimeAgo.m */,
 				F28D9A251A15A20200070B2D /* Matrix.h */,
 				F28D9A261A15A20200070B2D /* Matrix.m */,
 				F28D9A121A1567A100070B2D /* UICustom.h */,
@@ -639,14 +656,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				F2946BC11A23EBFD00635A18 /* drum.caf in Resources */,
+				F25CE6DF1A2D01A80081ADF7 /* NSDateTimeAgo.bundle in Resources */,
 				F26BEDFE1A23CD93003075C7 /* track2.caf in Resources */,
 				F2946D001A26B61800635A18 /* tong.mp3 in Resources */,
 				F26BEDFD1A23CD90003075C7 /* track1.caf in Resources */,
 				F2946BC21A23EBFD00635A18 /* duck.caf in Resources */,
+				F2DF58451A2CFB6E008593E2 /* experiments.csv in Resources */,
+				F2DF58461A2CFB6E008593E2 /* White Noise.mp3 in Resources */,
 				F26BEE031A23CFE0003075C7 /* track3.caf in Resources */,
 				F26BEDFC1A23CD8D003075C7 /* sound2.caf in Resources */,
 				F26BEDFB1A23CD8B003075C7 /* sound1.caf in Resources */,
 				F28D99F11A1556F300070B2D /* Main.storyboard in Resources */,
+				F23566B11A2B7461007CF3F1 /* curvature_ws_test.html in Resources */,
 				F2946D021A26B66C00635A18 /* ding.mp3 in Resources */,
 				F2929A2C1A1D6AA6006390EC /* Settings.bundle in Resources */,
 				F28D99F31A1556F300070B2D /* Images.xcassets in Resources */,
@@ -669,6 +690,7 @@
 				F28D9A0D1A15667000070B2D /* UserViewController.m in Sources */,
 				F28D9A291A15A20200070B2D /* Matrix.m in Sources */,
 				F28D99E51A1556F200070B2D /* AppDelegate.m in Sources */,
+				F25CE6DD1A2D017A0081ADF7 /* NSDate+TimeAgo.m in Sources */,
 				F26BEDF01A23BC01003075C7 /* SoundManager.m in Sources */,
 				F2A292DF1A2A802100F06D36 /* cuEnc64.c in Sources */,
 				F23F73C81A22290200C814BE /* User.m in Sources */,

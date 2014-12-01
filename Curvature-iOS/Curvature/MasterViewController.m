@@ -58,6 +58,7 @@
 }
 
 - (void)sync:(id)sender {
+    [self saveAsFile];
     UIActivityViewController *activityVC = [[UIActivityViewController alloc] initWithActivityItems:@[[NSURL fileURLWithPath:filePath]] applicationActivities:nil];
     NSArray *excludeActivities = @[UIActivityTypeAddToReadingList,
                                    UIActivityTypeAssignToContact,

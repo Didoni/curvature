@@ -17,7 +17,7 @@
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 @property (strong, nonatomic) UILabel *vrpnUpdater;
 - (void)saveContext;
-- (void)checkVRPN;
+
 - (NSURL *)applicationDocumentsDirectory;
 
 

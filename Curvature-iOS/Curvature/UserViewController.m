@@ -13,22 +13,21 @@
 #import "AppDelegate.h"
 #import "SoundManager.h"
 #import "VRPN.h"
+#import "NSDate+TimeAgo.h"
 #include "CoreWebSocket.h"
 
-#define MAX_TRAILS 30
+#define MAX_TRAILS 500
 #define MAX_TRIAL (trialType!=2?maxTrials:maxTrialsType3)
 
 @interface UserViewController () {
     NSString *noiseFile;
-    WebSocketRef _webSocket;
     UIFont *font;
     NSTimer *perSecTimer;
-    
-    NSUInteger maxTrials;
-    NSUInteger maxTrialsType3;
+    NSUInteger counter;
     NSUInteger totalTrials;
     NSUInteger maxTimerVal;
-    NSUInteger trialType;
+    NSUInteger lTime;
+    NSUInteger rTime;
     
     BOOL isCurrentModelA;
     BOOL runTimer;
@@ -49,9 +48,10 @@
 @implementation UserViewController
 @synthesize start;
 BOOL paused;
-int trialsPlates[MAX_TRAILS * 3][2];
+int trialsPlates[MAX_TRAILS * 3][3];
 User *currentUser;
 static UserViewController *_THIS;
+WebSocketRef _webSocket;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -71,16 +71,12 @@ static UserViewController *_THIS;
     self.container.otherPageColor = [UICustom appColor:AppColorLightGray];
     [_container refreshData];
     [self.trialHistory registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
-    maxTrials = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial"];
-    maxTrialsType3 = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial_type_3"];
     maxTimerVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_time"];
-    totalTrials = maxTrialsType3+maxTrials*2;
+    [self getExperimentData];
     [self makeDial];
     ((AppDelegate *)[UIApplication sharedApplication].delegate).vrpnUpdater = self.tableHeader;
     currentUser = ((User *)self.fetchedResultsController.fetchedObjects.lastObject);
-    if (currentUser.trials.count) {
-        [self changeTrialType:((Trial *)currentUser.trials.lastObject).trialType];
-    }
+    [self changeTrialType:trialsPlates[currentUser.trials.count][2]];
     if (currentUser.trials.count >= totalTrials) {
         [self changeUser];
     }
@@ -100,11 +96,12 @@ static UserViewController *_THIS;
 }
 
 - (void)changeTrialType:(int)ltrialType {
-    if (ltrialType != trialType) {
-        if (ltrialType) {
-            [[SoundManager sharedManager] playSound:@"ding.mp3"];
-        }
-        trialType = ltrialType;
+    NSUInteger trialType = trialsPlates[currentUser.trials.count][2];
+    if (trialType != ((Trial*)currentUser.trials.lastObject).trialType) {
+        counter = 0;
+    }
+    if (counter == 0) {
+        [[SoundManager sharedManager] playSound:@"ding.mp3"];
         _trialType.image = [UIImage imageNamed:trialType ? (trialType == 1 ? @"servoWhite" : @"joint") : @"tap"];
         UIView *view = [_trialType superview];
         CGRect frame = view.frame;
@@ -137,6 +134,11 @@ static UserViewController *_THIS;
 
 - (void)perSecondUpdate {
     if (runTimer) {
+        if (isCurrentModelA) {
+            lTime++;
+        }else{
+            rTime++;
+        }
         _timerView.progressCounter += 1;
         if (_timerView.progressCounter == _timerView.progressTotal) {
             [[SoundManager sharedManager] playSound:@"tong.mp3"];
@@ -149,6 +151,7 @@ static UserViewController *_THIS;
 - (void)doneCounting {
     if (!isCurrentModelA) {
         NSString *one, *two;
+        NSUInteger trialType = trialsPlates[currentUser.trials.count][2];
         if (trialType != 2) {
             one = @"Model Left";
             two = @"Model Right";
@@ -192,8 +195,11 @@ static UserViewController *_THIS;
             _tableHeader.text = @"Ongoing Trials";
         }
         [_trialHistory reloadData];
-        [_trialHistory scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentUser.trials.count - 1 inSection:0]
-                             atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+        if (currentUser.trials.count) {
+            [_trialHistory scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentUser.trials.count - 1 inSection:0]
+                                 atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+        }
+        
     }
     CGFloat offset;
     if (leftSideOpen) {
@@ -225,6 +231,13 @@ static UserViewController *_THIS;
     if (cur == 8) {
         _refresh.enabled = YES;
         UILabel *model = isCurrentModelA ? _left : _right;
+        NSUInteger trialType = trialsPlates[currentUser.trials.count][2];
+        if (isCurrentModelA) {
+            lTime = 0;
+        }else{
+            rTime = 0;
+        }
+        
         if (trialType != 2) {
             CGRect frame = model.frame;
             _left.alpha = 0;
@@ -414,10 +427,9 @@ static UserViewController *_THIS;
                     }
                 }
                 else {
-                    int type = (int)currentUser.trials.count - 1;
-                    type = type<2*maxTrials?(type<maxTrials?0:1):2;
-                    [self changeTrialType:type];
-                    [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", (currentUser.trials.count % MAX_TRIAL) + 1] forState:UIControlStateNormal];
+                    int i = (int)currentUser.trials.count - 1;
+                    [self changeTrialType:trialsPlates[i][3]];
+                    [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", counter + 1] forState:UIControlStateNormal];
                 }
             }
         }
@@ -487,13 +499,16 @@ static UserViewController *_THIS;
         
         Trial *trial = [NSEntityDescription insertNewObjectForEntityForName:@"Trial" inManagedObjectContext:context];
         trial.timeStamp = [[NSDate date] timeIntervalSinceReferenceDate];
-        uint index = (uint)((userTrialCount) % totalTrials);
-        trial.trial = index + 1;
-        trial.trialType = trialType;
         trial.selectedLeft = selctedLeft;
+        NSUInteger index = currentUser.trials.count;
         trial.left = trialsPlates[index][0];
         trial.right = trialsPlates[index][1];
-        [self emitEvent:CEventUserTrialEnded withData:selctedLeft];
+        trial.trialType = trialsPlates[index][2];
+        trial.leftTime = lTime;
+        trial.rightTime = rTime;
+        lTime = rTime = 0;
+        trial.trial = ++counter;
+        [self emitEvent:CEventUserTrialEnded withData:trial];
         NSMutableOrderedSet *tempSet = [NSMutableOrderedSet orderedSetWithOrderedSet:currentUser.trials];
         [tempSet addObject:trial];
         currentUser.trials = tempSet;
@@ -654,7 +669,7 @@ static UserViewController *_THIS;
     if (cur != 4) {
         isCurrentModelA = YES;
         _timerView.theme.incompletedColor = [UICustom appColor:AppColorBlue];
-        [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", (cur == 8) ? (currentUser.trials.count % MAX_TRIAL) + 1 : 1] forState:UIControlStateNormal];
+        [_trialBtn setTitle:[NSString stringWithFormat:@"Trial %2ld", (cur == 8) ? (currentUser.trials.count) + 1 : 1] forState:UIControlStateNormal];
         if (cur == 8) {
             shouldShowDemo = YES;
         }
@@ -737,26 +752,31 @@ static UserViewController *_THIS;
     int row = (int)indexPath.row;
     if (tableView == _trialHistory) {
         int type = 0;
+        NSString *details = @"";
+        cell.textLabel.numberOfLines = 2;
+        cell.textLabel.font = _tableHeader.font;
         if (row < currentUser.trials.count) {
             Trial *trial = currentUser.trials[row];
             type  = trial.trialType;
             cell.textLabel.textColor = [UIColor whiteColor];
             cell.backgroundColor = [UICustom appColor:trial.selectedLeft ? AppColorBlue : AppColorGreen];
             cell.imageView.image = [UIImage imageNamed:type ? (type == 1 ? @"servoWhite" : @"jointWhite") : @"tap"];
+            details = [NSString stringWithFormat:@" in %dsecs\n%@",(int)(trial.leftTime+trial.rightTime),[[NSDate dateWithTimeIntervalSinceReferenceDate:trial.timeStamp] timeAgo]];
         }
         else {
             cell.textLabel.textColor = [UIColor darkTextColor];
             cell.backgroundColor = [UIColor whiteColor];
-            type = row<2*maxTrials?(row<maxTrials?0:1):2;
+            type = trialsPlates[row][2];
             cell.imageView.image = [UIImage imageNamed:type ? (type == 1 ? @"servo" : @"joint") : @"hand"];
         }
-        cell.textLabel.text = [NSString stringWithFormat:@"%d, %d", trialsPlates[row][0], trialsPlates[row][1]];
+        cell.textLabel.text = [NSString stringWithFormat:@"%d, %d%@", trialsPlates[row][0], trialsPlates[row][1],details];
     }
     else {
         static NSString *icons[4] = { @"metal", @"punk", @"rock", @"electric" };
         static NSString *names[4] = { @"Silence", @"Random 1", @"Random 2", @"No music" };
         cell.imageView.image = [UIImage imageNamed:icons[row % 4]];
-        cell.textLabel.text = row < files.count?files[row]:[names[(row - files.count)%4]  stringByReplacingOccurrencesOfString:@".mp3" withString:@""];
+        NSString *text = row < files.count?files[row]:names[(row - files.count)%4];
+        cell.textLabel.text = [text stringByReplacingOccurrencesOfString:@".mp3" withString:@""];
         cell.backgroundColor = row < files.count + 3 ? [UIColor colorWithWhite:0.92 alpha:1]:[UIColor colorWithWhite:0.8 alpha:1];
     }
     return cell;
@@ -796,20 +816,19 @@ static UserViewController *_THIS;
 #pragma mark - detecting app state
 - (void)appDidBecomeActive:(NSNotification *)notification {
     BOOL changed = NO;
-    NSUInteger lmaxrials = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial"];
-    NSUInteger lmaxTimerVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_time"];
-    NSUInteger lmaxTrialsType3 = [[NSUserDefaults standardUserDefaults] integerForKey:@"max_trial_type_3"];
+    NSUInteger lmaxTimerVal = [[[NSUserDefaults standardUserDefaults] stringForKey:@"trial_time"]  intValue];
     BOOL reset = [[NSUserDefaults standardUserDefaults] boolForKey:@"reset"];
     if (reset) {
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"reset"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    if (lmaxrials != maxTimerVal || lmaxrials != maxTrials || lmaxTrialsType3 != maxTrialsType3) {
-        maxTrialsType3 = lmaxTrialsType3;
-        maxTrials = lmaxrials;
+    [self getExperimentData];
+    if (lmaxTimerVal != maxTimerVal) {
         maxTimerVal = lmaxTimerVal;
-        totalTrials = maxTrialsType3+maxTrials*2;
         _container.currentPageIndex = 0;
+        if (maxTimerVal > currentUser.trials.count) {
+            [self changeUser];
+        }
         changed = YES;
     }
     BOOL userType = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_user"];
@@ -825,29 +844,6 @@ static UserViewController *_THIS;
         changed = YES;
     }
     [VRPN instance];
-    if (trialsPlates[0][0] == 0) {
-        uint st = arc4random() % (MAX_TRIAL + 1);
-        NSMutableArray *array = [NSMutableArray new];
-        for (int i = 0; i < MAX_TRIAL + 1; i++) {
-            if (i != st) {
-                [array addObject:@(i)];
-            }
-        }
-        
-        for (int i = 0; i < MAX_TRIAL; i++) {
-            uint r = arc4random() % array.count;
-            uint val = [[array objectAtIndex:r] intValue] + 1;
-            uint val2 = st + 1;
-            BOOL lr = arc4random() % 2;
-            trialsPlates[i][lr] = val2;
-            trialsPlates[i][1 - lr] = val;
-            trialsPlates[i + MAX_TRIAL][lr] = val2;
-            trialsPlates[i + MAX_TRIAL][1 - lr] = val;
-            trialsPlates[i + MAX_TRIAL * 2][lr] = val2;
-            trialsPlates[i + MAX_TRIAL * 2][1 - lr] = val;
-            [array removeObject:[array objectAtIndex:r]];
-        }
-    }
     [_trialHistory reloadData];
     if(!perSecTimer || changed){
         [perSecTimer invalidate];
@@ -874,6 +870,7 @@ static UserViewController *_THIS;
         runTimer = NO;
     }
 }
+
 - (void)searchForMusic {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
@@ -888,6 +885,34 @@ static UserViewController *_THIS;
         files = [NSArray arrayWithArray:array];
     }
 }
+
+- (void)getExperimentData {
+    BOOL t12 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_1_2"];
+    BOOL t3 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_3"];
+    if(!t12 && !t3){
+        t3 = YES;
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_3"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSArray *data = [[[NSString stringWithContentsOfFile:[documentsDirectory stringByAppendingPathComponent:@"experiments.csv"] encoding:NSUTF8StringEncoding error:nil] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] componentsSeparatedByString:@"\n"];
+    int i = 0;
+    for (NSString *row in data) {
+        NSString *cleaned = [row stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        NSArray *cols = [cleaned componentsSeparatedByString:@","];
+        if (cleaned.length && cols.count >= 3) {
+            int type = [cols[0] intValue];
+            if ((type == 2 && t3) || (type !=2 && t12)) {
+                trialsPlates[i][2] = type;
+                trialsPlates[i][0] = [cols[1] intValue];
+                trialsPlates[i++][1] = [cols[2] intValue];
+            }
+        }
+    }
+    totalTrials = i;
+}
+
 -(void)restartSocket
 {
     if(_webSocket){
@@ -904,20 +929,19 @@ static UserViewController *_THIS;
 -(void)emitEvent:(CEvent)event{
     [self emitEvent:event withData:nil];
 }
--(void)emitEvent:(CEvent)event withData:(bool)data
+-(void)emitEvent:(CEvent)event withData:(Trial*)trial
 {
     NSUInteger userTrialCount = currentUser.trials.count;
-    char index = (uint)((userTrialCount) % totalTrials);
+    char index = (uint)userTrialCount;
     index = trialsPlates[index][isCurrentModelA?0:1];
-    char type = (char)trialType;
+    char type = (char)trialsPlates[index][2];
     char leftOrRight;
     WebSocketRef websocket = _webSocket;
     for (CFIndex i = 0; i < WebSocketGetClientCount(websocket); ++i) {
         WebSocketClientRef client = WebSocketGetClientAtIndex(websocket, i);
         switch (event) {
             case CEventUserTrialEnded:
-                leftOrRight = (char)data;
-                WebSocketClientWriteWithFormat(client, CFSTR("%d,%d,%d,%d"), event,type,index,leftOrRight);
+                WebSocketClientWriteWithFormat(client, CFSTR("%d,%d,%d,%d,%.0f,%.0f"), event,type,index,trial.selectedLeft,trial.leftTime,trial.rightTime);
                 break;
             default:
                 leftOrRight = (char)isCurrentModelA;
@@ -925,7 +949,7 @@ static UserViewController *_THIS;
                 break;
         }
     }
-    NSLog(@"sending data: %d%d%d", event,(char)trialType,trialsPlates[index][isCurrentModelA?0:1]);
+    NSLog(@"sending data: %d%d%d", event,type,trialsPlates[index][isCurrentModelA?0:1]);
 }
 
 void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef value) {
@@ -936,37 +960,59 @@ void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef val
         char *buffer = (char *)malloc(maxSize);
         if (maxSize && CFStringGetCString(value, buffer, maxSize,
                                           kCFStringEncodingUTF8)) {
-            char action = buffer[0];
-            if(!action){
-                
-            }else{
-                switch (action & 7) {
-                    case CEventStartTrial: [_THIS startTimer:nil];break;
-                    case CEventStopTrial: [_THIS stopTimer];break;
-                    case CEventPauseTrial: if(!paused)[_THIS pause:_THIS.pause]; break;
-                    case CEventResumeTrial: if(paused)[_THIS pause:_THIS.pause]; break;
-                    case CEventReStartTrial: [_THIS refresh];  break;
-                    case CEventEndUserTrial:[_THIS  changeUser]; break;
+            int action = buffer[0];
+            switch (action & 7) {
+                case CEventStartTrial: [_THIS startTimer:nil];break;
+                case CEventStopTrial: [_THIS stopTimer];break;
+                case CEventPauseTrial: if(!paused)[_THIS pause:_THIS.pause]; break;
+                case CEventResumeTrial: if(paused)[_THIS pause:_THIS.pause]; break;
+                case CEventReStartTrial: [_THIS refresh];  break;
+                case CEventEndUserTrial:[_THIS  changeUser]; break;
+                case CEventSkipTrial:
+                    [_THIS  forward:_THIS.forward];
+                    break;
+            }
+            if (action & CEventSendTrialList) {
+                NSMutableString *csv = [NSMutableString new];
+                [csv appendFormat:@"%d,",CEventSendTrialList];
+                for (Trial *trial in currentUser.trials) {
+                    [csv appendFormat:@"\n%d,%d,%d,%d,%.0f,%.0f",trial.trialType,trial.left,trial.right,trial.selectedLeft,trial.leftTime,trial.rightTime];
                 }
-                if (action & CEventSendTrialList) {
-                    NSMutableString *csv = [NSMutableString new];
-                    [csv appendFormat:@"%d,",CEventSendTrialList];
-                    for (Trial *trial in currentUser.trials) {
-                        [csv appendFormat:@"\n%d,%d,%d,%d",trial.trialType,trial.left,trial.right,trial.selectedLeft];
+                WebSocketClientWriteWithFormat(client, (__bridge CFStringRef)[csv stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]]);
+            }
+            if (action & CEventUpdateTrialList) {
+                BOOL valid = NO;
+                NSString *data = [[((__bridge NSString *)value) substringFromIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                if(data.length){
+                    for (NSString *row in [data componentsSeparatedByString:@"\n"]) {
+                        NSArray *cols = [[row stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] componentsSeparatedByString:@","];
+                        if (cols.count>=3) {
+                            valid = YES;
+                            break;
+                        }
                     }
-                    WebSocketClientWriteWithFormat(client, (__bridge CFStringRef)[csv stringByTrimmingCharactersInSet:[NSCharacterSet newlineCharacterSet]]);
                 }
-                if (action & CEventUpdateTrialList && maxSize > 1 &&maxSize > buffer[1] + 1) {
-                    char size = buffer[1];
-                    for (int i = 0; i < size; i++) {
-                        char val = buffer[i+2];
-                        char index = (i - 2) / 2;
-                        char subIndex = (i - 2) %2;
-                        trialsPlates[index][subIndex] = val;
+                if (valid) {
+                    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+                    NSString *documentsDirectory = [paths objectAtIndex:0];
+                    NSString *filePath = [documentsDirectory stringByAppendingPathComponent:@"experiments.csv"];
+                    [data writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                }
+            }
+            if (action & CEventSendAllUserTrials) {
+                NSMutableString *writeString = [NSMutableString stringWithCapacity:0]; //don't worry about the capacity, it will expand as necessary
+                [writeString appendFormat:@"%d,User,Trial type,Trial,Left,Time taken,Right,Time taken,Trial On,Output",CEventSendAllUserTrials];
+                NSArray *dataArray = _THIS.fetchedResultsController.fetchedObjects;
+                for (User *user in dataArray) {
+                    for (Trial *trial in user.trials) {
+                        NSString *type = trial.trialType ? (trial.trialType == 1 ? @"servo" : @"joint") : @"touch";
+                        [writeString appendFormat:@"\n%d,%@,%d,%d,%f,%d,%f,%@,%@", user.userId, type, trial.trial, trial.left, trial.leftTime, trial.right, trial.rightTime, [NSDate dateWithTimeIntervalSinceReferenceDate:trial.timeStamp], trial.selectedLeft ? @"Left" : @"Right"];
                     }
                 }
-                if (action & CEventSendAllUserTrials) {
-                    
+                WebSocketRef websocket =  _webSocket;
+                for (CFIndex i = 0; i < WebSocketGetClientCount(websocket); ++i) {
+                    WebSocketClientRef client = WebSocketGetClientAtIndex(websocket, i);
+                    WebSocketClientWriteWithFormat(client, CFSTR("%@"), writeString);
                 }
             }
         }

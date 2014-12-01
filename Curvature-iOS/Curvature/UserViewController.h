@@ -28,6 +28,7 @@ typedef enum {
     CEventResumeTrial = 0x4,
     CEventReStartTrial = 0x5,
     CEventEndUserTrial = 0x6,
+    CEventSkipTrial = 0x7,
     
     CEventSendTrialList = 0x1 << 4,
     CEventUpdateTrialList = 0x1 << 5,

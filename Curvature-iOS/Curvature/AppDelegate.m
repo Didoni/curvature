@@ -34,7 +34,7 @@
 - (void)checkDocuments {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"ding.mp3"];
+    NSString *path = [documentsDirectory stringByAppendingPathComponent:@"experiments.csv"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     if (![fileManager fileExistsAtPath:path]) {
@@ -47,6 +47,8 @@
         [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"ding" ofType:@"mp3"] toPath:[documentsDirectory stringByAppendingPathComponent:@"ding.mp3"] error:NULL];
         [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"duck" ofType:@"caf"] toPath:[documentsDirectory stringByAppendingPathComponent:@"duck.caf"] error:NULL];
         [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"tong" ofType:@"mp3"] toPath:[documentsDirectory stringByAppendingPathComponent:@"tong.mp3"] error:NULL];
+        [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"White Noise" ofType:@"mp3"] toPath:[documentsDirectory stringByAppendingPathComponent:@"White Noise.mp3"] error:NULL];
+        [fileManager copyItemAtPath:[[NSBundle mainBundle] pathForResource:@"experiments" ofType:@"csv"] toPath:[documentsDirectory stringByAppendingPathComponent:@"experiments.csv"] error:NULL];
     }
     
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
@@ -54,6 +56,7 @@
     if (!set) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:version];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"reset"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_1_2"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sound"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_user"];
         [[NSUserDefaults standardUserDefaults] setInteger:20 forKey:@"trial_time"];

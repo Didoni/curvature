@@ -30,7 +30,7 @@ static VRPN *vrpnClient = NULL;
 }
 
 + (VRPN *)instance {
-    if (!vrpnClient) {
+    if (0 && !vrpnClient) {
         BOOL vrpn = [[NSUserDefaults standardUserDefaults] boolForKey:@"vrpn"];
         if (vrpn) {
             if (!vrpnClient) {
