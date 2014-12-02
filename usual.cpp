@@ -1,108 +1,92 @@
-#include <iostream>
 #include <sys\utime.h>
 #include <conio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <vector>
-#include <fstream>
 #include <Windows.h>
 #include <stdlib.h>
-#include <opencv\cv.h>
-#include <opencv\highgui.h>
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
 #include "COMToolkit.h"
-#include "winhttp.h" // add this line
-#include <string.h>
+
 #include "vrpn_Connection.h"
-#include "quat\quat.h"
-#include "MultiVariableInterp2D.h"
-// Missing this file?  Get the latest VRPN distro at
 #include "vrpn_Tracker.h"    //    ftp://ftp.cs.unc.edu/pub/packages/GRIP/vrpn
-//F#include <glm/glm.hpp>
-//#include "conio.h"           // for kbhit()
+
+#include "MultiVariableInterp2D.h"
 
 #define PI 3.14159265
 using namespace std;
-using namespace cv;
 
 #define MAX_ANGLE 15
 #define DIFFERENCE_H 0.001
 #define MIN_SERVO_VALUE 1250
 
+#define MILLIS_PER_TRIAL 20000
+
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
-#define EXPERIMENT_3 1
+//#define EXPERIMENT_3 1
+#define EVALUATION_1 1
 
 //#define EXPERIMENT_KEYBOARD 1
-//#define EXPERIMENT_SCREENOUTPUT 1
 
-//#ifdef EXPERIMENT_3
+
+#ifdef EXPERIMENT_3
 static MultiVariableInterp2D* mInterpMars;
 static MultiVariableInterp2D* mInterpEarth;
 static MultiVariableInterp2D* mInterpJupiter;
 static MultiVariableInterp2D* mInterpSaturn;
-//#endif
+static FILE* fileExp3;
+#endif
 
-bool stopped=true;
-HANDLE hSerialIN = INVALID_HANDLE_VALUE; 
-const char* wndname = "Object Detection";
-clock_t begin_time;
-int curvatureNum;
-int x;
-int trial;
-int y;
-int atstart = 0;
-long startmilis=0;
-float coordinateX, coordinateZ;
+#ifdef EVALUATION_1
+static MultiVariableInterp2D* mInterpMars;
+static MultiVariableInterp2D* mInterpEarth;
+static MultiVariableInterp2D* mInterpJupiter;
+static MultiVariableInterp2D* mInterpSaturn;
+static FILE* positionTracking = NULL;
+static FILE* trialsFile = NULL;
 
+std::vector<int> pairA;
+std::vector<int> pairB;
+int amountOfTrials = 0;
+
+static int id;
+#define NAME_LENGTH 32
+static char eName[NAME_LENGTH];
+enum eCondition{
+	conditionRealOnlyCapture = 1,
+	conditionVirtualNoAskFS = 2, 
+	conditionReal = 3, 
+	conditionVirtual = 4 
+};
+static eCondition condition = conditionRealOnlyCapture;
+static int trial = 0;
+static bool firstPair = true;
+
+static int timerCount = 0;
+static long timerNextPrint = 0;
+static long timerLimit = 0;
+
+#endif
+
+
+float coordinateX = 0, coordinateZ = 0;
 static float mPitch = 0;
 static float mRoll = 0;
 static float mYaw = 0;
-static FILE* fileExp3;
-static float rx;
-static float ry;
+static float rx = 0;
+static float ry = 0;
 
+static float zoffsets[4] = {0.025, 0.0, -0.025, -0.05};
+static float xoffsets[4] = {-0.11, -0.1, -0.11, -0.13};
 
-class Instruction{
-public:
-	float getPhi() {Instruction instr = *this; return instr.phi;};
-	float getTheta() {Instruction instr = *this; return instr.theta;};
-	void setPhi(float input) { 
-		phi = input; } ; 
-	void setTheta(float input) { 
-		theta = input; } ; 
-
-private:
-	float phi;
-	float theta;
-}; 
-
-class Trial{
-public:
-	int getReal() {Trial instr = *this; return instr.real;};
-	int getVirt() {Trial instr = *this; return instr.virt;};
-	void setVirt(int input) { 
-		virt = input; } ; 
-	void setReal(int input) { 
-		real = input; } ; 
-
-private:
-	int real;
-	int virt;
-}; 
-
-Instruction angleArray[91][91][13];
-Trial sequenceArray[40];
-
-
- void wsconnect()
-{
-    
-}
-//== Callback prototype ==--
-
-// Arduino
-HANDLE hDevice;
+//1 to 11
+static const float cNumberToCurv[] = { 0, 
+	3, 2.5, 2, 1, 0.5, 0, -0.5, -1, -2, -2.5, -3};
 
 void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t);
 
@@ -111,7 +95,6 @@ long getMillisTime(){
 	gettimeofday(&time, NULL);
 	return (time.tv_sec * 1000) + (time.tv_usec / 1000);
 }
-
 
 void rotateAroundOrigin(float angle, float& x, float& y) {
 	const float cos = cosf(angle);
@@ -148,49 +131,17 @@ void send4ServosPackedIn9Bytes(short t0, short f0,short t1, short f1,short t2, s
 	significantBits |= (t3 & (1<<8)) >> 2;
 	significantBits |= (f3 & (1<<8)) >> 1;
 
-	/*
-	//decode
-	t0 = (t0 & 255) + ((significantBits & (1<<0)) ? 256 : 0 );
-	f0 = (f0 & 255) + ((significantBits & (1<<1)) ? 256 : 0 );
-	t1 = (t1 & 255) + ((significantBits & (1<<2)) ? 256 : 0 );
-	f1 = (f1 & 255) + ((significantBits & (1<<3)) ? 256 : 0 );
-	t2 = (t2 & 255) + ((significantBits & (1<<4)) ? 256 : 0 );
-	f2 = (f2 & 255) + ((significantBits & (1<<5)) ? 256 : 0 );
-	t3 = (t3 & 255) + ((significantBits & (1<<6)) ? 256 : 0 );
-	f3 = (f3 & 255) + ((significantBits & (1<<7)) ? 256 : 0 );
-
-	t0 += MIN_SERVO_VALUE; f0 += MIN_SERVO_VALUE;
-	t1 += MIN_SERVO_VALUE; f1 += MIN_SERVO_VALUE;
-	t2 += MIN_SERVO_VALUE; f2 += MIN_SERVO_VALUE;
-	t3 += MIN_SERVO_VALUE; f3 += MIN_SERVO_VALUE;
-
-	printf("Values after %d %d %d %d %d %d %d %d\n", t0, f0, t1, f1, t2, f2, t3, f3);
-
-	printf("\n");
-	*/
-
-
 	COMToolkit::sendByte( t0 & 255 ); COMToolkit::sendByte( f0 & 255 );
 	COMToolkit::sendByte( t1 & 255 ); COMToolkit::sendByte( f1 & 255 );
 	COMToolkit::sendByte( t2 & 255 ); COMToolkit::sendByte( f2 & 255 );
 	COMToolkit::sendByte( t3 & 255 ); COMToolkit::sendByte( f3 & 255 );
 	COMToolkit::sendByte( significantBits );
-
 }
 
 void handshake () {
 	short key = 255;
 	COMToolkit::sendByte(key & 255);
-
 }
-
-/*
-void send8ShortsPacked(short t[4], short f[4]){
-
-	COMToolkit::sendByte( t0 & 255);
-
-}
-*/
 
 
 float sphereFunction(float coordX, float coordZ, float curvature){
@@ -254,55 +205,15 @@ void findAnglesFinite(float coordX, float coordZ, float rotation, float& phi, fl
 	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
 }
 
-void findAngles(float coordX, float coordZ, float& phi, float& theta, float curvature) {
-	float sign = 1.0f;
-
-	if (curvature == 0.0f){
-		phi = 0.0f;
-		theta = 0.0f;
-		return;
-	}else if(curvature < 0.0f){
-		curvature = -curvature;
-		sign = -1.0f;
-	}
-
-	const float radious = 1.0f / curvature;
-
-	
-	const float rxy = sqrtf(radious*radious - coordX*coordX - coordZ*coordZ);
-
-	phi = sign * -atanf( -coordX / rxy ) * 180.f / PI;
-	theta = sign * atanf( -coordZ / rxy ) * 180.f / PI;
-
-	int offsetTheta = 0;
-	int offsetPhi = 0;
-	theta = theta + offsetTheta;
-	phi = phi + offsetPhi;
-
-	if (theta > MAX_ANGLE) { theta = MAX_ANGLE;}
-	else if (theta < -MAX_ANGLE) { theta = -MAX_ANGLE;}
-	if (phi > MAX_ANGLE) { phi = MAX_ANGLE;}
-	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
-}
-
-
-
-void findCurve() {
-	float thetaAngle, phiAngle;
-	const float curv = 3;
-
+void findCurve(float curv) {
 	float xTemp; 
 	float zTemp;
 	float thetaPlanets[4]= {0,0,0,0};//Sat, Mars, Earth, Jup
 	float phiPlanets[4] = {0,0,0,0};
 
-	float zoffsets[4] = {0.025, 0.0, -0.025, -0.05};
-	float xoffsets[4] ={-0.11, -0.1, -0.11, -0.13};
-
 	const float rotRad = mYaw / 180.0f * PI;
 
 	if(curv != 0) {
-		//coordinateX = coordinateX - 0.1;
 		for (int i=0; i<4; i++) {
 			xTemp = xoffsets[i];
 			zTemp = zoffsets[i];
@@ -314,7 +225,6 @@ void findCurve() {
 		}
 	}
 
-	//findAngles(coordinateX, coordinateZ, phiAngle, thetaAngle, radious);
 	rx = thetaPlanets[1];
 	ry = phiPlanets[1];
 
@@ -324,6 +234,7 @@ void findCurve() {
 	mInterpEarth->query(phiPlanets[2],thetaPlanets[2], sxE,syE);
 	mInterpMars->query(phiPlanets[1],thetaPlanets[1], sxM,syM);
 	mInterpSaturn->query(phiPlanets[0],thetaPlanets[0], sxS,syS);
+	
 	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<" Theta "<<thetaPlanets[2]<<" phi "<<phiPlanets[2]<<" Sx"<<sxE<<" Sy "<<syE<<endl;
 	//cout<<"x "<<coordinateX<<" z "<<coordinateZ<<endl;
 	//cout<<"Sx "<<sxJ<<" , "<<sxE<<" , "<<sxM<<" , "<<sxS<<" Sz "<<syJ<<" , "<<syE<<" , "<<syM<<" , "<<syS<<endl;
@@ -344,17 +255,12 @@ static float getRoll(float x, float y, float z, float w, bool reprojectAxis)
 	{
 		if (reprojectAxis)
 		{
-			// roll = atan2(localx.y, localx.x)
-			// pick parts of xAxis() implementation that we need
-//			float fTx  = 2.0*x;
 			float fTy  = 2.0f*y;
 			float fTz  = 2.0f*z;
 			float fTwz = fTz*w;
 			float fTxy = fTy*x;
 			float fTyy = fTy*y;
 			float fTzz = fTz*z;
-
-			// Vector3(1.0-(fTyy+fTzz), fTxy+fTwz, fTxz-fTwy);
 
 			return float(atan2(fTxy+fTwz, 1.0f-(fTyy+fTzz)));
 
@@ -369,22 +275,17 @@ static float getPitch(float x, float y, float z, float w,  bool reprojectAxis)
 	{
 		if (reprojectAxis)
 		{
-			// pitch = atan2(localy.z, localy.y)
-			// pick parts of yAxis() implementation that we need
 			float fTx  = 2.0f*x;
-//			float fTy  = 2.0f*y;
 			float fTz  = 2.0f*z;
 			float fTwx = fTx*w;
 			float fTxx = fTx*x;
 			float fTyz = fTz*y;
 			float fTzz = fTz*z;
 
-			// Vector3(fTxy-fTwz, 1.0-(fTxx+fTzz), fTyz+fTwx);
 			return float(atan2(fTyz+fTwx, 1.0f-(fTxx+fTzz)));
 		}
 		else
 		{
-			// internal version
 			return float(atan2(2*(y*z + w*x), w*w - x*x - y*y + z*z));
 		}
 	}
@@ -393,8 +294,6 @@ static float getYaw(float x, float y, float z, float w,  bool reprojectAxis)
 	{
 		if (reprojectAxis)
 		{
-			// yaw = atan2(localz.x, localz.z)
-			// pick parts of zAxis() implementation that we need
 			float fTx  = 2.0f*x;
 			float fTy  = 2.0f*y;
 			float fTz  = 2.0f*z;
@@ -402,8 +301,6 @@ static float getYaw(float x, float y, float z, float w,  bool reprojectAxis)
 			float fTxx = fTx*x;
 			float fTxz = fTz*x;
 			float fTyy = fTy*y;
-
-			// Vector3(fTxz+fTwy, fTyz-fTwx, 1.0-(fTxx+fTyy));
 
 			return float(atan2(fTxz+fTwy, 1.0f-(fTxx+fTyy)));
 
@@ -416,9 +313,7 @@ static float getYaw(float x, float y, float z, float w,  bool reprojectAxis)
 	}
 
 
-void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
-{
-
+void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t){
 	//printf("Tracker Position:(%.4f,%.4f,%.4f) Orientation:(%.2f,%.2f,%.2f,%.2f)\n",t.pos[0], t.pos[1], t.pos[2],t.quat[0], t.quat[1], t.quat[2], t.quat[3]);
 	
 	const float pitch = getPitch(t.quat[0], t.quat[1], t.quat[2], t.quat[3], false) * 180.0f / PI;
@@ -428,26 +323,22 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t)
 	mPitch = pitch;
 	mRoll = roll;
 	mYaw = yaw;
+	coordinateX = t.pos[2];
+	coordinateZ = t.pos[0];
 
-#ifdef EXPERIMENT_3
-	//fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-	coordinateZ = t.pos[0]-0.0084;
-	coordinateX = t.pos[2]+ 0.0107;
-	//cout<<" cZ "<<coordinateZ<<" cX "<<coordinateX<<endl;
+#ifdef EVALUATION_1
+	//time stamp x z y, rz rx ry
+	if(positionTracking != NULL){ //multiple access problems?
+		fprintf(positionTracking, "%ld,%f,%f,%f,%f,%f,%f\n", getMillisTime(), t.pos[2], t.pos[0], t.pos[1], mYaw, mPitch, mRoll);
+	}
 #endif
 
+#ifdef EXPERIMENT_3
+	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+#endif
 }
 
-void fitCurve(float coordX, float coordY, float rotX, float rotY) {
-	//calibrate input
-	float phi = rotX;
-	float theta = rotY;
-
-
-	//calibrate input
-	cout<<"fitting Curve"<<endl;
-}
 
 float interp(float a, float b, float p){
 	return a + (b-a)*p;
@@ -477,10 +368,94 @@ float rangeRandom (float fLow, float fHigh){
 };
 
 
+void readFingerOffsets(){
+	const int nFingers = 4;
+	int holes[4];
+	for(int i = 0; i < nFingers; ++i){
+		printf("Holes below %d: ", (i+1) );
+		scanf("%d", & holes[i]);
+	}
+	for(int i = 0; i < nFingers; ++i){
+		xoffsets[i] += (holes[i]-holes[1]) * 0.005f;
+	}
+}
+ 
+#ifdef EVALUATION_1
+
+void closePositionTrackingFile(){
+	if( positionTracking != NULL){
+		FILE* aux = positionTracking;
+		positionTracking = NULL;
+		fclose(aux);
+	}
+}
+
+void openPositionTrackingFile(){
+	closePositionTrackingFile();
+
+	char tmpStr[256];
+	sprintf(tmpStr, "%s_%d_%d_pos_%d_%s.txt", eName, id, condition, trial, firstPair ? "a" : "b");
+	positionTracking = fopen(tmpStr, "w");
+}
+
+
+
+void readPairsFile(const char* pairsFile, int useValue){
+	pairA.clear();
+	pairB.clear();
+
+	FILE* f = fopen(pairsFile, "rb");
+	if (f == NULL){
+		printf("ERROR opening file %s", pairsFile);
+		return;
+	}
+
+	int exp, a, b;
+
+	while ( fscanf(f, "%d,%d,%d\n", &exp, &a, &b) > 0 ){
+		if (exp == useValue){
+			pairA.push_back( a );
+			pairB.push_back( b );
+		}
+	}
+	amountOfTrials = pairA.size();
+
+	fclose(f);
+}
+
+void startCountDown(){
+	timerCount = 0;
+	long t = getMillisTime();
+	timerNextPrint = t;
+	timerLimit = t + MILLIS_PER_TRIAL;
+}
+
+//returns false if the countdown should be stopped, additionally it places the remainingMillis (if any) to finish
+bool tickCountDown(long& remainingMillis){
+	long t = getMillisTime();
+	if (t > timerNextPrint){
+		printf("%d..", timerCount);
+		timerCount++;
+		timerNextPrint += 1000; 
+	}
+	if (t >= timerLimit || kbhit()){
+		long diff = timerLimit - t;
+		if (diff < 0) { diff = 0;}
+		remainingMillis = diff;
+		return false;
+	}
+
+	return true;
+}
+
+#endif
+
 
 
 int main(int argc, char* argv[])
 {
+	initRandomSeed();
+
     vrpn_Connection *connection;
     char connectionName[128];
     int  port = 3883;
@@ -493,9 +468,8 @@ int main(int argc, char* argv[])
 	// Arduino port
 	COMToolkit::connect(L"\\\\.\\COM15");
 
-	//initializeSequence();
 
-	//first experiment
+	//first experiment: send a grid of values to the servo and read back the values
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
 	int N = 39;
@@ -521,7 +495,6 @@ int main(int argc, char* argv[])
 	
 
 	if (shuffle){
-		initRandomSeed();
 		for(int i = permutations.size() - 1; i >= 0; --i){
 			int target = intRandom(0,i+1);
 			const int tmp = permutations[i];
@@ -532,8 +505,10 @@ int main(int argc, char* argv[])
 
 	FILE* f = fopen(fileName, "w");
 #endif
+
+//second experiment: test the interpolators
 #ifdef EXPERIMENT_2
-	//second experiment
+	
 	const int N = 400;
 	
 	MultiVariableInterp2D* interpolator;
@@ -549,6 +524,7 @@ int main(int argc, char* argv[])
 	const float minrY = -18, maxrY = 18;
 #endif
 
+//third experiment desired and real rx,ry on real time
 #ifdef EXPERIMENT_3
 	char calibFileJupiter[] = "jupiter_calib_18.csv";
 	char calibFileMars[] = "mars_calib_18.csv";
@@ -558,40 +534,169 @@ int main(int argc, char* argv[])
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
 	mInterpSaturn = new MVIDelunayLinear(calibFileSaturn);
-	char fileName[] = "sytem_HighMed_18.csv";
-	curvatureNum = 6;
+	char fileName[] = "tracking_hand.csv";
 
 	coordinateX = 0; 
 	coordinateZ = 0;
 
 	fileExp3 = fopen(fileName, "w");
 	//init time
-	
-	begin_time = clock();
-	trial = 0;
 
-	//third experiement
 
-	 while(!kbhit())
-    {
+	while(!kbhit()){
 		tracker->mainloop();
 		connection->mainloop();
         Sleep(5);
 		tracker->mainloop();
 		connection->mainloop();
         Sleep(5);
-		findCurve();
+		findCurve(3);
     }
-
 
 #endif
 
-	//handshake();
-	begin_time = clock();
-	stopped=false;
+//first evaluation
+#ifdef EVALUATION_1
+	//init interpolators
+	char calibFileJupiter[] = "jupiter_calib_18.csv";
+	char calibFileMars[] = "mars_calib_18.csv";
+	char calibFileEarth[] = "earth_calib_18.csv";
+	char calibFileSaturn[] = "saturn_calib_18.csv";
+	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
+	mInterpMars = new MVIDelunayLinear(calibFileMars);
+	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
+	mInterpSaturn = new MVIDelunayLinear(calibFileSaturn);
 
-	tracker->mainloop(); 
-	connection->mainloop();
+	//read pairs file
+	char pairsFile[] = "experiments.csv";
+	readPairsFile(pairsFile, 1);
+	id = intRandom(0,999999999); //random id
+	printf("---- Evaluation 1 with %d trials ID %d\n", amountOfTrials, id);
+
+	//ask for initial information
+	
+	printf("Enter the name of the participant: ");
+	scanf("%s", eName);
+	printf("Enter condition (1=onlyCapture 2=virtualNoAsk 3=real 4=virtual): ");
+	scanf("%d", &condition);
+	printf("Starting trial (1): ");
+	do{
+		scanf("%d", &trial);
+	}while (trial < 1 || trial > amountOfTrials);
+	firstPair = true;
+
+	//read the offsets of the fingers if it were needed
+	if (condition == conditionVirtualNoAskFS || condition == conditionVirtual){
+		readFingerOffsets();
+	}
+
+	//open the tracking file
+	openPositionTrackingFile();
+	
+	//opening the trials file if it were needed (in append mode just in case)
+	if (condition == conditionReal || condition == conditionVirtual){
+		char tmpStr[256];
+		sprintf(tmpStr, "%s_%d_%d_trials.txt", eName, id, condition);
+		trialsFile = fopen(tmpStr, "w+");
+	}
+
+	if (condition == conditionRealOnlyCapture){
+		printf("Only capturing data\n");
+	}
+
+	bool stop = false;
+	bool countDown = false;
+	float curvature = 3;
+	long remainingMillisA, remainingMillisB;
+
+	while(! stop){
+		if (condition == conditionRealOnlyCapture){
+			stop = kbhit();
+			tracker->mainloop();
+			connection->mainloop();
+			Sleep(5);
+
+		}else if (condition == conditionVirtualNoAskFS || condition == conditionReal || condition == conditionVirtual){
+			if (countDown){
+				if( condition == conditionVirtualNoAskFS || condition == conditionVirtual){
+					findCurve(curvature);
+				}
+				long rm;
+				countDown = tickCountDown(rm);
+
+				if (!countDown){
+					printf("STOP!!!!\n");
+
+					if (firstPair) {remainingMillisA = rm;}
+					else {remainingMillisB = rm;}
+					
+					if ( (!firstPair) && (condition == conditionReal || condition == conditionVirtual)){
+						printf("Ask first or second (1 or 2): ");
+						int firstOrSecond;
+						do {
+							scanf("%d", &firstOrSecond);
+						} while(firstOrSecond != 1 &&  firstOrSecond != 2);
+						
+						float curvA = cNumberToCurv[ pairA[trial - 1] ];
+						float curvB = cNumberToCurv[ pairB[trial - 1] ];
+						//trial firstOrSecond curvA curvB remainingTimeA remainingTimeB timestamp
+						fprintf(trialsFile,"%d,%d,%f,%f,%ld,%ld,%ld\n", trial, firstOrSecond, 
+							curvA, curvB, remainingMillisA, remainingMillisB, getMillisTime());
+						fflush(trialsFile);
+					}
+
+					//increase pair, trial, end of eval?
+					if (firstPair){
+						firstPair = false;
+					}else{
+						trial++;
+						firstPair = true;
+						if(trial > amountOfTrials){
+							stop = true;
+							break;
+						}
+					}
+				}
+			}else{
+				int curvNumber = firstPair ? pairA[trial - 1] : pairB[trial - 1];
+				curvature = cNumberToCurv[curvNumber];
+				
+				//read the command
+				char command;
+				do {
+					printf("Trial %d/%d %s curv(%d) %.4f continue (c) or back (b): ", trial, amountOfTrials, firstPair ? "a":"b", curvNumber, curvature);
+					scanf("%c", &command);
+				}while (command != 'c' && command != 'b');
+
+				if (command == 'b'){ // go back to the trial
+					printf("\n");
+					char aOrB = 'a';
+					do{
+						printf("trial and (a/b) ");
+						scanf("%d %c", &trial, &aOrB);
+					}while (trial < 1 || trial > amountOfTrials || (aOrB != 'a' && aOrB != 'b'));
+					firstPair = aOrB == 'a';
+					
+				}else{
+					if(condition == conditionReal || condition == conditionVirtual){
+						openPositionTrackingFile();
+					}
+
+					startCountDown();
+					countDown = true;
+				}
+			}
+
+			tracker->mainloop();
+			connection->mainloop();
+			Sleep(5);
+		}
+
+
+    }
+
+#endif
+
 
 #ifdef EXPERIMENT_1
 	Sleep(1200);
@@ -655,8 +760,6 @@ int main(int argc, char* argv[])
     }
 #endif
 
-
-
 #ifdef EXPERIMENT_1
 	fclose(f);
 #endif
@@ -664,10 +767,26 @@ int main(int argc, char* argv[])
 	fclose(f);
 	delete interpolator;
 #endif
+
 #ifdef EXPERIMENT_3
 	fclose(fileExp3);
+	delete mInterpMars;
+    delete mInterpEarth;
+    delete mInterpJupiter;
+    delete mInterpSaturn;
 #endif
-	CloseHandle(hDevice);
+
+#ifdef EVALUATION_1
+	closePositionTrackingFile();
+	if (trialsFile != NULL) {
+		fclose(trialsFile);
+	}
+	delete mInterpMars;
+    delete mInterpEarth;
+    delete mInterpJupiter;
+    delete mInterpSaturn;
+#endif
+
 	return 0;
 }
 

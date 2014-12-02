@@ -1,60 +1,63 @@
 #include <Servo.h>
 #include <DSSerial.h>
-//#include <stdlib.h>
 
-#define MINANGLE 1200
-#define MAXANGLE 1800
+#define MINANGLE 1250
+#define MAXANGLE 1750
 
-int servoPin[8] = {2,3,5,4,7,6,12,13};
-//int servoPintwo = 3;
-Servo myServo[8];
-//Servo myServotwo;
-int incomingByte = 0;
-int incomingByte2 = 0;
-int incomingByte3 = 0;
-int angle;
-int oldDegree[8];
-int degree[8];
+#define N_SERVOS 8
+#define PACKED_SIZE 9
+
+int servoPin[N_SERVOS] = {2,3,5,4,7,6,12,13};
+Servo myServo[N_SERVOS];
+int oldDegree[N_SERVOS];
+int degree[N_SERVOS];
+
+byte buff[PACKED_SIZE];
 
 DSSerial serial = DSSerial();
 
 void setup()
 {
-  myServo[0].attach(servoPin[0],600,2400);
-  myServo[1].attach(servoPin[1],600,2400);
-  myServo[2].attach(servoPin[2],600,2400);
-  myServo[3].attach(servoPin[3],600,2400);
-  myServo[4].attach(servoPin[4],600,2400);
-  myServo[5].attach(servoPin[5],600,2400);
-  myServo[6].attach(servoPin[6],600,2400);
-  myServo[7].attach(servoPin[7],600,2400);
-  
-  int ang = (MINANGLE + MAXANGLE)/2; //8
-  int angtwo =(MINANGLE + MAXANGLE)/2;  //6
-  //ang = map(ang, 72,108,71, 116);
-  //ang = map(ang,78,102,77, 106);
-  //angtwo = map(angtwo,78,102,75, 103);
-  //angtwo = map(angtwo,72,108,70, 110);
-  //ang=ang-1;
-  //for(int i =0; i<8;i++) {
-  //    myServo[i].write(ang);
- // }
-  
+  for(int i = 0; i < N_SERVOS; ++i){
+    myServo[i].attach(servoPin[i],600,2400);
+  }  
+ 
   Serial.begin(115200);
-  for (int i=0;i<8; i++) 
+  
+  for (int i=0;i<8; i++){
+    degree[i] = 0;
     oldDegree[i] = 0;
-  //oldDegreeTwo = 0;
+  }
   delay(30); 
 }
 
 void writetoServo(int number) {
-  if(oldDegree[number] != degree[number] && degree[number] < MAXANGLE && degree[number] > MINANGLE)
-      {
+  if(oldDegree[number] != degree[number] && degree[number] < MAXANGLE && degree[number] > MINANGLE){
           oldDegree[number] = degree[number];
           myServo[number].writeMicroseconds(degree[number]);
-       }
-  
+   }
 }
+
+void readServosNormal(){
+      for(int i = 0; i < N_SERVOS; ++i){
+        degree[i]= serial.readInt();
+      }
+}
+
+void read4ServosPacked(){
+  Serial.readBytes(buff, PACKED_SIZE);
+  
+  for(int i = 0; i < N_SERVOS; ++i){
+        degree[i] = buff[i];
+        degree[i] += MINANGLE;
+  }
+  unsigned char significantBits = buff[PACKED_SIZE-1];
+  for(int i = 0; i < N_SERVOS; ++i){
+    degree[i] += (significantBits & (1<<i)) ? 256 : 0; //more efficient with bit operators instead of ? but this way is endianess independent
+  }
+   
+}
+
 
 void loop() 
 {
@@ -66,37 +69,15 @@ void loop()
     int key = Serial.read(); 
     if (key == 255) {
       
-       degree[0]= serial.readInt();
-       degree[1] = serial.readInt();
-       
-       /*
-       degree[2] = degree[0];
-       degree[3] = degree[1];
-       
-       degree[4] = degree[0];
-       degree[5] = degree[1];
-       degree[6] = degree[0];
-       degree[7] = degree[1];
-       */
-       degree[2] = serial.readInt();
-       degree[3] = serial.readInt();
-       degree[4] = serial.readInt();
-       degree[5] = serial.readInt();
-       degree[6] = serial.readInt();
-       degree[7] = serial.readInt();
+      //readServosNormal();
+      read4ServosPacked();
+      
+      for(int i = 0; i < N_SERVOS; ++i){
+        writetoServo(i);
+      }
 
-
-       writetoServo(0);
-       writetoServo(1);
-       writetoServo(2);
-       writetoServo(3);
-       writetoServo(4);
-       writetoServo(5);
-       writetoServo(6);
-       writetoServo(7);
+      
      }
-        
-   
-  
+     
   }
 }
