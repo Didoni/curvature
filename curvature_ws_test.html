@@ -2321,6 +2321,7 @@ function sendTrialData(data) {
         ws.send('' + String.fromCharCode(32) + data.trim());
     }
     $('#curvatureModel').modal('hide');
+    document.getElementById('message-text').value = '';
 }
 var Base64 = (function () {
     "use strict";
