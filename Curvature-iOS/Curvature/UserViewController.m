@@ -29,6 +29,8 @@
     NSUInteger lTime;
     NSUInteger rTime;
     
+    BOOL type1_2;
+    BOOL type3;
     BOOL isCurrentModelA;
     BOOL runTimer;
     BOOL alertTimer;
@@ -63,7 +65,6 @@ WebSocketRef _webSocket;
     _forward.enabled = YES;
     perSecTimer = nil;
     dualDemo = NO;
-    memset(trialsPlates, 0, MAX_TRAILS * 6 * sizeof(int));
     trialCounter = _trialBtn.titleLabel;
     self.navigationItem.rightBarButtonItem.customView.hidden = YES;
     self.views = [[self.view viewWithTag:10] subviews];
@@ -72,7 +73,7 @@ WebSocketRef _webSocket;
     [_container refreshData];
     [self.trialHistory registerClass:[UITableViewCell class] forCellReuseIdentifier:@"Cell"];
     maxTimerVal = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_time"];
-    [self getExperimentData];
+    [self getExperiments];
     [self makeDial];
     ((AppDelegate *)[UIApplication sharedApplication].delegate).vrpnUpdater = self.tableHeader;
     currentUser = ((User *)self.fetchedResultsController.fetchedObjects.lastObject);
@@ -87,6 +88,9 @@ WebSocketRef _webSocket;
     font = [UIFont systemFontOfSize:42.0f];
     start.titleLabel.font = font;
     start.titleLabel.frame = start.frame;
+    
+    type1_2 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_1_2"];
+    type3 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_3"];
     [self appDidBecomeActive:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillInactive:) name:UIApplicationWillResignActiveNotification object:nil];
@@ -885,8 +889,8 @@ WebSocketRef _webSocket;
         files = [NSArray arrayWithArray:array];
     }
 }
-
-- (void)getExperimentData {
+- (void)getExperimentData
+{
     BOOL t12 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_1_2"];
     BOOL t3 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_3"];
     if(!t12 && !t3){
@@ -894,10 +898,23 @@ WebSocketRef _webSocket;
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_3"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    NSUInteger i = totalTrials;
+    [self getExperiments];
+    if ((i != totalTrials || type1_2!=t12 || type3 !=t3) && currentUser.trials.count) {
+        [self changeUser];
+    }
+    
+}
+- (void)getExperiments {
+    
+    BOOL t12 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_1_2"];
+    BOOL t3 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_3"];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSArray *data = [[[NSString stringWithContentsOfFile:[documentsDirectory stringByAppendingPathComponent:@"experiments.csv"] encoding:NSUTF8StringEncoding error:nil] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] componentsSeparatedByString:@"\n"];
     int i = 0;
+    memset(trialsPlates, 0, sizeof(int)*MAX_TRAILS*9);
+    totalTrials = 0;
     for (NSString *row in data) {
         NSString *cleaned = [row stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         NSArray *cols = [cleaned componentsSeparatedByString:@","];
@@ -911,6 +928,7 @@ WebSocketRef _webSocket;
         }
     }
     totalTrials = i;
+    [_trialHistory reloadData];
 }
 
 -(void)restartSocket
@@ -996,7 +1014,10 @@ void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef val
                     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
                     NSString *documentsDirectory = [paths objectAtIndex:0];
                     NSString *filePath = [documentsDirectory stringByAppendingPathComponent:@"experiments.csv"];
-                    [data writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                    bool  written = [data writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
+                    if(written){
+                        [_THIS getExperimentData];
+                    }
                 }
             }
             if (action & CEventSendAllUserTrials) {
