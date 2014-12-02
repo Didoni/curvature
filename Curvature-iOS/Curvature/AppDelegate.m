@@ -56,12 +56,10 @@
     if (!set) {
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:version];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"reset"];
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_1_2"];
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_type"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sound"];
         [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_user"];
         [[NSUserDefaults standardUserDefaults] setInteger:20 forKey:@"trial_time"];
-        [[NSUserDefaults standardUserDefaults] setInteger:8 forKey:@"max_trial"];
-        [[NSUserDefaults standardUserDefaults] setInteger:4 forKey:@"max_trial_type_3"];
         [[NSUserDefaults standardUserDefaults] setInteger:100 forKey:@"vrpn_refresh"];
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"vrpn"];
         [[NSUserDefaults standardUserDefaults] synchronize];

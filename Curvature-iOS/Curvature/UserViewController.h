@@ -33,6 +33,7 @@ typedef enum {
     CEventSendTrialList = 0x1 << 4,
     CEventUpdateTrialList = 0x1 << 5,
     CEventSendAllUserTrials = 0x1 << 6,
+    CEventChangeTrialType = 0x1 << 7,
 } CEvent;
 
 @interface UserViewController : UIViewController <NSFetchedResultsControllerDelegate, UITableViewDataSource>

@@ -116,21 +116,11 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Type1&amp;2</string>
+			<string>Type 1&amp;2</string>
 			<key>Key</key>
-			<string>trial_1_2</string>
+			<string>trial_type</string>
 			<key>DefaultValue</key>
 			<string>1</string>
-		</dict>
-		<dict>
-			<key>Type</key>
-			<string>PSToggleSwitchSpecifier</string>
-			<key>Title</key>
-			<string>Type 3</string>
-			<key>Key</key>
-			<string>trial_3</string>
-			<key>DefaultValue</key>
-			<string>NO</string>
 		</dict>
 		<dict>
 			<key>DefaultValue</key>

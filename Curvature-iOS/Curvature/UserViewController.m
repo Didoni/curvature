@@ -17,7 +17,6 @@
 #include "CoreWebSocket.h"
 
 #define MAX_TRAILS 500
-#define MAX_TRIAL (trialType!=2?maxTrials:maxTrialsType3)
 
 @interface UserViewController () {
     NSString *noiseFile;
@@ -28,9 +27,6 @@
     NSUInteger maxTimerVal;
     NSUInteger lTime;
     NSUInteger rTime;
-    
-    BOOL type1_2;
-    BOOL type3;
     BOOL isCurrentModelA;
     BOOL runTimer;
     BOOL alertTimer;
@@ -49,6 +45,8 @@
 
 @implementation UserViewController
 @synthesize start;
+
+BOOL lrType;
 BOOL paused;
 int trialsPlates[MAX_TRAILS * 3][3];
 User *currentUser;
@@ -89,8 +87,7 @@ WebSocketRef _webSocket;
     start.titleLabel.font = font;
     start.titleLabel.frame = start.frame;
     
-    type1_2 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_1_2"];
-    type3 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_3"];
+    lrType = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_type"];
     [self appDidBecomeActive:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillInactive:) name:UIApplicationWillResignActiveNotification object:nil];
@@ -232,7 +229,8 @@ WebSocketRef _webSocket;
     runTimer = YES;
     uint cur = (uint)_container.currentPageIndex;
     _pause.enabled = YES;
-    if (cur == 8) {
+    BOOL isTimer = (cur > 0 && cur % 2 == 0);
+    if (isTimer) {
         _refresh.enabled = YES;
         UILabel *model = isCurrentModelA ? _left : _right;
         NSUInteger trialType = trialsPlates[currentUser.trials.count][2];
@@ -308,7 +306,9 @@ WebSocketRef _webSocket;
 }
 
 - (void)forward:(UIBarButtonItem *)btn {
-    if (_container.currentPageIndex == 8) {
+    NSUInteger cur = _container.currentPageIndex;
+    BOOL isTimer = (cur > 0 && cur % 2 == 0);
+    if (isTimer) {
         if (isCurrentModelA) {
             if (paused || runTimer) {
                 runTimer = NO;
@@ -644,6 +644,7 @@ WebSocketRef _webSocket;
 
 #pragma mark - horizontal slider view delegate
 - (void)endedScrolling {
+    counter = 0;
     NSUInteger cur = _container.currentPageIndex;
     BOOL isTimer = (cur > 0 && cur % 2 == 0);
     if (isTimer && cur != [_views indexOfObject:[_timerViewContainer superview]]) {
@@ -654,7 +655,8 @@ WebSocketRef _webSocket;
             _timerViewContainer.alpha = 1.f;
         }];
     }
-    _trialType.hidden = (cur != 8);
+    _trialType.hidden = !isTimer;
+    [_trialType superview].backgroundColor =  cur != 8?[UICustom appColor:AppColorDarkOrange]:[UIColor clearColor];
     _container.scrollView.scrollEnabled = !isTimer;
     NSUInteger userType = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_user"];
     _rewind.enabled = !userType && (cur != 1);
@@ -667,7 +669,7 @@ WebSocketRef _webSocket;
     dualDemo = NO;
     runTimer = NO;
     _timerView.progressCounter = 0;
-    _left.alpha = 0;
+    _left.alpha = !isTimer;
     _right.alpha = 0;
     _timerView.theme.completedColor = cur == 8 ? [UIColor clearColor] : [UICustom appColor:AppColorLiteOrange];
     if (cur != 4) {
@@ -882,7 +884,9 @@ WebSocketRef _webSocket;
     NSMutableArray *array = [NSMutableArray new];
     for (NSString *filePath in filePathsArray) {
         if ([[filePath pathExtension] isEqualToString:@"mp3"]) {
-            [array addObject:[filePath lastPathComponent]];
+            NSString *lastPath = [filePath lastPathComponent];
+            if(!( [lastPath isEqualToString:@"ding.mp3"] || [lastPath isEqualToString:@"tong.mp3"] ))
+                [array addObject:lastPath];
         }
     }
     if (array.count) {
@@ -891,24 +895,19 @@ WebSocketRef _webSocket;
 }
 - (void)getExperimentData
 {
-    BOOL t12 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_1_2"];
-    BOOL t3 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_3"];
-    if(!t12 && !t3){
-        t3 = YES;
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"trial_3"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
     NSUInteger i = totalTrials;
     [self getExperiments];
-    if ((i != totalTrials || type1_2!=t12 || type3 !=t3) && currentUser.trials.count) {
+    if ((i != totalTrials) && currentUser.trials.count) {
         [self changeUser];
+        [self changeTrialType:lrType?0:2];
+    }else{
+        [self changeTrialType:lrType?0:2];
     }
     
 }
 - (void)getExperiments {
     
-    BOOL t12 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_1_2"];
-    BOOL t3 = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_3"];
+    lrType = [[NSUserDefaults standardUserDefaults] boolForKey:@"trial_type"];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSArray *data = [[[NSString stringWithContentsOfFile:[documentsDirectory stringByAppendingPathComponent:@"experiments.csv"] encoding:NSUTF8StringEncoding error:nil] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] componentsSeparatedByString:@"\n"];
@@ -920,7 +919,7 @@ WebSocketRef _webSocket;
         NSArray *cols = [cleaned componentsSeparatedByString:@","];
         if (cleaned.length && cols.count >= 3) {
             int type = [cols[0] intValue];
-            if ((type == 2 && t3) || (type !=2 && t12)) {
+            if ((type == 2 && !lrType) || (type !=2 && lrType)) {
                 trialsPlates[i][2] = type;
                 trialsPlates[i][0] = [cols[1] intValue];
                 trialsPlates[i++][1] = [cols[2] intValue];
@@ -958,6 +957,9 @@ WebSocketRef _webSocket;
     for (CFIndex i = 0; i < WebSocketGetClientCount(websocket); ++i) {
         WebSocketClientRef client = WebSocketGetClientAtIndex(websocket, i);
         switch (event) {
+            case CEventChangeTrialType:
+                WebSocketClientWriteWithFormat(client, CFSTR("%d,%d"), event,type,lrType);
+                break;
             case CEventUserTrialEnded:
                 WebSocketClientWriteWithFormat(client, CFSTR("%d,%d,%d,%d,%.0f,%.0f"), event,type,index,trial.selectedLeft,trial.leftTime,trial.rightTime);
                 break;
@@ -992,7 +994,7 @@ void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef val
             }
             if (action & CEventSendTrialList) {
                 NSMutableString *csv = [NSMutableString new];
-                [csv appendFormat:@"%d,",CEventSendTrialList];
+                [csv appendFormat:@"%d,%d",CEventSendTrialList,lrType];
                 for (Trial *trial in currentUser.trials) {
                     [csv appendFormat:@"\n%d,%d,%d,%d,%.0f,%.0f",trial.trialType,trial.left,trial.right,trial.selectedLeft,trial.leftTime,trial.rightTime];
                 }
@@ -1019,6 +1021,17 @@ void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef val
                         [_THIS getExperimentData];
                     }
                 }
+            }
+            if (action & CEventChangeTrialType) {
+                if(maxSize>1){
+                    NSArray *vals = [((__bridge NSString*)value) componentsSeparatedByString:@","];
+                    if(vals.count >= 2){
+                        [[NSUserDefaults standardUserDefaults] setBool:[vals[1] boolValue] forKey:@"trial_type"];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                        [_THIS getExperimentData];
+                    }
+                }
+                [_THIS emitEvent:CEventChangeTrialType];
             }
             if (action & CEventSendAllUserTrials) {
                 NSMutableString *writeString = [NSMutableString stringWithCapacity:0]; //don't worry about the capacity, it will expand as necessary
