@@ -776,7 +776,7 @@ int main(int argc, char* argv[])
 		const float targetRX = rangeRandom(minrX, maxrX);
 		const float targetRY = rangeRandom(minrY, maxrY);
 #ifdef EXPERIMENT_KEYBOARD
-		printf("enter rx ry you ugly twat: ");
+		printf("Please enter rx ry values: ");
 		scanf("%f %f", &targetRX, &targetRY);
 #endif
 		int sx, sy;
