@@ -20,7 +20,7 @@
 #define PI 3.14159265
 using namespace std;
 
-#define MAX_ANGLE 15
+#define MAX_ANGLE 12
 #define DIFFERENCE_H 0.001
 #define MIN_SERVO_VALUE 1250
 
@@ -28,8 +28,8 @@ using namespace std;
 
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
-//#define EXPERIMENT_3 1
-#define EVALUATION_1 1
+#define EXPERIMENT_3 1
+//#define EVALUATION_1 1
 
 //#define EXPERIMENT_KEYBOARD 1
 
@@ -82,11 +82,10 @@ static float rx = 0;
 static float ry = 0;
 
 static float zoffsets[4] = {0.025, 0.0, -0.025, -0.05};
-static float xoffsets[4] = {-0.11, -0.1, -0.11, -0.13};
+static float xoffsets[4] = {-0.01, 0.0, -0.01, -0.03};
 
 //1 to 11
-static const float cNumberToCurv[] = { 0, 
-	3, 2.5, 2, 1, 0.5, 0, -0.5, -1, -2, -2.5, -3};
+static const float cNumberToCurv[] = { -1.4, -0.6, -0.4, 0, 0.4, 0.6, 1.4};
 
 void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t);
 
@@ -323,8 +322,8 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t){
 	mPitch = pitch;
 	mRoll = roll;
 	mYaw = yaw;
-	coordinateX = t.pos[2];
-	coordinateZ = t.pos[0];
+	coordinateX = t.pos[2] + 0.0146991f;
+	coordinateZ = t.pos[0] - 0.0097213f;
 
 #ifdef EVALUATION_1
 	//time stamp x z y, rz rx ry
@@ -394,7 +393,7 @@ void openPositionTrackingFile(){
 	closePositionTrackingFile();
 
 	char tmpStr[256];
-	sprintf(tmpStr, "%s_%d_%d_pos_%d_%s.txt", eName, id, condition, trial, firstPair ? "a" : "b");
+	sprintf(tmpStr, "%s_%d_%d_pos_%d_%s.txt", eName, id, condition, trial, firstPair ? "first" : "second");
 	positionTracking = fopen(tmpStr, "w");
 }
 
@@ -431,14 +430,25 @@ void startCountDown(){
 }
 
 //returns false if the countdown should be stopped, additionally it places the remainingMillis (if any) to finish
-bool tickCountDown(long& remainingMillis){
+bool tickCountDown(long& remainingMillis, bool& keyPressed){
+	keyPressed = false;
 	long t = getMillisTime();
 	if (t > timerNextPrint){
 		printf("%d..", timerCount);
 		timerCount++;
 		timerNextPrint += 1000; 
 	}
-	if (t >= timerLimit || kbhit()){
+	
+	bool enterPressed = false;
+	if ( kbhit() ){
+		int code = _getch();
+		if (code == 13){//Enter key
+			enterPressed = true; 
+			keyPressed = true;
+		}
+	}
+	
+	if (t >= timerLimit || enterPressed){
 		long diff = timerLimit - t;
 		if (diff < 0) { diff = 0;}
 		remainingMillis = diff;
@@ -446,6 +456,10 @@ bool tickCountDown(long& remainingMillis){
 	}
 
 	return true;
+}
+
+int getKeyWithoutEnter(){
+	return _getch();
 }
 
 #endif
@@ -462,8 +476,11 @@ int main(int argc, char* argv[])
 
     sprintf(connectionName,"localhost:%d", port);
     connection = vrpn_get_connection_by_name(connectionName);
-    vrpn_Tracker_Remote *tracker = new vrpn_Tracker_Remote("testingSlope", connection);
+	vrpn_Tracker_Remote *tracker;
+#ifndef EVALUATION_1
+    tracker = new vrpn_Tracker_Remote("testingSlope", connection);
   	tracker->register_change_handler(NULL, handle_pos);
+#endif
 
 	// Arduino port
 	COMToolkit::connect(L"\\\\.\\COM15");
@@ -473,7 +490,7 @@ int main(int argc, char* argv[])
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
 	int N = 39;
-	char fileName[] = "Jupiter_Shuffled1_18_18.csv";
+	char fileName[] = "Mars_Shuffled5_18_18.csv";
 	const int minX = 1250, maxX = 1750;
 	const int minY = 1250, maxY = 1750;
 	//const int minX = 1397, maxX = 1635;
@@ -559,7 +576,7 @@ int main(int argc, char* argv[])
 #ifdef EVALUATION_1
 	//init interpolators
 	char calibFileJupiter[] = "jupiter_calib_18.csv";
-	char calibFileMars[] = "mars_calib_18.csv";
+	char calibFileMars[] = "MARS.csv";
 	char calibFileEarth[] = "earth_calib_18.csv";
 	char calibFileSaturn[] = "saturn_calib_18.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
@@ -585,9 +602,16 @@ int main(int argc, char* argv[])
 	}while (trial < 1 || trial > amountOfTrials);
 	firstPair = true;
 
-	//read the offsets of the fingers if it were needed
+	
 	if (condition == conditionVirtualNoAskFS || condition == conditionVirtual){
-		readFingerOffsets();
+		readFingerOffsets(); //read the offsets of the fingers if it were needed
+		
+		//reading tracker on the device
+		tracker = new vrpn_Tracker_Remote("testingSlope", connection);
+  		tracker->register_change_handler(NULL, handle_pos);
+	}else{
+		tracker = new vrpn_Tracker_Remote("handTracking", connection);
+  		tracker->register_change_handler(NULL, handle_pos);
 	}
 
 	//open the tracking file
@@ -622,21 +646,24 @@ int main(int argc, char* argv[])
 					findCurve(curvature);
 				}
 				long rm;
-				countDown = tickCountDown(rm);
+				bool keyPressed;
+				countDown = tickCountDown(rm, keyPressed);
 
 				if (!countDown){
-					printf("STOP!!!!\n");
+					if(!keyPressed){
+						printf("\n\nSTOP!!!! STOP!!!!STOP!!!!STOP!!!!STOP!!!!STOP!!!!STOP!!!!\n\n");
+					}
 
 					if (firstPair) {remainingMillisA = rm;}
 					else {remainingMillisB = rm;}
 					
 					if ( (!firstPair) && (condition == conditionReal || condition == conditionVirtual)){
-						printf("Ask first or second (1 or 2): ");
-						int firstOrSecond;
+						char ch;
 						do {
-							scanf("%d", &firstOrSecond);
-						} while(firstOrSecond != 1 &&  firstOrSecond != 2);
-						
+							printf("\n\nAsk first or second (1 or 2): ");
+							ch = getKeyWithoutEnter();
+						} while(ch != '1' &&  ch != '2');
+						int firstOrSecond = ch - '0';
 						float curvA = cNumberToCurv[ pairA[trial - 1] ];
 						float curvB = cNumberToCurv[ pairB[trial - 1] ];
 						//trial firstOrSecond curvA curvB remainingTimeA remainingTimeB timestamp
@@ -660,12 +687,22 @@ int main(int argc, char* argv[])
 			}else{
 				int curvNumber = firstPair ? pairA[trial - 1] : pairB[trial - 1];
 				curvature = cNumberToCurv[curvNumber];
+				const float curvA = cNumberToCurv[ pairA[trial - 1] ];
+				const float curvB = cNumberToCurv[ pairB[trial - 1] ];
+				int nextTrial = trial < amountOfTrials ? trial : 0;
+				const float nextCurvA = cNumberToCurv[ pairA[nextTrial] ];
+				const float nextCurvB = cNumberToCurv[ pairB[nextTrial] ];
 				
 				//read the command
 				char command;
 				do {
-					printf("Trial %d/%d %s curv(%d) %.4f continue (c) or back (b): ", trial, amountOfTrials, firstPair ? "a":"b", curvNumber, curvature);
-					scanf("%c", &command);
+					if (firstPair){
+						printf("\n\n[[%.1f]]    %.1f       %.1f   %.1f  Trial %d/%d %s",  curvA, curvB, nextCurvA, nextCurvB, trial, amountOfTrials, firstPair ? "first":"second");
+					}else{
+						printf("\n\n  %.1f    [[%.1f]]     %.1f   %.1f  Trial %d/%d %s",  curvA, curvB, nextCurvA, nextCurvB, trial, amountOfTrials, firstPair ? "first":"second");
+					}
+					
+					command = getKeyWithoutEnter();
 				}while (command != 'c' && command != 'b');
 
 				if (command == 'b'){ // go back to the trial
@@ -678,6 +715,7 @@ int main(int argc, char* argv[])
 					firstPair = aOrB == 'a';
 					
 				}else{
+					printf("\n");
 					if(condition == conditionReal || condition == conditionVirtual){
 						openPositionTrackingFile();
 					}
@@ -711,7 +749,7 @@ int main(int argc, char* argv[])
 		scanf("%d %d", &sx, &sy);
 		sendBytesTest(sx, sy);
 #else
-		sendBytesTest(pointToSend.x, pointToSend.y);
+		send4ServosPackedIn9Bytes(pointToSend.x, pointToSend.y,pointToSend.x, pointToSend.y,pointToSend.x, pointToSend.y,pointToSend.x, pointToSend.y);
 #endif		
         Sleep(600);
 		tracker->mainloop(); 
