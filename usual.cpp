@@ -745,7 +745,7 @@ int main(int argc, char* argv[])
 		const Point2D& pointToSend = points[ permIndex ];
 #ifdef EXPERIMENT_KEYBOARD
 		int sx,sy;
-		printf("input sx sy you ugly twat: ");
+		printf("Please input sx sy values: ");
 		scanf("%d %d", &sx, &sy);
 		sendBytesTest(sx, sy);
 #else
