@@ -730,7 +730,7 @@ int main(int argc, char* argv[])
 		const Point2D& pointToSend = points[ permIndex ];
 #ifdef EXPERIMENT_KEYBOARD
 		int sx,sy;
-		printf("input sx sy you ugly twat: ");
+		printf("Please input sx sy values: ");
 		scanf("%d %d", &sx, &sy);
 		sendBytesTest(sx, sy);
 #else
@@ -761,7 +761,7 @@ int main(int argc, char* argv[])
 		const float targetRX = rangeRandom(minrX, maxrX);
 		const float targetRY = rangeRandom(minrY, maxrY);
 #ifdef EXPERIMENT_KEYBOARD
-		printf("enter rx ry you ugly twat: ");
+		printf("Please input rx ry values: ");
 		scanf("%f %f", &targetRX, &targetRY);
 #endif
 		int sx, sy;
