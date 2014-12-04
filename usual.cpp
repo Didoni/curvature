@@ -28,8 +28,8 @@ using namespace std;
 
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
-#define EXPERIMENT_3 1
-//#define EVALUATION_1 1
+//#define EXPERIMENT_3 1
+#define EVALUATION_1 1
 
 //#define EXPERIMENT_KEYBOARD 1
 
@@ -58,12 +58,12 @@ static int id;
 #define NAME_LENGTH 32
 static char eName[NAME_LENGTH];
 enum eCondition{
-	conditionRealOnlyCapture = 1,
-	conditionVirtualNoAskFS = 2, 
+	conditionRealNoAsk = 1,
+	conditionVirtualNoAsk = 2, 
 	conditionReal = 3, 
 	conditionVirtual = 4 
 };
-static eCondition condition = conditionRealOnlyCapture;
+static eCondition condition = conditionRealNoAsk;
 static int trial = 0;
 static bool firstPair = true;
 
@@ -389,7 +389,7 @@ void closePositionTrackingFile(){
 	}
 }
 
-void openPositionTrackingFile(){
+void openAPositionTrackingFile(){
 	closePositionTrackingFile();
 
 	char tmpStr[256];
@@ -594,7 +594,7 @@ int main(int argc, char* argv[])
 	
 	printf("Enter the name of the participant: ");
 	scanf("%s", eName);
-	printf("Enter condition (1=onlyCapture 2=virtualNoAsk 3=real 4=virtual): ");
+	printf("Enter condition (1=RealNoAsk 2=VirtualNoAsk 3=Real 4=Virtual): ");
 	scanf("%d", &condition);
 	printf("Starting trial (1): ");
 	do{
@@ -603,7 +603,7 @@ int main(int argc, char* argv[])
 	firstPair = true;
 
 	
-	if (condition == conditionVirtualNoAskFS || condition == conditionVirtual){
+	if (condition == conditionVirtualNoAsk || condition == conditionVirtual){
 		readFingerOffsets(); //read the offsets of the fingers if it were needed
 		
 		//reading tracker on the device
@@ -615,7 +615,7 @@ int main(int argc, char* argv[])
 	}
 
 	//open the tracking file
-	openPositionTrackingFile();
+	openAPositionTrackingFile();
 	
 	//opening the trials file if it were needed (in append mode just in case)
 	if (condition == conditionReal || condition == conditionVirtual){
@@ -624,9 +624,6 @@ int main(int argc, char* argv[])
 		trialsFile = fopen(tmpStr, "w+");
 	}
 
-	if (condition == conditionRealOnlyCapture){
-		printf("Only capturing data\n");
-	}
 
 	bool stop = false;
 	bool countDown = false;
@@ -634,15 +631,8 @@ int main(int argc, char* argv[])
 	long remainingMillisA, remainingMillisB;
 
 	while(! stop){
-		if (condition == conditionRealOnlyCapture){
-			stop = kbhit();
-			tracker->mainloop();
-			connection->mainloop();
-			Sleep(5);
-
-		}else if (condition == conditionVirtualNoAskFS || condition == conditionReal || condition == conditionVirtual){
 			if (countDown){
-				if( condition == conditionVirtualNoAskFS || condition == conditionVirtual){
+				if( condition == conditionVirtualNoAsk || condition == conditionVirtual){
 					findCurve(curvature);
 				}
 				long rm;
@@ -657,7 +647,7 @@ int main(int argc, char* argv[])
 					if (firstPair) {remainingMillisA = rm;}
 					else {remainingMillisB = rm;}
 					
-					if ( (!firstPair) && (condition == conditionReal || condition == conditionVirtual)){
+					if ( (!firstPair) && (condition == conditionReal || condition == conditionVirtual) ){
 						char ch;
 						do {
 							printf("\n\nAsk first or second (1 or 2): ");
@@ -701,11 +691,10 @@ int main(int argc, char* argv[])
 					}else{
 						printf("\n\n  %.1f    [[%.1f]]     %.1f   %.1f  Trial %d/%d %s",  curvA, curvB, nextCurvA, nextCurvB, trial, amountOfTrials, firstPair ? "first":"second");
 					}
-					
 					command = getKeyWithoutEnter();
 				}while (command != 'c' && command != 'b');
 
-				if (command == 'b'){ // go back to the trial
+				if (command == 'b'){ // go back to a trial
 					printf("\n");
 					char aOrB = 'a';
 					do{
@@ -716,9 +705,8 @@ int main(int argc, char* argv[])
 					
 				}else{
 					printf("\n");
-					if(condition == conditionReal || condition == conditionVirtual){
-						openPositionTrackingFile();
-					}
+						
+					openAPositionTrackingFile();
 
 					startCountDown();
 					countDown = true;
@@ -728,9 +716,6 @@ int main(int argc, char* argv[])
 			tracker->mainloop();
 			connection->mainloop();
 			Sleep(5);
-		}
-
-
     }
 
 #endif
@@ -745,7 +730,7 @@ int main(int argc, char* argv[])
 		const Point2D& pointToSend = points[ permIndex ];
 #ifdef EXPERIMENT_KEYBOARD
 		int sx,sy;
-		printf("Please input sx sy values: ");
+		printf("input sx sy you ugly twat: ");
 		scanf("%d %d", &sx, &sy);
 		sendBytesTest(sx, sy);
 #else
@@ -776,7 +761,7 @@ int main(int argc, char* argv[])
 		const float targetRX = rangeRandom(minrX, maxrX);
 		const float targetRY = rangeRandom(minrY, maxrY);
 #ifdef EXPERIMENT_KEYBOARD
-		printf("Please enter rx ry values: ");
+		printf("enter rx ry you ugly twat: ");
 		scanf("%f %f", &targetRX, &targetRY);
 #endif
 		int sx, sy;
@@ -827,5 +812,3 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
-
-
