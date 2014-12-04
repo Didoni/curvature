@@ -14,8 +14,11 @@
 		F223C27D1A1BF03600D3245A /* MDRadialProgressTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C2791A1BF03600D3245A /* MDRadialProgressTheme.m */; };
 		F223C27E1A1BF03600D3245A /* MDRadialProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = F223C27B1A1BF03600D3245A /* MDRadialProgressView.m */; };
 		F23566B11A2B7461007CF3F1 /* curvature_ws_test.html in Resources */ = {isa = PBXBuildFile; fileRef = F23566B01A2B7461007CF3F1 /* curvature_ws_test.html */; };
-		F23F73C81A22290200C814BE /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = F23F73C71A22290200C814BE /* User.m */; };
 		F23F73CB1A22290300C814BE /* Trial.m in Sources */ = {isa = PBXBuildFile; fileRef = F23F73CA1A22290300C814BE /* Trial.m */; };
+		F25783F41A2F8C9B00562E70 /* VRPNController.mm in Sources */ = {isa = PBXBuildFile; fileRef = F25783F31A2F8C9B00562E70 /* VRPNController.mm */; };
+		F25783F71A2F8D0A00562E70 /* MultiVariableInterp2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F25783F61A2F8D0A00562E70 /* MultiVariableInterp2D.cpp */; };
+		F25783F91A2F93CD00562E70 /* experiments.csv in Resources */ = {isa = PBXBuildFile; fileRef = F25783F81A2F93CD00562E70 /* experiments.csv */; };
+		F25783FF1A30F4ED00562E70 /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = F25783FE1A30F4ED00562E70 /* User.m */; };
 		F25CE6DD1A2D017A0081ADF7 /* NSDate+TimeAgo.m in Sources */ = {isa = PBXBuildFile; fileRef = F25CE6DC1A2D017A0081ADF7 /* NSDate+TimeAgo.m */; };
 		F25CE6DF1A2D01A80081ADF7 /* NSDateTimeAgo.bundle in Resources */ = {isa = PBXBuildFile; fileRef = F25CE6DE1A2D01A80081ADF7 /* NSDateTimeAgo.bundle */; };
 		F26BEDEA1A23AAE1003075C7 /* Telephone.mm in Sources */ = {isa = PBXBuildFile; fileRef = F26BEDE91A23AAE1003075C7 /* Telephone.mm */; };
@@ -51,7 +54,6 @@
 		F2A292E21A2A802100F06D36 /* WebSocket.c in Sources */ = {isa = PBXBuildFile; fileRef = F2A292D71A2A802100F06D36 /* WebSocket.c */; };
 		F2A292E31A2A802100F06D36 /* WebSocketClient.c in Sources */ = {isa = PBXBuildFile; fileRef = F2A292D91A2A802100F06D36 /* WebSocketClient.c */; };
 		F2A292E41A2A802100F06D36 /* WebSocketFrame.c in Sources */ = {isa = PBXBuildFile; fileRef = F2A292DB1A2A802100F06D36 /* WebSocketFrame.c */; };
-		F2DF58451A2CFB6E008593E2 /* experiments.csv in Resources */ = {isa = PBXBuildFile; fileRef = F2DF58431A2CFB6E008593E2 /* experiments.csv */; };
 		F2DF58461A2CFB6E008593E2 /* White Noise.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = F2DF58441A2CFB6E008593E2 /* White Noise.mp3 */; };
 /* End PBXBuildFile section */
 
@@ -66,10 +68,15 @@
 		F223C27A1A1BF03600D3245A /* MDRadialProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MDRadialProgressView.h; sourceTree = "<group>"; };
 		F223C27B1A1BF03600D3245A /* MDRadialProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MDRadialProgressView.m; sourceTree = "<group>"; };
 		F23566B01A2B7461007CF3F1 /* curvature_ws_test.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = curvature_ws_test.html; path = ../../curvature_ws_test.html; sourceTree = "<group>"; };
-		F23F73C61A22290200C814BE /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
-		F23F73C71A22290200C814BE /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		F23F73C91A22290300C814BE /* Trial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Trial.h; sourceTree = "<group>"; };
 		F23F73CA1A22290300C814BE /* Trial.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Trial.m; sourceTree = "<group>"; };
+		F25783F21A2F8C9B00562E70 /* VRPNController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VRPNController.h; sourceTree = "<group>"; };
+		F25783F31A2F8C9B00562E70 /* VRPNController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VRPNController.mm; sourceTree = "<group>"; };
+		F25783F51A2F8D0A00562E70 /* MultiVariableInterp2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultiVariableInterp2D.h; sourceTree = "<group>"; };
+		F25783F61A2F8D0A00562E70 /* MultiVariableInterp2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MultiVariableInterp2D.cpp; sourceTree = "<group>"; };
+		F25783F81A2F93CD00562E70 /* experiments.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = experiments.csv; sourceTree = SOURCE_ROOT; };
+		F25783FD1A30F4ED00562E70 /* User.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
+		F25783FE1A30F4ED00562E70 /* User.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
 		F25CE6DB1A2D017A0081ADF7 /* NSDate+TimeAgo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+TimeAgo.h"; sourceTree = "<group>"; };
 		F25CE6DC1A2D017A0081ADF7 /* NSDate+TimeAgo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+TimeAgo.m"; sourceTree = "<group>"; };
 		F25CE6DE1A2D01A80081ADF7 /* NSDateTimeAgo.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = NSDateTimeAgo.bundle; sourceTree = "<group>"; };
@@ -255,7 +262,6 @@
 		F2A292DB1A2A802100F06D36 /* WebSocketFrame.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = WebSocketFrame.c; sourceTree = "<group>"; };
 		F2A292DC1A2A802100F06D36 /* WebSocketFrame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocketFrame.h; sourceTree = "<group>"; };
 		F2A292DD1A2A802100F06D36 /* WebSocketTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocketTypes.h; sourceTree = "<group>"; };
-		F2DF58431A2CFB6E008593E2 /* experiments.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = experiments.csv; sourceTree = "<group>"; };
 		F2DF58441A2CFB6E008593E2 /* White Noise.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "White Noise.mp3"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -360,7 +366,7 @@
 			isa = PBXGroup;
 			children = (
 				F25CE6DE1A2D01A80081ADF7 /* NSDateTimeAgo.bundle */,
-				F2DF58431A2CFB6E008593E2 /* experiments.csv */,
+				F25783F81A2F93CD00562E70 /* experiments.csv */,
 				F2DF58441A2CFB6E008593E2 /* White Noise.mp3 */,
 				F23566B01A2B7461007CF3F1 /* curvature_ws_test.html */,
 				F2946D011A26B66C00635A18 /* ding.mp3 */,
@@ -418,10 +424,10 @@
 			isa = PBXGroup;
 			children = (
 				F28D99E61A1556F300070B2D /* Curvature.xcdatamodeld */,
+				F25783FD1A30F4ED00562E70 /* User.h */,
+				F25783FE1A30F4ED00562E70 /* User.m */,
 				F23F73C91A22290300C814BE /* Trial.h */,
 				F23F73CA1A22290300C814BE /* Trial.m */,
-				F23F73C61A22290200C814BE /* User.h */,
-				F23F73C71A22290200C814BE /* User.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -566,6 +572,10 @@
 			children = (
 				F2946C751A26710900635A18 /* VRPN.h */,
 				F2946C761A26710900635A18 /* VRPN.mm */,
+				F25783F21A2F8C9B00562E70 /* VRPNController.h */,
+				F25783F31A2F8C9B00562E70 /* VRPNController.mm */,
+				F25783F51A2F8D0A00562E70 /* MultiVariableInterp2D.h */,
+				F25783F61A2F8D0A00562E70 /* MultiVariableInterp2D.cpp */,
 			);
 			name = "vprn client";
 			sourceTree = "<group>";
@@ -661,13 +671,13 @@
 				F2946D001A26B61800635A18 /* tong.mp3 in Resources */,
 				F26BEDFD1A23CD90003075C7 /* track1.caf in Resources */,
 				F2946BC21A23EBFD00635A18 /* duck.caf in Resources */,
-				F2DF58451A2CFB6E008593E2 /* experiments.csv in Resources */,
 				F2DF58461A2CFB6E008593E2 /* White Noise.mp3 in Resources */,
 				F26BEE031A23CFE0003075C7 /* track3.caf in Resources */,
 				F26BEDFC1A23CD8D003075C7 /* sound2.caf in Resources */,
 				F26BEDFB1A23CD8B003075C7 /* sound1.caf in Resources */,
 				F28D99F11A1556F300070B2D /* Main.storyboard in Resources */,
 				F23566B11A2B7461007CF3F1 /* curvature_ws_test.html in Resources */,
+				F25783F91A2F93CD00562E70 /* experiments.csv in Resources */,
 				F2946D021A26B66C00635A18 /* ding.mp3 in Resources */,
 				F2929A2C1A1D6AA6006390EC /* Settings.bundle in Resources */,
 				F28D99F31A1556F300070B2D /* Images.xcassets in Resources */,
@@ -681,6 +691,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F25783F41A2F8C9B00562E70 /* VRPNController.mm in Sources */,
 				F223C2671A1BD1B100D3245A /* HorizontalTableView.m in Sources */,
 				F2A292E21A2A802100F06D36 /* WebSocket.c in Sources */,
 				F28D99EE1A1556F300070B2D /* DetailViewController.m in Sources */,
@@ -688,17 +699,18 @@
 				F2946C771A26710900635A18 /* VRPN.mm in Sources */,
 				F28D99E81A1556F300070B2D /* Curvature.xcdatamodeld in Sources */,
 				F28D9A0D1A15667000070B2D /* UserViewController.m in Sources */,
+				F25783FF1A30F4ED00562E70 /* User.m in Sources */,
 				F28D9A291A15A20200070B2D /* Matrix.m in Sources */,
 				F28D99E51A1556F200070B2D /* AppDelegate.m in Sources */,
 				F25CE6DD1A2D017A0081ADF7 /* NSDate+TimeAgo.m in Sources */,
 				F26BEDF01A23BC01003075C7 /* SoundManager.m in Sources */,
 				F2A292DF1A2A802100F06D36 /* cuEnc64.c in Sources */,
-				F23F73C81A22290200C814BE /* User.m in Sources */,
 				F223C27D1A1BF03600D3245A /* MDRadialProgressTheme.m in Sources */,
 				F26BEDEA1A23AAE1003075C7 /* Telephone.mm in Sources */,
 				F28D9A141A1567A100070B2D /* UICustom.m in Sources */,
 				F28D99E21A1556F100070B2D /* main.m in Sources */,
 				F23F73CB1A22290300C814BE /* Trial.m in Sources */,
+				F25783F71A2F8D0A00562E70 /* MultiVariableInterp2D.cpp in Sources */,
 				F2A292E41A2A802100F06D36 /* WebSocketFrame.c in Sources */,
 				F223C27C1A1BF03600D3245A /* MDRadialProgressLabel.m in Sources */,
 				F2A292E31A2A802100F06D36 /* WebSocketClient.c in Sources */,

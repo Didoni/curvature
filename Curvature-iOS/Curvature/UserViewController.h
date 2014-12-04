@@ -21,6 +21,7 @@ typedef enum {
     CEventTrialResumed = 0x4,
     CEventTrialReStarted = 0x5,
     CEventUserTrialEnded = 0x6,
+    CEventUserName = 0x7,
     
     CEventStartTrial = 0x1,
     CEventStopTrial = 0x2,
@@ -45,6 +46,7 @@ typedef enum {
 @property (strong, nonatomic) IBOutlet UIButton *trialBtn;
 @property (strong, nonatomic) IBOutlet UILabel *left;
 @property (strong, nonatomic) IBOutlet UILabel *right;
+@property (strong, nonatomic) IBOutlet UILabel *name;
 @property (strong, nonatomic) IBOutlet UILabel *tableHeader;
 @property (strong, nonatomic) IBOutlet UIButton *start;
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *rewind;

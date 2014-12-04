@@ -94,8 +94,35 @@ WebSocketRef _webSocket;
     [SoundManager sharedManager].allowsBackgroundMusic = YES;
     [[SoundManager sharedManager] prepareToPlay];
     [self restartSocket];
+    _name.userInteractionEnabled = YES;
+    [_name addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(changeName)]];
+    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+    BOOL changed = NO;
+    for (User *remUser in self.fetchedResultsController.fetchedObjects) {
+        if(remUser.trials.count == 0){
+            changed = YES;
+            [context deleteObject:remUser];
+            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:[NSString stringWithFormat:@"user-%d",currentUser.userId]];
+        }
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    if(changed){
+        [context save:nil];
+    }
+    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"user-%d",currentUser.userId]];
+    if(name.length){
+        _name.text = name;
+    }
 }
-
+-(void)changeName
+{
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"Please enter your name" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil] ;
+    alertView.tag = 100;
+    UITextField * alertTextField = [alertView textFieldAtIndex:0];
+    alertTextField.text = _name.text;
+    alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [alertView show];
+}
 - (void)changeTrialType:(int)ltrialType {
     NSUInteger trialType = trialsPlates[currentUser.trials.count][2];
     if (trialType != ((Trial*)currentUser.trials.lastObject).trialType) {
@@ -420,7 +447,7 @@ WebSocketRef _webSocket;
                 [self addTrial:!buttonIndex];
                 if (currentUser.trials.count >= totalTrials) {
                     NSUInteger userType = [[NSUserDefaults standardUserDefaults] integerForKey:@"trial_user"];
-                    [self changeTrialType:0];
+                    [self changeTrialType:lrType?0:2];
                     if (userType) {
                         [[[UIAlertView alloc] initWithTitle:nil message:[NSString stringWithFormat:@"User %ld finished the experiment.", self.fetchedResultsController.fetchedObjects.count] delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
                         [self changeUser];
@@ -449,9 +476,23 @@ WebSocketRef _webSocket;
             }
             [self changeUser];
         }
-    }
-    else {
+    }else {
         if (buttonIndex) {
+            if (alertView.tag == 100){
+                if(!currentUser){
+                    [self changeUser];
+                }
+                UITextField * alertTextField = [alertView textFieldAtIndex:0];
+                NSString *text = [alertTextField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+                
+                [[NSUserDefaults standardUserDefaults] setObject:text forKey:[NSString stringWithFormat:@"user-%d",currentUser.userId]];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                if(text.length){
+                    [self emitEvent:CEventUserName];
+                }
+                _name.text = text.length?text:@"Tap here to add name";
+                return;
+            }
             if (alertView.tag == 10) {
                 shouldShowDemo = YES;
                 if (buttonIndex == 2 && currentUser.trials.count) {
@@ -540,6 +581,11 @@ WebSocketRef _webSocket;
 - (void)changeUser {
     [[SoundManager sharedManager] playSound:@"duck"];
     NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+    for (User *remUser in self.fetchedResultsController.fetchedObjects) {
+        if(remUser.trials.count == 0){
+            [context deleteObject:remUser];
+        }
+    }
     currentUser = [NSEntityDescription insertNewObjectForEntityForName:@"User" inManagedObjectContext:context];
     currentUser.userId = ((User *)self.fetchedResultsController.fetchedObjects.lastObject).userId + 1;
     NSError *error = nil;
@@ -550,8 +596,9 @@ WebSocketRef _webSocket;
         abort();
     }
     [self.fetchedResultsController performFetch:nil];
-    [self changeTrialType:0];
+    [self changeTrialType:lrType?0:2];
     [_trialBtn setTitle:@"Trial 1" forState:UIControlStateNormal];
+    _name.text = @"Tap here to add name";
 }
 
 - (NSFetchedResultsController *)fetchedResultsController {
@@ -828,6 +875,19 @@ WebSocketRef _webSocket;
         [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"reset"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+    BOOL dbChanged = NO;
+    for (User *remUser in self.fetchedResultsController.fetchedObjects) {
+        if(remUser.trials.count == 0){
+            dbChanged = YES;
+            [context deleteObject:remUser];
+            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:[NSString stringWithFormat:@"user-%d",currentUser.userId]];
+        }
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    if(dbChanged){
+        [context save:nil];
+    }
     [self getExperimentData];
     if (lmaxTimerVal != maxTimerVal) {
         maxTimerVal = lmaxTimerVal;
@@ -899,7 +959,6 @@ WebSocketRef _webSocket;
     [self getExperiments];
     if ((i != totalTrials) && currentUser.trials.count) {
         [self changeUser];
-        [self changeTrialType:lrType?0:2];
     }else{
         [self changeTrialType:lrType?0:2];
     }
@@ -963,6 +1022,11 @@ WebSocketRef _webSocket;
             case CEventUserTrialEnded:
                 WebSocketClientWriteWithFormat(client, CFSTR("%d,%d,%d,%d,%.0f,%.0f"), event,type,index,trial.selectedLeft,trial.leftTime,trial.rightTime);
                 break;
+            case CEventUserName:{
+                NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"user-%d",currentUser.userId]];
+                WebSocketClientWriteWithFormat(client, CFSTR("%d, , ,%@"), event,name);
+            }
+                break;
             default:
                 leftOrRight = (char)isCurrentModelA;
                 WebSocketClientWriteWithFormat(client, CFSTR("%d,%d,%d,%d"), event,type,index,leftOrRight);
@@ -994,7 +1058,11 @@ void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef val
             }
             if (action & CEventSendTrialList) {
                 NSMutableString *csv = [NSMutableString new];
-                [csv appendFormat:@"%d,%d",CEventSendTrialList,lrType];
+                NSString *name = _THIS.name.text;
+                if(!name.length||[name isEqualToString:@"Tap here to add name"]){
+                    name = @"";
+                }
+                [csv appendFormat:@"%d,%d,%@",CEventSendTrialList,lrType,name];
                 for (Trial *trial in currentUser.trials) {
                     [csv appendFormat:@"\n%d,%d,%d,%d,%.0f,%.0f",trial.trialType,trial.left,trial.right,trial.selectedLeft,trial.leftTime,trial.rightTime];
                 }
@@ -1038,9 +1106,13 @@ void remote_action(WebSocketRef self, WebSocketClientRef client, CFStringRef val
                 [writeString appendFormat:@"%d,User,Trial type,Trial,Left,Time taken,Right,Time taken,Trial On,Output",CEventSendAllUserTrials];
                 NSArray *dataArray = _THIS.fetchedResultsController.fetchedObjects;
                 for (User *user in dataArray) {
+                    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"user-%d",user.userId]];
+                    if(!name.length){
+                        name = [NSString stringWithFormat:@"User %d",user.userId];
+                    }
                     for (Trial *trial in user.trials) {
                         NSString *type = trial.trialType ? (trial.trialType == 1 ? @"servo" : @"joint") : @"touch";
-                        [writeString appendFormat:@"\n%d,%@,%d,%d,%f,%d,%f,%@,%@", user.userId, type, trial.trial, trial.left, trial.leftTime, trial.right, trial.rightTime, [NSDate dateWithTimeIntervalSinceReferenceDate:trial.timeStamp], trial.selectedLeft ? @"Left" : @"Right"];
+                        [writeString appendFormat:@"\n%@,%@,%d,%d,%f,%d,%f,%@,%@",name , type, trial.trial, trial.left, trial.leftTime, trial.right, trial.rightTime, [NSDate dateWithTimeIntervalSinceReferenceDate:trial.timeStamp], trial.selectedLeft ? @"Left" : @"Right"];
                     }
                 }
                 WebSocketRef websocket =  _webSocket;

@@ -91,6 +91,13 @@ Model</string>
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                     </view>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Tap here to add name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="lbH-kG-4kG">
+                                        <rect key="frame" x="80" y="331" width="160" height="20"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" name="HelveticaNeue-UltraLight" family="Helvetica Neue" pointSize="14"/>
+                                        <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
                                     <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="K1U-cW-Ppj">
                                         <rect key="frame" x="0.0" y="524" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
@@ -581,6 +588,7 @@ Please swipe left when you are ready.</string>
                         <outlet property="container" destination="w3U-q7-Luc" id="VIH-Sf-gI8"/>
                         <outlet property="forward" destination="e71-Dh-Nje" id="obV-Lm-KOh"/>
                         <outlet property="left" destination="HcY-OR-ubL" id="Ul4-Em-yMH"/>
+                        <outlet property="name" destination="lbH-kG-4kG" id="fmT-jB-BEQ"/>
                         <outlet property="pause" destination="QnR-LI-nNT" id="RwF-WI-OxE"/>
                         <outlet property="refresh" destination="m2a-xB-2kK" id="2rj-MV-ZJZ"/>
                         <outlet property="rewind" destination="pr2-R0-YMo" id="vi4-MT-HnL"/>

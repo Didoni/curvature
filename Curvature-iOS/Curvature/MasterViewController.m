@@ -49,9 +49,13 @@
     [writeString appendFormat:@"User,Trial type,Trial,Left,Time taken,Right,Time taken,Trial On,Output"];
     NSArray *dataArray = self.fetchedResultsController.fetchedObjects;
     for (User *user in dataArray) {
+        NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"user-%d", user.userId]];
+        if (!name.length) {
+            name = [NSString stringWithFormat:@"User %d", user.userId];
+        }
         for (Trial *trial in user.trials) {
             NSString *type = trial.trialType ? (trial.trialType == 1 ? @"servo" : @"joint") : @"touch";
-            [writeString appendFormat:@"\n%d,%@,%d,%d,%f,%d,%f,%@,%@", user.userId, type, trial.trial, trial.left, trial.leftTime, trial.right, trial.rightTime, [NSDate dateWithTimeIntervalSinceReferenceDate:trial.timeStamp], trial.selectedLeft ? @"Left" : @"Right"];
+            [writeString appendFormat:@"\n%@,%@,%d,%d,%f,%d,%f,%@,%@", name, type, trial.trial, trial.left, trial.leftTime, trial.right, trial.rightTime, [NSDate dateWithTimeIntervalSinceReferenceDate:trial.timeStamp], trial.selectedLeft ? @"Left" : @"Right"];
         }
     }
     [[NSFileManager defaultManager] createFileAtPath:filePath contents:[writeString dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
@@ -107,7 +111,11 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     User *user = self.fetchedResultsController.fetchedObjects.count ? self.fetchedResultsController.fetchedObjects[section] : nil;
-    return [NSString stringWithFormat:@"User %d", user.userId];
+    NSString *name = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"user-%d", user.userId]];
+    if (!name.length) {
+        name = [NSString stringWithFormat:@"User %d", user.userId];
+    }
+    return name;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
