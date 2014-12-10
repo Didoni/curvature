@@ -28,19 +28,19 @@ using namespace std;
 
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
-//#define EXPERIMENT_3 1
-#define EVALUATION_1 1
+#define EXPERIMENT_3 1
+//#define EVALUATION_1 1
 
 //#define EXPERIMENT_KEYBOARD 1
 
 
-#ifdef EXPERIMENT_3
+//#ifdef EXPERIMENT_3
 static MultiVariableInterp2D* mInterpMars;
 static MultiVariableInterp2D* mInterpEarth;
 static MultiVariableInterp2D* mInterpJupiter;
 static MultiVariableInterp2D* mInterpSaturn;
 static FILE* fileExp3;
-#endif
+//#endif
 
 #ifdef EVALUATION_1
 static MultiVariableInterp2D* mInterpMars;
@@ -224,8 +224,8 @@ void findCurve(float curv) {
 		}
 	}
 
-	rx = thetaPlanets[1];
-	ry = phiPlanets[1];
+	rx = thetaPlanets[0];
+	ry = phiPlanets[0];
 
 	int sxJ,syJ, sxE,syE, sxM,syM, sxS,syS;
 	
@@ -335,6 +335,7 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t){
 #ifdef EXPERIMENT_3
 	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
 	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	printf("%.2f,%.2f,%.2f,%.2f\n", rx, ry, (rx-mRoll), (ry-mPitch));
 #endif
 }
 
@@ -489,10 +490,10 @@ int main(int argc, char* argv[])
 	//first experiment: send a grid of values to the servo and read back the values
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
-	int N = 39;
-	char fileName[] = "Mars_Shuffled5_18_18.csv";
-	const int minX = 1250, maxX = 1750;
-	const int minY = 1250, maxY = 1750;
+	int N = 30;
+	char fileName[] = "Jup.csv";
+	const int minX = 1300, maxX = 1750;
+	const int minY = 1300, maxY = 1750;
 	//const int minX = 1397, maxX = 1635;
 	//const int minY = 1346, maxY = 1506;
 
@@ -543,10 +544,10 @@ int main(int argc, char* argv[])
 
 //third experiment desired and real rx,ry on real time
 #ifdef EXPERIMENT_3
-	char calibFileJupiter[] = "jupiter_calib_18.csv";
+	char calibFileJupiter[] = "JupJup.csv";
 	char calibFileMars[] = "mars_calib_18.csv";
 	char calibFileEarth[] = "earth_calib_18.csv";
-	char calibFileSaturn[] = "saturn_calib_18.csv";
+	char calibFileSaturn[] = "JupJup.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
@@ -559,6 +560,9 @@ int main(int argc, char* argv[])
 	fileExp3 = fopen(fileName, "w");
 	//init time
 
+	for(int i = 0; i < 4; ++i){
+		xoffsets[i] = zoffsets[i] = 0.0;
+	}
 
 	while(!kbhit()){
 		tracker->mainloop();
@@ -567,7 +571,7 @@ int main(int argc, char* argv[])
 		tracker->mainloop();
 		connection->mainloop();
         Sleep(5);
-		findCurve(3);
+		findCurve(1);
     }
 
 #endif
@@ -575,7 +579,7 @@ int main(int argc, char* argv[])
 //first evaluation
 #ifdef EVALUATION_1
 	//init interpolators
-	char calibFileJupiter[] = "jupiter_calib_18.csv";
+	char calibFileJupiter[] = "jupiter_calib_david.csv";
 	char calibFileMars[] = "MARS.csv";
 	char calibFileEarth[] = "earth_calib_18.csv";
 	char calibFileSaturn[] = "saturn_calib_18.csv";
@@ -730,11 +734,15 @@ int main(int argc, char* argv[])
 		const Point2D& pointToSend = points[ permIndex ];
 #ifdef EXPERIMENT_KEYBOARD
 		int sx,sy;
-		printf("Please input sx sy values: ");
+		printf("input sx sy you ugly twat: ");
 		scanf("%d %d", &sx, &sy);
-		sendBytesTest(sx, sy);
+		handshake();
+		send4ServosPackedIn9Bytes(sx, sy,sx, sy,sx, sy,sx, sy);
+
 #else
+		handshake();
 		send4ServosPackedIn9Bytes(pointToSend.x, pointToSend.y,pointToSend.x, pointToSend.y,pointToSend.x, pointToSend.y,pointToSend.x, pointToSend.y);
+
 #endif		
         Sleep(600);
 		tracker->mainloop(); 
@@ -761,7 +769,7 @@ int main(int argc, char* argv[])
 		const float targetRX = rangeRandom(minrX, maxrX);
 		const float targetRY = rangeRandom(minrY, maxrY);
 #ifdef EXPERIMENT_KEYBOARD
-		printf("Please input rx ry values: ");
+		printf("enter rx ry you ugly twat: ");
 		scanf("%f %f", &targetRX, &targetRY);
 #endif
 		int sx, sy;
@@ -812,3 +820,5 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+
+
