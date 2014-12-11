@@ -27,7 +27,7 @@ using namespace std;
 #define MILLIS_PER_TRIAL 20000
 
 //#define EXPERIMENT_1 1
-//#define EXPERIMENT_2 1
+//#define EXPERIMENT_2 1//
 #define EXPERIMENT_3 1
 //#define EVALUATION_1 1
 
@@ -205,6 +205,13 @@ void findAnglesFinite(float coordX, float coordZ, float rotation, float& phi, fl
 }
 
 void findCurve(float curv) {
+	#ifdef EXPERIMENT_3
+	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	//printf("%.2f,%.2f,%.2f,%.2f\n", rx, ry, (rx-mRoll), (ry-mPitch));
+	#endif
+
+
 	float xTemp; 
 	float zTemp;
 	float thetaPlanets[4]= {0,0,0,0};//Sat, Mars, Earth, Jup
@@ -239,6 +246,7 @@ void findCurve(float curv) {
 	//cout<<"Sx "<<sxJ<<" , "<<sxE<<" , "<<sxM<<" , "<<sxS<<" Sz "<<syJ<<" , "<<syE<<" , "<<syM<<" , "<<syS<<endl;
 	//cout<<"tt "<<phiPlanets[1]<<" "<<thetaPlanets[1]<<"Jup "<<sxJ<<" "<<syJ<<" Earth "<<sxE<<" "<<syE<<" Mars "<<sxM<<" "<<syM<<" Sat "<<sxS<<" "<<syS<<endl;
 
+
 	handshake();
 	/*
 	sendBytesTest((short)sxJ,(short)syJ);
@@ -247,6 +255,11 @@ void findCurve(float curv) {
 	sendBytesTest((short)sxS,(short)syS);
 	*/
 	send4ServosPackedIn9Bytes(sxJ, syJ, sxE, syE, sxM, syM, sxS, syS);
+	
+	#ifdef EXPERIMENT_3
+	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
+	printf("%f,%f,%d,%d,%.2f,%.2f,%.2f,%.2f\n", coordinateX,coordinateZ, sxJ, syJ, rx, ry, (rx-mRoll), (ry-mPitch));
+	#endif
 }
 
 
@@ -332,11 +345,7 @@ void VRPN_CALLBACK handle_pos (void *, const vrpn_TRACKERCB t){
 	}
 #endif
 
-#ifdef EXPERIMENT_3
-	fprintf(fileExp3, "%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-	//printf("%ld,%f,%f,%f,%f\n", getMillisTime(), rx, ry, mPitch, mRoll);
-	printf("%.2f,%.2f,%.2f,%.2f\n", rx, ry, (rx-mRoll), (ry-mPitch));
-#endif
+
 }
 
 
@@ -491,9 +500,9 @@ int main(int argc, char* argv[])
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
 	int N = 30;
-	char fileName[] = "Jup.csv";
-	const int minX = 1300, maxX = 1750;
-	const int minY = 1300, maxY = 1750;
+	char fileName[] = "Earth.csv";
+	const int minX = 1350, maxX = 1700;
+	const int minY = 1250, maxY = 1650;
 	//const int minX = 1397, maxX = 1635;
 	//const int minY = 1346, maxY = 1506;
 
@@ -544,15 +553,15 @@ int main(int argc, char* argv[])
 
 //third experiment desired and real rx,ry on real time
 #ifdef EXPERIMENT_3
-	char calibFileJupiter[] = "JupJup.csv";
+	char calibFileJupiter[] = "jupiter1.csv";
 	char calibFileMars[] = "mars_calib_18.csv";
 	char calibFileEarth[] = "earth_calib_18.csv";
-	char calibFileSaturn[] = "JupJup.csv";
+	char calibFileSaturn[] = "Sat_card.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
 	mInterpSaturn = new MVIDelunayLinear(calibFileSaturn);
-	char fileName[] = "tracking_hand.csv";
+	char fileName[] = "tracking_Sat_04.csv";
 
 	coordinateX = 0; 
 	coordinateZ = 0;
@@ -571,7 +580,7 @@ int main(int argc, char* argv[])
 		tracker->mainloop();
 		connection->mainloop();
         Sleep(5);
-		findCurve(1);
+		findCurve(1.4);
     }
 
 #endif
