@@ -6,12 +6,23 @@
 
 package marionettesim;
 
+import marionettesim.gui.controls.ScriptEditFrame;
+
 /**
  *
  * @author Asier
  */
 public class Log {
+    public static ScriptEditFrame scriptFrame;
+    
     public static void log(String s){
         System.out.println("Log: " + s); //TOHACK
+        
+    }
+    
+    public static void logGLSLError(String s){
+        if(scriptFrame != null){
+            scriptFrame.setError(s);
+        }
     }
 }

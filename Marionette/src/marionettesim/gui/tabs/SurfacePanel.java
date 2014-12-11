@@ -58,12 +58,9 @@ public class SurfacePanel extends javax.swing.JPanel {
         return Parse.stringToFloat( fpsText.getText() );
     }
     
-    public float getTime() {
-        return 0.0f;
-    }
     
     public String getGlslScript() {
-        return "";
+        return scriptFrame.getGlslScript();
     }
     
     /**
@@ -102,6 +99,7 @@ public class SurfacePanel extends javax.swing.JPanel {
         editScriptsButton = new javax.swing.JButton();
         enableDinamicCheck = new javax.swing.JCheckBox();
         fpsText = new javax.swing.JTextField();
+        resetTimeButton = new javax.swing.JButton();
         colouringCombo = new javax.swing.JComboBox();
         jLabel11 = new javax.swing.JLabel();
         colAmpMinText = new javax.swing.JTextField();
@@ -139,6 +137,11 @@ public class SurfacePanel extends javax.swing.JPanel {
         jLabel3.setText("Gain:");
 
         gainText.setText("1.0");
+        gainText.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                gainTextActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Color:");
 
@@ -265,6 +268,13 @@ public class SurfacePanel extends javax.swing.JPanel {
 
         fpsText.setText("30");
 
+        resetTimeButton.setText("reset time");
+        resetTimeButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetTimeButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -274,7 +284,8 @@ public class SurfacePanel extends javax.swing.JPanel {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(editScriptsButton)
-                        .addGap(0, 142, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
+                        .addComponent(resetTimeButton))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addComponent(enableDinamicCheck)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -289,7 +300,9 @@ public class SurfacePanel extends javax.swing.JPanel {
                     .addComponent(enableDinamicCheck)
                     .addComponent(fpsText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
-                .addComponent(editScriptsButton)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(editScriptsButton)
+                    .addComponent(resetTimeButton))
                 .addContainerGap())
         );
 
@@ -474,6 +487,14 @@ public class SurfacePanel extends javax.swing.JPanel {
         scriptFrame.setVisible(true);
     }//GEN-LAST:event_editScriptsButtonActionPerformed
 
+    private void resetTimeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetTimeButtonActionPerformed
+        mf.simulation.resetTime();
+    }//GEN-LAST:event_resetTimeButtonActionPerformed
+
+    private void gainTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gainTextActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_gainTextActionPerformed
+
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton applyCurvatureButton;
@@ -503,6 +524,7 @@ public class SurfacePanel extends javax.swing.JPanel {
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JButton okButton;
     private javax.swing.JTextField pathText;
+    private javax.swing.JButton resetTimeButton;
     private javax.swing.JTextField resizeText;
     private javax.swing.JButton selectFileText;
     private javax.swing.JTextField sizeXText;

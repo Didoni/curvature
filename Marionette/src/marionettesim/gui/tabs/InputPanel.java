@@ -6,9 +6,11 @@
 
 package marionettesim.gui.tabs;
 
+import java.net.DatagramSocketImpl;
 import marionettesim.gui.MainForm;
 import marionettesim.utils.Parse;
 import marionettesim.utils.StringUtils;
+import marionettesim.workers.UdpControlWorker;
 
 /**
  *
@@ -17,6 +19,7 @@ import marionettesim.utils.StringUtils;
 public class InputPanel extends javax.swing.JPanel {
     MainForm mf;
     private float lastX, lastZ, lastRY;
+    private UdpControlWorker udpWorker;
     
     public InputPanel(MainForm mf) {
         this.mf = mf;
@@ -95,16 +98,35 @@ public class InputPanel extends javax.swing.JPanel {
         zOffsetText = new javax.swing.JTextField();
         ryOffsetText = new javax.swing.JTextField();
         resetButton = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        portText = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
+        ipText = new javax.swing.JTextField();
 
         inputGroup.add(noneCheck);
         noneCheck.setSelected(true);
         noneCheck.setText("none");
+        noneCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                noneCheckActionPerformed(evt);
+            }
+        });
 
         inputGroup.add(mouseCheck);
         mouseCheck.setText("mouse");
+        mouseCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mouseCheckActionPerformed(evt);
+            }
+        });
 
         inputGroup.add(optiCheck);
         optiCheck.setText("OptiTrack");
+        optiCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                optiCheckActionPerformed(evt);
+            }
+        });
 
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("X");
@@ -147,6 +169,14 @@ public class InputPanel extends javax.swing.JPanel {
             }
         });
 
+        jLabel6.setText("Port:");
+
+        portText.setText("33557");
+
+        jLabel7.setText("Address:");
+
+        ipText.setText("127.0.0.1");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -171,10 +201,7 @@ public class InputPanel extends javax.swing.JPanel {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(optiCheck)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(ryText)))
+                            .addComponent(ryText, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(xGainText)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -191,8 +218,17 @@ public class InputPanel extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
                             .addComponent(jLabel5)
-                            .addComponent(resetButton))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(resetButton)
+                            .addComponent(optiCheck))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel6))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(portText)
+                            .addComponent(ipText))))
                 .addContainerGap())
         );
 
@@ -204,8 +240,7 @@ public class InputPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(noneCheck)
-                    .addComponent(mouseCheck)
-                    .addComponent(optiCheck))
+                    .addComponent(mouseCheck))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
@@ -230,6 +265,16 @@ public class InputPanel extends javax.swing.JPanel {
                     .addComponent(xOffsetText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(zOffsetText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ryOffsetText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(optiCheck)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7)
+                    .addComponent(ipText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6)
+                    .addComponent(portText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(resetButton)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -242,17 +287,55 @@ public class InputPanel extends javax.swing.JPanel {
         ryOffsetText.setText( ryText.getText() );
     }//GEN-LAST:event_resetButtonActionPerformed
 
+    public UdpControlWorker getUdpWorker() {
+        return udpWorker;
+    }
+
+    
+    private void optiCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_optiCheckActionPerformed
+        updateInput();
+    }//GEN-LAST:event_optiCheckActionPerformed
+
+    private void mouseCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mouseCheckActionPerformed
+        updateInput();
+    }//GEN-LAST:event_mouseCheckActionPerformed
+
+    private void noneCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_noneCheckActionPerformed
+        updateInput();
+    }//GEN-LAST:event_noneCheckActionPerformed
+
+    private void updateInput(){
+        if (optiCheck.isSelected() && udpWorker == null){
+            udpWorker = new UdpControlWorker(mf);
+            udpWorker.start();
+        }else if(!optiCheck.isSelected() && udpWorker != null){
+            udpWorker.interrupt();
+            udpWorker = null;
+        }
+    }
+    
+    public int getPort(){
+        return Parse.stringToInt( portText.getText() );
+    }
+    
+    public String getAddress(){
+        return ipText.getText();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup inputGroup;
+    private javax.swing.JTextField ipText;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JRadioButton mouseCheck;
     private javax.swing.JRadioButton noneCheck;
     private javax.swing.JRadioButton optiCheck;
+    private javax.swing.JTextField portText;
     private javax.swing.JButton resetButton;
     private javax.swing.JTextField ryGainText;
     private javax.swing.JTextField ryOffsetText;
@@ -264,4 +347,5 @@ public class InputPanel extends javax.swing.JPanel {
     private javax.swing.JTextField zOffsetText;
     private javax.swing.JTextField zText;
     // End of variables declaration//GEN-END:variables
+
 }

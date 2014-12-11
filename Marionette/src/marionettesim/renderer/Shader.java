@@ -186,8 +186,8 @@ public class Shader {
     // Create a shader program
     int createProgramFromBuffer(GL2 gl, String vProgram, String fProgram){
         int program = 0;
-        vertexShader = initShader(gl, GL2.GL_VERTEX_SHADER, preProcessVertex( getSourceCode(vProgram) ));
-        fragmentShader = initShader(gl, GL2.GL_FRAGMENT_SHADER, preProcessFragment( getSourceCode(fProgram) ));
+        vertexShader = initShader(gl, GL2.GL_VERTEX_SHADER, vProgram, preProcessVertex( getSourceCode(vProgram) ));
+        fragmentShader = initShader(gl, GL2.GL_FRAGMENT_SHADER,fProgram, preProcessFragment( getSourceCode(fProgram) ));
 
         if (vertexShader != 0 && fragmentShader != 0) {
             program = gl.glCreateProgram();
@@ -210,6 +210,7 @@ public class Shader {
                         byte[] b = new byte[length];
                         buf.get(b);
                         Log.log("Could not link program: " + new String(b));
+                        
                     }
                 }
             }
@@ -219,7 +220,7 @@ public class Shader {
     }
 
     // Initialise a shader
-    int initShader(GL2 gl, int nShaderType, String source) {
+    int initShader(GL2 gl, int nShaderType, String name, String source) {
         int shader = gl.glCreateShader(nShaderType);
 
         if (shader != 0) {
@@ -239,7 +240,9 @@ public class Shader {
                     gl.glGetShaderInfoLog(shader, length, infoLen, buf);
                     byte[] b = new byte[infoLen.get()];
                     buf.get(b);
-                    Log.log("Error compiling shader " + vProgram + " " + fProgram + " -> " + new String(b));
+                    String errorS = new String(b);
+                    Log.log("Error Shader " + name + " -> " + errorS);
+                    Log.logGLSLError(errorS);
                 }
             }
         }

@@ -52,6 +52,7 @@ public class Renderer {
     
     public void reloadDinamicSurface(){
         needToReloadDinamicSurface = true;
+        form.needUpdate();
     }
     
     public void init(GL2 gl, int w, int h){

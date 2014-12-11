@@ -23,6 +23,7 @@ public class DinamicSurfaceShader extends Shader{
     int minColor, maxColor;
     int gain;
     int time;
+    int recommendedH;
    
     private MainForm mf;
     
@@ -36,6 +37,7 @@ public class DinamicSurfaceShader extends Shader{
         super.getUniforms(gl);
  
         time = gl.glGetUniformLocation(shaderProgramID, "t");
+        recommendedH = gl.glGetUniformLocation(shaderProgramID, "recommendedH");
         gain = gl.glGetUniformLocation(shaderProgramID, "heightGain");
         minColor = gl.glGetUniformLocation(shaderProgramID, "minColor");
         maxColor = gl.glGetUniformLocation(shaderProgramID, "maxColor");
@@ -53,11 +55,12 @@ public class DinamicSurfaceShader extends Shader{
     void bindUniforms(GL2 gl, Scene scene, Renderer renderer,Simulation s, MeshEntity me, Matrix4f projectionViewModel, Matrix4f viewModel, Matrix4f model, FloatBuffer fb) {
        super.bindUniforms(gl, scene, renderer, s, me, projectionViewModel, viewModel, model, fb);
         
-       gl.glUniform1f(time, renderer.getForm().surfacePanel.getTime());
-       gl.glUniform1f(gain, renderer.getForm().surfacePanel.getGain());
-       gl.glUniform1f(minColor, renderer.getForm().surfacePanel.getMinColor());
-       gl.glUniform1f(maxColor, renderer.getForm().surfacePanel.getMaxColor());
-       gl.glUniform1i(colouring, renderer.getForm().surfacePanel.getColorGradient());
+       gl.glUniform1f(recommendedH, renderer.getForm().simulation.getRecommendedH() );
+       gl.glUniform1f(time, renderer.getForm().simulation.getTime() );
+       gl.glUniform1f(gain, renderer.getForm().surfacePanel.getGain() );
+       gl.glUniform1f(minColor, renderer.getForm().surfacePanel.getMinColor() );
+       gl.glUniform1f(maxColor, renderer.getForm().surfacePanel.getMaxColor() );
+       gl.glUniform1i(colouring, renderer.getForm().surfacePanel.getColorGradient() );
     }
 
     @Override

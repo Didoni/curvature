@@ -14,7 +14,6 @@ import marionettesim.math.Vector3f;
 import marionettesim.scene.Entity;
 import marionettesim.scene.MeshEntity;
 import marionettesim.scene.Resources;
-import static marionettesim.scene.Resources.MESH_BOX_UP;
 import marionettesim.scene.Scene;
 import marionettesim.shapes.Quad;
 import marionettesim.simulation.functions.ZeroFunction;
@@ -44,7 +43,7 @@ public class Simulation {
     
     MeshEntity[] boundaries;
     
-    
+    private long startMillis;
     
     public Simulation() {
         final float halfSize = SURFACE_SIZE / 2.0f;
@@ -59,6 +58,8 @@ public class Simulation {
         fingersOffsets[1] = new Vector3f(-0.022f, 5, -0.112f);
         fingersOffsets[2] = new Vector3f( 0.012f, 0, -0.108f);
         fingersOffsets[3] = new Vector3f( 0.042f, -8, -0.082f);
+        
+        resetTime();
     }
 
 
@@ -214,7 +215,7 @@ public class Simulation {
         //update hand
         assignXZRYtoEntity(handCenter, inputX, inputZ, inputRy);
         
-        final float h = currentFunction.getRecommendedH( (getSurfaceWidth() + getSurfaceHeight()) / 2.0f);
+        final float h = getRecommendedH( );
         
         //calc fingers  Y
         float[] euler = new float[3];
@@ -284,7 +285,21 @@ public class Simulation {
     private static void assignXZRYtoEntity(Entity e, Vector3f v){
         assignXZRYtoEntity(e, v.x, v.z, v.y);
     }
+
+   
+    public void resetTime(){
+        startMillis = System.currentTimeMillis();
+    }
     
-    
-    
+    public float getTime() {
+        final long m = System.currentTimeMillis();
+        return (m-startMillis)/1000.0f;
+    }
+ 
+    public float getRecommendedH(){
+        if(currentFunction != null){
+            return currentFunction.getRecommendedH( (getSurfaceWidth() + getSurfaceHeight()) / 2.0f );
+        }
+        return 0.001f;
+    }
 }

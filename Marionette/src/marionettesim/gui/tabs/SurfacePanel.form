@@ -149,6 +149,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="1.0"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="gainTextActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
@@ -346,7 +349,8 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
                               <Component id="editScriptsButton" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace min="0" pref="142" max="32767" attributes="0"/>
+                              <EmptySpace pref="61" max="32767" attributes="0"/>
+                              <Component id="resetTimeButton" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="enableDinamicCheck" min="-2" max="-2" attributes="0"/>
@@ -367,7 +371,10 @@
                           <Component id="fpsText" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace pref="75" max="32767" attributes="0"/>
-                      <Component id="editScriptsButton" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="editScriptsButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="resetTimeButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -394,6 +401,14 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="30"/>
               </Properties>
+            </Component>
+            <Component class="javax.swing.JButton" name="resetTimeButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="reset time"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="resetTimeButtonActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

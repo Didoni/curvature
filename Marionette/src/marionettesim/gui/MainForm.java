@@ -51,6 +51,7 @@ import marionettesim.gui.tabs.OutputPanel;
 import marionettesim.gui.tabs.SurfacePanel;
 import marionettesim.simulation.EntityTag;
 import marionettesim.utils.StringUtils;
+import marionettesim.workers.UdpControlWorker;
 
 
 /**
@@ -62,8 +63,7 @@ public class MainForm extends javax.swing.JFrame {
      
     JFrame fullFrame;
     KinectControlForm kinectForm;
-    UDPControlForm udpForm;
-    
+   
     public final GLJPanel gljpanel;
     public final Renderer renderer;
     public final Scene scene;
@@ -141,7 +141,6 @@ public class MainForm extends javax.swing.JFrame {
         //animationThread.start();
    
         kinectForm = new KinectControlForm(this, scene);
-        udpForm = new UDPControlForm(this);
     }
 
     public Simulation getSimulation() {
@@ -218,8 +217,6 @@ public class MainForm extends javax.swing.JFrame {
         jMenu5 = new javax.swing.JMenu();
         kinectMenu = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
-        jMenu6 = new javax.swing.JMenu();
-        udpControlMenu = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         fullScreenMenu = new javax.swing.JMenuItem();
         camProjMenu = new javax.swing.JMenuItem();
@@ -634,18 +631,6 @@ public class MainForm extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu5);
 
-        jMenu6.setText("UDPControl");
-
-        udpControlMenu.setText("show");
-        udpControlMenu.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                udpControlMenuActionPerformed(evt);
-            }
-        });
-        jMenu6.add(udpControlMenu);
-
-        jMenuBar1.add(jMenu6);
-
         jMenu7.setText("View");
         jMenu7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -929,10 +914,6 @@ public class MainForm extends javax.swing.JFrame {
         kinectForm.getWorker().renderTestFrame = true;
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
-    private void udpControlMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_udpControlMenuActionPerformed
-        udpForm.setVisible(true);
-    }//GEN-LAST:event_udpControlMenuActionPerformed
-
     private void closeFullScreen(){
         gljpanel.removeKeyListener( gljpanel.getKeyListeners()[0] );
         fullFrame.remove(gljpanel);
@@ -1047,7 +1028,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu5;
-    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenu jMenu9;
     private javax.swing.JMenuBar jMenuBar1;
@@ -1073,7 +1053,6 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JTextField syText;
     private javax.swing.JTextField szText;
     private javax.swing.JMenuItem topCamMenu;
-    private javax.swing.JMenuItem udpControlMenu;
     private javax.swing.JMenuItem unlockCameraMenu;
     private javax.swing.ButtonGroup wrapPlayButtonGroup;
     private javax.swing.JTextField xText;

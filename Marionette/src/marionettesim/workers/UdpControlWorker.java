@@ -6,43 +6,60 @@
 
 package marionettesim.workers;
 
-import marionettesim.gui.UDPControlForm;
-import marionettesim.simulation.Simulation;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import marionettesim.gui.MainForm;
+import marionettesim.utils.Parse;
 
 /**
  *
  * @author Asier
  */
 public class UdpControlWorker extends Thread{
-    UDPControlForm form;
-    Simulation simulation;
+    MainForm mf;
     
     DatagramSocket serverSocket;
-    public UdpControlWorker(UDPControlForm form, Simulation simulation) {
-        this.form = form;
-        this.simulation = simulation;
+    public UdpControlWorker(MainForm mf) {
+        this.mf = mf;
     }
-    
+
     @Override
     public void run() {
         try {
-            serverSocket = new DatagramSocket( form.getPort() );
+            final int port = mf.inputPanel.getPort();
+            final String addr = mf.inputPanel.getAddress();
+            serverSocket = new DatagramSocket(port, InetAddress.getByName(addr) );
+            
             byte[] recData = new byte[1024];
+            byte[] sendData = new byte[1024];
+            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length);
             DatagramPacket recPacket = new DatagramPacket(recData, recData.length);
             while(!interrupted()){
                 try {
+                    //send output angles (8 float angles)
+                    String angles = mf.outputPanel.getAnglesString();
+                    sendData = angles.getBytes();
+                    sendPacket.setData(sendData);
+                    serverSocket.send(sendPacket);
+                    
+                    //Read input from OptiTrack	(3 floats)
                     serverSocket.receive(recPacket); 
                     String msg = new String(recPacket.getData(), 0, recPacket.getLength());
-                    int command = Integer.parseInt(msg);
-                   //TODO
-                    if (form.isRepaint()){
-                        form.getMf().needUpdate();
+                    String[] split = msg.split(" ");
+                    if(split.length > 2){
+                        float x = Parse.stringToFloat(split[0]);
+                        float y = Parse.stringToFloat(split[1]);
+                        float rz = Parse.stringToFloat(split[2]);
+
+                        mf.inputPanel.inputEventXZRY(x, y, rz);
+
+                        mf.needUpdate();
                     }
                 } catch (IOException ex) {
                      Logger.getLogger(UdpControlWorker.class.getName()).log(Level.SEVERE, null, ex);
@@ -51,6 +68,8 @@ public class UdpControlWorker extends Thread{
             }
             
         } catch (SocketException ex) {
+            Logger.getLogger(UdpControlWorker.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnknownHostException ex) {
             Logger.getLogger(UdpControlWorker.class.getName()).log(Level.SEVERE, null, ex);
         }
         

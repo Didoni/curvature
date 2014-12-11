@@ -17,14 +17,14 @@ uniform mat4 modelMatrix;
 uniform int colouring;
 uniform float t;
 uniform float heightGain;
+uniform float recommendedH;
 uniform float minColor;
 uniform float maxColor;
 
 //TEMPLATE MYFUNC
-
 /*
 float myFunc(vec3 p){
-    return sin(p.x + t);
+    return sin(p.x + t * PI * 2.0);
 }
 */
 
@@ -47,10 +47,10 @@ vec3 getNormalAt(vec3 px0, vec3 px1, vec3 py0, vec3 py1){
 void main()
 {
     wPos = modelMatrix * vertexPosition;
-    vec3 w = vec3(vertexPosition);
+    vec3 w = vec3(wPos);
 
     float value =  myFunc(w);
-    float divL = 1.0 / heightDiv;
+    float divL = recommendedH;
 
     vec3 px0 = vec3( modelMatrix * (vertexPosition + vec4(-divL, 0.0, 0.0, 0.0)) );
     vec3 px1 = vec3( modelMatrix * (vertexPosition + vec4(divL,  0.0, 0.0, 0.0)) );
