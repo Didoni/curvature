@@ -51,10 +51,10 @@ public class Simulation {
         
         fingersOffsets = new Vector3f[Simulation.N_FINGERS];
         //x, ry, z
-        fingersOffsets[0] = new Vector3f(-0.058f, 20, -0.09f);
-        fingersOffsets[1] = new Vector3f(-0.022f, 5, -0.112f);
-        fingersOffsets[2] = new Vector3f( 0.012f, 0, -0.108f);
-        fingersOffsets[3] = new Vector3f( 0.042f, -8, -0.082f);
+        fingersOffsets[0] = new Vector3f(-0.025f, 0, 0.07f);
+        fingersOffsets[1] = new Vector3f(0, 0, 0.06f);
+        fingersOffsets[2] = new Vector3f( 0.025f, 0, 0.07f);
+        fingersOffsets[3] = new Vector3f( 0.05f, 0, 0.10f);
         
         resetTime();
     }

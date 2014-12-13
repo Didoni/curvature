@@ -132,7 +132,7 @@ public class KinectWorker extends Thread{
         function = new KinectFunction(w,h, Resources.MESH_GRID_DIVS + 1, 
                 getKinectWidth(), getKinectHeight(),
                 mf.surfacePanel.getKinectX(), mf.surfacePanel.getKinectY(),
-                mf.surfacePanel.getKinectMaxDiff());
+                mf.surfacePanel.getKinectMaxDiff(),mf.surfacePanel.getKinectFilter());
     }
 
     public void snapFunctionBackground() {

@@ -25,14 +25,16 @@ public class KinectFunction extends HapticImage{
     private final int depthW, depthH;
     private final int startX, startY;
     private final float maxDiff;
-
-    public KinectFunction(float w, float h, int divs, int depthW, int depthH, int startX, int startY, float maxDiff) {
+    private final float filter;
+    
+    public KinectFunction(float w, float h, int divs, int depthW, int depthH, int startX, int startY, float maxDiff,float filter) {
         super("", w, h);
         this.startX = startX;
         this.startY = startY;
         this.depthW = depthW;
         this.depthH = depthH;
         this.maxDiff = maxDiff;
+        this.filter = filter;
         this.size = divs;
         width = divs; height = divs;
         values = new float[divs][divs];
@@ -56,6 +58,7 @@ public class KinectFunction extends HapticImage{
         final int nVert = grid.getVertCount();
         assert (nPoints == nVert );
         
+        final float nFilter = 1.0f - filter;
         
         //update values
         int i = 0;
@@ -66,7 +69,7 @@ public class KinectFunction extends HapticImage{
                 if (FastMath.abs(diff) > maxDiff){
                     diff = 0;
                 }
-                values[ix][iy] = (diff) / 1000.0f;
+                values[ix][iy] = filter*values[ix][iy] +  nFilter*(diff / 1000.0f);
                 
                 ++i;
             }

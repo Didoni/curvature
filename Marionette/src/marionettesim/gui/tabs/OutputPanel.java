@@ -35,7 +35,7 @@ public class OutputPanel extends javax.swing.JPanel {
         return f1RxText.getText() + " " +  f1RzText.getText() + " " +
                 f2RxText.getText() + " " +  f2RzText.getText() + " " +
                 f3RxText.getText() + " " +  f3RzText.getText() + " " +
-                f4RxText.getText() + " " +  f4RzText.getText();
+                f4RxText.getText() + " " +  f4RzText.getText() + '\0';
     }
     
     public float getMinAngle(){
@@ -51,19 +51,20 @@ public class OutputPanel extends javax.swing.JPanel {
         angles[i].y = rz;
     }
 
-    private static void updateFinger(Vector2f finger, JTextField x, JTextField y){
-        x.setText( StringUtils.get().twoDecs(finger.x));
-        y.setText( StringUtils.get().twoDecs(finger.y));
+    private static void updateFinger(Vector2f finger, JTextField x, JTextField y, float gain){
+        x.setText( StringUtils.get().twoDecs(finger.x * gain));
+        y.setText( StringUtils.get().twoDecs(finger.y * gain));
     }
     
     public void updateFingers() {
+        final float gain = Parse.stringToFloat(gainText.getText());
         //apply to gui
-        updateFinger(angles[0], f1RxText, f1RzText);
-        updateFinger(angles[1], f2RxText, f2RzText);
-        updateFinger(angles[2], f3RxText, f3RzText);
-        updateFinger(angles[3], f4RxText, f4RzText);
+        updateFinger(angles[0], f1RxText, f1RzText, gain);
+        updateFinger(angles[1], f2RxText, f2RzText, gain);
+        updateFinger(angles[2], f3RxText, f3RzText, gain);
+        updateFinger(angles[3], f4RxText, f4RzText, gain);
                 
-        //TODO send serial
+        
     }
     
     /**
@@ -117,11 +118,11 @@ public class OutputPanel extends javax.swing.JPanel {
 
         jLabel3.setText("min:");
 
-        minAngle.setText("-20");
+        minAngle.setText("-12");
 
         jLabel4.setText("max:");
 
-        maxAngle.setText("20");
+        maxAngle.setText("12");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

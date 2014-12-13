@@ -516,6 +516,7 @@ final public class FastMath {
     public static float sin(float v) {
         return (float) Math.sin(v);
     }
+    
 
     /**
      * Returns E^fValue

@@ -61,7 +61,7 @@ public class UdpControlWorker extends Thread{
                         float y = Parse.stringToFloat(split[1]);
                         float rz = Parse.stringToFloat(split[2]);
 
-                        mf.inputPanel.inputEventXZRY(x, y, rz);
+                        mf.inputPanel.inputEventXZRY(-y, -x, rz);
 
                         mf.needUpdate();
                     }
