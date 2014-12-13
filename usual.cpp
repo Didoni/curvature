@@ -26,21 +26,27 @@ using namespace std;
 
 #define MILLIS_PER_TRIAL 20000
 
+#define UDP_PORT 33557
+#define SOCKET_BUFFER 1024
+
 //#define EXPERIMENT_1 1
-//#define EXPERIMENT_2 1//
-#define EXPERIMENT_3 1
+//#define EXPERIMENT_2 1
+//#define EXPERIMENT_3 1
 //#define EVALUATION_1 1
+#define UDP_CONTROL 1
+
 
 //#define EXPERIMENT_KEYBOARD 1
 
+#define EXPERIMENT_3_CURV 1.4
 
-//#ifdef EXPERIMENT_3
+#ifdef EXPERIMENT_3
 static MultiVariableInterp2D* mInterpMars;
 static MultiVariableInterp2D* mInterpEarth;
 static MultiVariableInterp2D* mInterpJupiter;
 static MultiVariableInterp2D* mInterpSaturn;
 static FILE* fileExp3;
-//#endif
+#endif
 
 #ifdef EVALUATION_1
 static MultiVariableInterp2D* mInterpMars;
@@ -73,6 +79,13 @@ static long timerLimit = 0;
 
 #endif
 
+#ifdef UDP_CONTROL
+#include "UdpSocket.h"
+static MultiVariableInterp2D* mInterpMars;
+static MultiVariableInterp2D* mInterpEarth;
+static MultiVariableInterp2D* mInterpJupiter;
+static MultiVariableInterp2D* mInterpSaturn;
+#endif
 
 float coordinateX = 0, coordinateZ = 0;
 static float mPitch = 0;
@@ -178,6 +191,11 @@ float calcFiniteDiference(float coordX, float coordZ, float rotation, float xOff
 	*/
 }
 
+void inline clampAngle(float& angle){
+	if (angle > MAX_ANGLE) { angle = MAX_ANGLE;}
+	else if (angle < -MAX_ANGLE) { angle = -MAX_ANGLE;}
+}
+
 void findAnglesFinite(float coordX, float coordZ, float rotation, float& phi, float& theta, float curvature) {
 	float sign = 1.0f;
 
@@ -198,10 +216,8 @@ void findAnglesFinite(float coordX, float coordZ, float rotation, float& phi, fl
 	theta = theta + offsetTheta;
 	phi = phi + offsetPhi;
 
-	if (theta > MAX_ANGLE) { theta = MAX_ANGLE;}
-	else if (theta < -MAX_ANGLE) { theta = -MAX_ANGLE;}
-	if (phi > MAX_ANGLE) { phi = MAX_ANGLE;}
-	else if (phi < -MAX_ANGLE) { phi = -MAX_ANGLE;}
+	clampAngle(theta);
+	clampAngle(phi);
 }
 
 void findCurve(float curv) {
@@ -500,9 +516,9 @@ int main(int argc, char* argv[])
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
 	int N = 30;
-	char fileName[] = "Earth.csv";
-	const int minX = 1350, maxX = 1700;
-	const int minY = 1250, maxY = 1650;
+	char fileName[] = "jupiter4.csv";
+	const int minX = 1300, maxX = 1700;
+	const int minY = 1350, maxY = 1750;
 	//const int minX = 1397, maxX = 1635;
 	//const int minY = 1346, maxY = 1506;
 
@@ -553,15 +569,15 @@ int main(int argc, char* argv[])
 
 //third experiment desired and real rx,ry on real time
 #ifdef EXPERIMENT_3
-	char calibFileJupiter[] = "jupiter1.csv";
-	char calibFileMars[] = "mars_calib_18.csv";
-	char calibFileEarth[] = "earth_calib_18.csv";
-	char calibFileSaturn[] = "Sat_card.csv";
+	char calibFileJupiter[] = "jupiter4.csv";
+	char calibFileMars[] = "mars1.csv";
+	char calibFileEarth[] = "earth2.csv";
+	char calibFileSaturn[] = "saturn1.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
 	mInterpSaturn = new MVIDelunayLinear(calibFileSaturn);
-	char fileName[] = "tracking_Sat_04.csv";
+	char fileName[] = "Esmall_curve.csv";
 
 	coordinateX = 0; 
 	coordinateZ = 0;
@@ -580,7 +596,65 @@ int main(int argc, char* argv[])
 		tracker->mainloop();
 		connection->mainloop();
         Sleep(5);
-		findCurve(1.4);
+		findCurve( EXPERIMENT_3_CURV );
+    }
+
+#endif
+
+#ifdef UDP_CONTROL
+	Socket::InitializeSockets();
+
+	char calibFileJupiter[] = "jupiter4.csv";
+	char calibFileMars[] = "mars1.csv";
+	char calibFileEarth[] = "earth2.csv";
+	char calibFileSaturn[] = "saturn1.csv";
+	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
+	mInterpMars = new MVIDelunayLinear(calibFileMars);
+	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
+	mInterpSaturn = new MVIDelunayLinear(calibFileSaturn);
+
+	coordinateX = 0; 
+	coordinateZ = 0;
+
+	//open a port
+	Socket udpSocket;
+	Address sender;
+	char data[SOCKET_BUFFER];
+	char toSend[SOCKET_BUFFER];
+	udpSocket.Open( 33557 );
+
+	while(!kbhit()){
+		tracker->mainloop();
+		connection->mainloop();
+        Sleep(10);
+		// send optitrack data through UDP if we now the address of the sender
+		if (sender.GetAddress() != 0){
+			sprintf(toSend,"%f %f %f", coordinateX, coordinateZ, mYaw);
+			udpSocket.Send(sender,toSend, strlen(toSend) + 1);
+		}
+
+		//if we read angles, send them to the arduino
+		int read = udpSocket.Receive(sender, data, SOCKET_BUFFER);
+		if(read > 0){
+			float rx0, ry0, rx1, ry1, rx2, ry2, rx3, ry3;
+			int matched = sscanf(data,"%f %f %f %f %f %f %f %f", &ry0, &rx0, &ry1, &rx1, &ry2, &rx2, &ry3, &rx3);
+			if(matched == 8){
+				clampAngle(rx0); clampAngle(ry0); 
+				clampAngle(rx1); clampAngle(ry1); 
+				clampAngle(rx2); clampAngle(ry2); 
+				clampAngle(rx3); clampAngle(ry3); 
+
+				int sx0, sy0, sx1, sy1, sx2, sy2, sx3, sy3;
+				mInterpSaturn->query(-rx0,-ry0, sx0,sy0);
+				mInterpMars->query(-rx1,-ry1, sx1,sy1);
+				mInterpEarth->query(-rx2,-ry2, sx2,sy2);
+				mInterpJupiter->query(-rx3,-ry3, sx3,sy3);
+
+				//printf("%d %d %d %d %d %d %d %d \n", sx0, sy0, sx1, sy1, sx2, sy2, sx3, sy3);
+				handshake();
+				send4ServosPackedIn9Bytes(sx3, sy3, sx2, sy2, sx1, sy1, sx0, sy0);
+			}
+		}
     }
 
 #endif
@@ -588,10 +662,10 @@ int main(int argc, char* argv[])
 //first evaluation
 #ifdef EVALUATION_1
 	//init interpolators
-	char calibFileJupiter[] = "jupiter_calib_david.csv";
-	char calibFileMars[] = "MARS.csv";
-	char calibFileEarth[] = "earth_calib_18.csv";
-	char calibFileSaturn[] = "saturn_calib_18.csv";
+	char calibFileJupiter[] = "jupiter4.csv";
+	char calibFileMars[] = "mars1.csv";
+	char calibFileEarth[] = "earth2.csv";
+	char calibFileSaturn[] = "saturn1.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
@@ -821,6 +895,14 @@ int main(int argc, char* argv[])
 	if (trialsFile != NULL) {
 		fclose(trialsFile);
 	}
+	delete mInterpMars;
+    delete mInterpEarth;
+    delete mInterpJupiter;
+    delete mInterpSaturn;
+#endif
+
+#ifdef UDP_CONTROL
+	Socket::ShutdownSockets();
 	delete mInterpMars;
     delete mInterpEarth;
     delete mInterpJupiter;
