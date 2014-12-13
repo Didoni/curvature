@@ -35,11 +35,8 @@ public class Simulation {
     Function2D currentFunction;
     
     MeshEntity[] fingers;
-    Vector3f[] fingersOffsets; //x ry z
-    
+    Vector3f[] fingersOffsets; //x ry z    
     MeshEntity handCenter;
-    
-    MeshEntity kinectSlice;
     
     MeshEntity[] boundaries;
     
@@ -80,9 +77,6 @@ public class Simulation {
         this.boundaryMax = boundaryMax;
     }
 
-    public MeshEntity getKinectSlice() {
-        return kinectSlice;
-    }
 
     public Vector3f[] getFingersOffsets() {
         return fingersOffsets;
@@ -142,12 +136,6 @@ public class Simulation {
 
 
     private void addVizObjects(Scene scene) {     
-        kinectSlice = new MeshEntity(Resources.MESH_CUSTOM, null, Resources.SHADER_SOLID_SPEC);
-        kinectSlice.setTag( EntityTag.KINECT_MESH );
-        kinectSlice.setVisible( false );
-        kinectSlice.getTransform().getScale().set(0.001f);
-        scene.getEntities().add( kinectSlice );
-        
         boundaries = new MeshEntity[4];
         for(int i = 0; i < 4; ++i){
             boundaries[i] = new MeshEntity(Resources.MESH_BOX, null, Resources.SHADER_SOLID);
@@ -203,6 +191,10 @@ public class Simulation {
         final float gain = mf.surfacePanel.getGain();
         
         //update surface if needed
+        if(currentFunction != null && currentFunction.needsUpdate()){
+            currentFunction.applyToGrid(getSurfaceWidth(), getSurfaceHeight(), 
+                    mf.surfacePanel.getGain(), surface.customMesh);
+        }
         
         //get input position X,Z,RY
         final float inputX = mf.inputPanel.getLastX();
@@ -251,15 +243,7 @@ public class Simulation {
         
         //calc hand Y, do this in the last place, otherwise will affect finger.y while doing combineFather
         handCenter.getTransform().getTranslation().y = currentFunction.eval(inputX, -inputZ) * gain;
-          
-        //logic
-        logic();
-        
-        //send data
-    }
-    
-    public void logic(){
-        
+              
     }
     
     public void applyNewFunction(Function2D f, float gain){

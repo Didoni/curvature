@@ -6,7 +6,6 @@
 
 package marionettesim.gui.tabs;
 
-import java.net.DatagramSocketImpl;
 import marionettesim.gui.MainForm;
 import marionettesim.utils.Parse;
 import marionettesim.utils.StringUtils;
@@ -175,7 +174,7 @@ public class InputPanel extends javax.swing.JPanel {
 
         jLabel7.setText("Address:");
 
-        ipText.setText("127.0.0.1");
+        ipText.setText("localhost");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

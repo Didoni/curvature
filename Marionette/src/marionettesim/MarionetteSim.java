@@ -12,7 +12,7 @@ import marionettesim.gui.MainForm;
  *
  * @author Asier
  */
-public class AcousticField3D {
+public class MarionetteSim {
 
     /**
      * @param args the command line arguments

@@ -34,11 +34,15 @@ public class UdpControlWorker extends Thread{
         try {
             final int port = mf.inputPanel.getPort();
             final String addr = mf.inputPanel.getAddress();
-            serverSocket = new DatagramSocket(port, InetAddress.getByName(addr) );
+            
+            serverSocket = new DatagramSocket();
             
             byte[] recData = new byte[1024];
             byte[] sendData = new byte[1024];
             DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length);
+            sendPacket.setAddress(InetAddress.getByName(addr));
+            sendPacket.setPort(port);
+            
             DatagramPacket recPacket = new DatagramPacket(recData, recData.length);
             while(!interrupted()){
                 try {

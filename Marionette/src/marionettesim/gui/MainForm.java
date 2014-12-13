@@ -33,8 +33,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,7 +49,6 @@ import marionettesim.gui.tabs.OutputPanel;
 import marionettesim.gui.tabs.SurfacePanel;
 import marionettesim.simulation.EntityTag;
 import marionettesim.utils.StringUtils;
-import marionettesim.workers.UdpControlWorker;
 
 
 /**
@@ -62,7 +59,6 @@ public class MainForm extends javax.swing.JFrame {
     SliderPanel sliderPanel;
      
     JFrame fullFrame;
-    KinectControlForm kinectForm;
    
     public final GLJPanel gljpanel;
     public final Renderer renderer;
@@ -139,8 +135,6 @@ public class MainForm extends javax.swing.JFrame {
          
         animationThread = new BehavioursThread(scene, this);
         //animationThread.start();
-   
-        kinectForm = new KinectControlForm(this, scene);
     }
 
     public Simulation getSimulation() {
@@ -214,9 +208,6 @@ public class MainForm extends javax.swing.JFrame {
         originCamMenu = new javax.swing.JMenuItem();
         centerCamMenu = new javax.swing.JMenuItem();
         otherCamMenu = new javax.swing.JMenuItem();
-        jMenu5 = new javax.swing.JMenu();
-        kinectMenu = new javax.swing.JMenuItem();
-        jMenuItem1 = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         fullScreenMenu = new javax.swing.JMenuItem();
         camProjMenu = new javax.swing.JMenuItem();
@@ -611,26 +602,6 @@ public class MainForm extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
-        jMenu5.setText("Kinect");
-
-        kinectMenu.setText("Show");
-        kinectMenu.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kinectMenuActionPerformed(evt);
-            }
-        });
-        jMenu5.add(kinectMenu);
-
-        jMenuItem1.setText("capture frame");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu5.add(jMenuItem1);
-
-        jMenuBar1.add(jMenu5);
-
         jMenu7.setText("View");
         jMenu7.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -906,14 +877,6 @@ public class MainForm extends javax.swing.JFrame {
        updateTransForField(FieldsToChange.szField, szText.getText());
     }//GEN-LAST:event_szTextActionPerformed
 
-    private void kinectMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kinectMenuActionPerformed
-        kinectForm.setVisible( true );
-    }//GEN-LAST:event_kinectMenuActionPerformed
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        kinectForm.getWorker().renderTestFrame = true;
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
-
     private void closeFullScreen(){
         gljpanel.removeKeyListener( gljpanel.getKeyListeners()[0] );
         fullFrame.remove(gljpanel);
@@ -1027,14 +990,11 @@ public class MainForm extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu5;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenu jMenu9;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JMenuItem kinectMenu;
     private javax.swing.JTabbedPane mainTabPanel;
     private javax.swing.ButtonGroup maskObjectsGroup;
     private javax.swing.JMenuItem originCamMenu;

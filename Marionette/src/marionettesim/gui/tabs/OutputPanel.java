@@ -32,9 +32,9 @@ public class OutputPanel extends javax.swing.JPanel {
     }
     
     public String getAnglesString(){
-        return f1RxText.getText() + " " +  f1RzText.getText() +
-                f2RxText.getText() + " " +  f2RzText.getText() +
-                f3RxText.getText() + " " +  f3RzText.getText() +
+        return f1RxText.getText() + " " +  f1RzText.getText() + " " +
+                f2RxText.getText() + " " +  f2RzText.getText() + " " +
+                f3RxText.getText() + " " +  f3RzText.getText() + " " +
                 f4RxText.getText() + " " +  f4RzText.getText();
     }
     

@@ -19,6 +19,7 @@ import marionettesim.simulation.functions.CurvatureFunction;
 import marionettesim.simulation.functions.HapticImage;
 import marionettesim.utils.FileUtils;
 import marionettesim.utils.Parse;
+import marionettesim.workers.KinectWorker;
 import marionettesim.workers.PlayerThread;
 
 /**
@@ -27,8 +28,9 @@ import marionettesim.workers.PlayerThread;
  */
 public class SurfacePanel extends javax.swing.JPanel {
     public MainForm mf;
-    private PlayerThread player;
-    private ScriptEditFrame scriptFrame;
+    private final PlayerThread player;
+    private final ScriptEditFrame scriptFrame;
+    private final KinectWorker kinectWorker;
     
     public SurfacePanel(MainForm mf) {
         this.mf = mf;
@@ -37,6 +39,9 @@ public class SurfacePanel extends javax.swing.JPanel {
         scriptFrame = new ScriptEditFrame(mf);
         player = new PlayerThread(this);
         player.start();
+        
+        kinectWorker = new KinectWorker(mf);
+        kinectWorker.start();
     }
 
     public float getGain(){
@@ -73,6 +78,7 @@ public class SurfacePanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         sizeXText = new javax.swing.JTextField();
         sizeYText = new javax.swing.JTextField();
@@ -93,19 +99,33 @@ public class SurfacePanel extends javax.swing.JPanel {
         selectFileText = new javax.swing.JButton();
         jLabel7 = new javax.swing.JLabel();
         resizeText = new javax.swing.JTextField();
-        filterCombo = new javax.swing.JComboBox();
         imageApplyButton = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         editScriptsButton = new javax.swing.JButton();
         enableDinamicCheck = new javax.swing.JCheckBox();
         fpsText = new javax.swing.JTextField();
         resetTimeButton = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        kinectCheck = new javax.swing.JCheckBox();
+        kinectFPSText = new javax.swing.JTextField();
+        createKinectFunctionButton = new javax.swing.JButton();
+        kinectRepaintCheck = new javax.swing.JCheckBox();
+        jLabel8 = new javax.swing.JLabel();
+        kinectStartXText = new javax.swing.JTextField();
+        jLabel9 = new javax.swing.JLabel();
+        kinectStartYText = new javax.swing.JTextField();
+        kinectApplyButton = new javax.swing.JButton();
+        snapKinectBackgroundButton = new javax.swing.JButton();
+        jLabel10 = new javax.swing.JLabel();
+        kinectMaxDiffText = new javax.swing.JTextField();
         colouringCombo = new javax.swing.JComboBox();
         jLabel11 = new javax.swing.JLabel();
         colAmpMinText = new javax.swing.JTextField();
         colAmpMaxText = new javax.swing.JTextField();
 
         jButton1.setText("jButton1");
+
+        jButton2.setText("jButton2");
 
         jLabel1.setText("Size");
 
@@ -181,7 +201,7 @@ public class SurfacePanel extends javax.swing.JPanel {
                     .addComponent(curvatureText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(applyCurvatureButton)
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addContainerGap(96, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Curvature", jPanel1);
@@ -199,8 +219,6 @@ public class SurfacePanel extends javax.swing.JPanel {
 
         resizeText.setText("128");
 
-        filterCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "No filtering" }));
-
         imageApplyButton.setText("Apply");
         imageApplyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -215,7 +233,6 @@ public class SurfacePanel extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(filterCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel6)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -243,11 +260,9 @@ public class SurfacePanel extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
                     .addComponent(resizeText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(filterCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(32, 32, 32)
                 .addComponent(imageApplyButton)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(41, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Image", jPanel2);
@@ -299,7 +314,7 @@ public class SurfacePanel extends javax.swing.JPanel {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(enableDinamicCheck)
                     .addComponent(fpsText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 89, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(editScriptsButton)
                     .addComponent(resetTimeButton))
@@ -307,6 +322,116 @@ public class SurfacePanel extends javax.swing.JPanel {
         );
 
         jTabbedPane1.addTab("JS+GLSL", jPanel3);
+
+        kinectCheck.setText("enable");
+        kinectCheck.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                kinectCheckActionPerformed(evt);
+            }
+        });
+
+        kinectFPSText.setText("30");
+
+        createKinectFunctionButton.setText("Create");
+        createKinectFunctionButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                createKinectFunctionButtonActionPerformed(evt);
+            }
+        });
+
+        kinectRepaintCheck.setText("repaint");
+
+        jLabel8.setText("Xstart:");
+
+        kinectStartXText.setText("96");
+
+        jLabel9.setText("Ystart:");
+
+        kinectStartYText.setText("56");
+
+        kinectApplyButton.setText("Apply");
+        kinectApplyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                kinectApplyButtonActionPerformed(evt);
+            }
+        });
+
+        snapKinectBackgroundButton.setText("Snap background");
+        snapKinectBackgroundButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                snapKinectBackgroundButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel10.setText("maxDiff:");
+
+        kinectMaxDiffText.setText("1000");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(kinectCheck)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(kinectFPSText)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(kinectRepaintCheck))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(createKinectFunctionButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(snapKinectBackgroundButton))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(kinectApplyButton)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+                                        .addComponent(jLabel10)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(kinectMaxDiffText))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+                                        .addComponent(jLabel8)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(kinectStartXText, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel9)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(kinectStartYText, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(kinectCheck)
+                    .addComponent(kinectFPSText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(kinectRepaintCheck))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(createKinectFunctionButton)
+                    .addComponent(snapKinectBackgroundButton))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel10)
+                    .addComponent(kinectMaxDiffText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(kinectStartXText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9)
+                    .addComponent(kinectStartYText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(kinectApplyButton)
+                .addContainerGap())
+        );
+
+        jTabbedPane1.addTab("Kinect", jPanel4);
 
         colouringCombo.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "red", "fire", "hue", "brown to blue", "test1", " " }));
         colouringCombo.addActionListener(new java.awt.event.ActionListener() {
@@ -444,7 +569,6 @@ public class SurfacePanel extends javax.swing.JPanel {
     private void imageApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_imageApplyButtonActionPerformed
         final String path = pathText.getText();
         final int size = Parse.stringToInt( resizeText.getText() );
-        final int filter = filterCombo.getSelectedIndex();
         final float w = mf.simulation.getSurfaceWidth();
         final float h = mf.simulation.getSurfaceHeight();
         final float gain = getGain();
@@ -452,7 +576,7 @@ public class SurfacePanel extends javax.swing.JPanel {
         HapticImage image = new HapticImage(path, w, h);
         try {
             final float topHeight = mf.simulation.getBoundaryMax().y;
-            image.init(size, filter, topHeight);
+            image.loadImage(size, topHeight);
             mf.simulation.applyNewFunction(image, gain);
             mf.needUpdate();
         } catch (IOException ex) {
@@ -491,9 +615,45 @@ public class SurfacePanel extends javax.swing.JPanel {
         mf.simulation.resetTime();
     }//GEN-LAST:event_resetTimeButtonActionPerformed
 
+    public boolean isKinectEnabled(){
+        return kinectCheck.isSelected();
+    }
+    
+    public boolean isKinectRepaint(){
+        return kinectRepaintCheck.isSelected();
+    }
+    
+    public float getKinectFrames(){
+        return Parse.stringToFloat( kinectFPSText.getText() );
+    }
+
+    public int getKinectX(){
+        return Parse.stringToInt( kinectStartXText.getText() );
+    }
+    
+    public int getKinectY(){
+        return Parse.stringToInt( kinectStartYText.getText() );
+    }
+    
     private void gainTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gainTextActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_gainTextActionPerformed
+
+    private void kinectCheckActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kinectCheckActionPerformed
+        kinectWorker.wakeUp();
+    }//GEN-LAST:event_kinectCheckActionPerformed
+
+    private void kinectApplyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kinectApplyButtonActionPerformed
+        mf.simulation.applyNewFunction(kinectWorker.getFunction(), mf.surfacePanel.getGain());
+    }//GEN-LAST:event_kinectApplyButtonActionPerformed
+
+    private void createKinectFunctionButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createKinectFunctionButtonActionPerformed
+        kinectWorker.createFunction();
+    }//GEN-LAST:event_createKinectFunctionButtonActionPerformed
+
+    private void snapKinectBackgroundButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_snapKinectBackgroundButtonActionPerformed
+        kinectWorker.snapFunctionBackground(); 
+    }//GEN-LAST:event_snapKinectBackgroundButtonActionPerformed
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -501,16 +661,18 @@ public class SurfacePanel extends javax.swing.JPanel {
     private javax.swing.JTextField colAmpMaxText;
     private javax.swing.JTextField colAmpMinText;
     private javax.swing.JComboBox colouringCombo;
+    private javax.swing.JButton createKinectFunctionButton;
     private javax.swing.JTextField curvatureText;
     private javax.swing.JButton editScriptsButton;
     private javax.swing.JCheckBox enableDinamicCheck;
-    private javax.swing.JComboBox filterCombo;
     private javax.swing.JTextField fpsText;
     private javax.swing.JTextField gainText;
     private javax.swing.JTextField gridDivsText;
     private javax.swing.JButton imageApplyButton;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -518,10 +680,20 @@ public class SurfacePanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JButton kinectApplyButton;
+    private javax.swing.JCheckBox kinectCheck;
+    private javax.swing.JTextField kinectFPSText;
+    private javax.swing.JTextField kinectMaxDiffText;
+    private javax.swing.JCheckBox kinectRepaintCheck;
+    private javax.swing.JTextField kinectStartXText;
+    private javax.swing.JTextField kinectStartYText;
     private javax.swing.JButton okButton;
     private javax.swing.JTextField pathText;
     private javax.swing.JButton resetTimeButton;
@@ -529,7 +701,12 @@ public class SurfacePanel extends javax.swing.JPanel {
     private javax.swing.JButton selectFileText;
     private javax.swing.JTextField sizeXText;
     private javax.swing.JTextField sizeYText;
+    private javax.swing.JButton snapKinectBackgroundButton;
     // End of variables declaration//GEN-END:variables
+
+    public float getKinectMaxDiff() {
+        return Parse.stringToFloat( kinectMaxDiffText.getText() );
+    }
 
     
 

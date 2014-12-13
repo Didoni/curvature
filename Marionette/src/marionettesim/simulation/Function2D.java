@@ -7,6 +7,7 @@
 package marionettesim.simulation;
 
 import java.nio.FloatBuffer;
+import marionettesim.gui.MainForm;
 import marionettesim.math.FastMath;
 import marionettesim.math.Vector2f;
 import marionettesim.math.Vector3f;
@@ -131,4 +132,7 @@ public abstract class Function2D {
     }
     
 
+    public boolean needsUpdate(){
+        return false;
+    }
 }

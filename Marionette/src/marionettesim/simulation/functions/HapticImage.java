@@ -24,9 +24,9 @@ public class HapticImage extends Function2D{
     float halfWidth, halfHeight;
     float[][] values;
     
-    private final String path;
-    private final float w,h;
-    private float sw, sh;
+     final String path;
+     final float w,h;
+     float sw, sh;
     
     
     public HapticImage(String path, float w, float h){
@@ -35,7 +35,15 @@ public class HapticImage extends Function2D{
         this.h = h;
     }
     
-    public void init(int size, int filter, float fixedGain) throws IOException{
+    public void calcScaleWorldImage(){
+        //scale world->image
+        sw = width / w;
+        sh = height / h;
+        halfWidth = width / 2.0f;
+        halfHeight = height / 2.0f;
+    }
+    
+    public void loadImage(int size, float fixedGain) throws IOException{
         //get the image
         BufferedImage bi = ImageIO.read(new File(path));
         width = bi.getWidth();
@@ -48,11 +56,7 @@ public class HapticImage extends Function2D{
             height = bi.getHeight();
         }
         
-        //scale world->image
-        sw = width / w;
-        sh = height / h;
-        halfWidth = width / 2.0f;
-        halfHeight = height / 2.0f;
+        calcScaleWorldImage();
         
         //extract argb
         int nPixels = width * height;
@@ -87,10 +91,10 @@ public class HapticImage extends Function2D{
         px = FastMath.clamp(px, 1, width-2);
         py = FastMath.clamp(py, 1, height-2);
         
-        return bilinear(px, py);
+        return bilinearFetch(px, py);
     }
     
-     public float bilinear(float x, float y) {
+     public float bilinearFetch(float x, float y) {
         int xx = (int) Math.floor(x);
         int yy = (int) Math.floor(y);
         float dx = x - xx;
