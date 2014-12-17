@@ -32,12 +32,10 @@ using namespace std;
 //#define EXPERIMENT_1 1
 //#define EXPERIMENT_2 1
 //#define EXPERIMENT_3 1
-//#define EVALUATION_1 1
-#define UDP_CONTROL 1
-
+#define EVALUATION_1 1
+//#define UDP_CONTROL 1
 
 //#define EXPERIMENT_KEYBOARD 1
-
 #define EXPERIMENT_3_CURV 1.4
 
 #ifdef EXPERIMENT_3
@@ -516,9 +514,9 @@ int main(int argc, char* argv[])
 #ifdef EXPERIMENT_1
 	bool shuffle = true;
 	int N = 30;
-	char fileName[] = "jupiter4.csv";
-	const int minX = 1300, maxX = 1700;
-	const int minY = 1350, maxY = 1750;
+	char fileName[] = "saturn4.csv";
+	const int minX = 1250, maxX = 1650;
+	const int minY = 1300, maxY = 1700;
 	//const int minX = 1397, maxX = 1635;
 	//const int minY = 1346, maxY = 1506;
 
@@ -572,7 +570,7 @@ int main(int argc, char* argv[])
 	char calibFileJupiter[] = "jupiter4.csv";
 	char calibFileMars[] = "mars1.csv";
 	char calibFileEarth[] = "earth2.csv";
-	char calibFileSaturn[] = "saturn1.csv";
+	char calibFileSaturn[] = "saturn3.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
@@ -607,7 +605,7 @@ int main(int argc, char* argv[])
 	char calibFileJupiter[] = "jupiter4.csv";
 	char calibFileMars[] = "mars1.csv";
 	char calibFileEarth[] = "earth2.csv";
-	char calibFileSaturn[] = "saturn1.csv";
+	char calibFileSaturn[] = "saturn3.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
@@ -626,7 +624,7 @@ int main(int argc, char* argv[])
 	while(!kbhit()){
 		tracker->mainloop();
 		connection->mainloop();
-        Sleep(10);
+        Sleep(50);
 		// send optitrack data through UDP if we now the address of the sender
 		if (sender.GetAddress() != 0){
 			sprintf(toSend,"%f %f %f", coordinateX, coordinateZ, mYaw);
@@ -665,7 +663,7 @@ int main(int argc, char* argv[])
 	char calibFileJupiter[] = "jupiter4.csv";
 	char calibFileMars[] = "mars1.csv";
 	char calibFileEarth[] = "earth2.csv";
-	char calibFileSaturn[] = "saturn1.csv";
+	char calibFileSaturn[] = "saturn3.csv";
 	mInterpJupiter = new MVIDelunayLinear(calibFileJupiter);
 	mInterpMars = new MVIDelunayLinear(calibFileMars);
 	mInterpEarth = new MVIDelunayLinear(calibFileEarth);
