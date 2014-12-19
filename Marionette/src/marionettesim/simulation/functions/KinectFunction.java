@@ -51,6 +51,11 @@ public class KinectFunction extends HapticImage{
     public boolean needsUpdate() {
         return true;
     }
+
+    @Override
+    public float getRecommendedH(float size) {
+        return super.getRecommendedH(size) * 4; 
+    }
     
     @Override
     public void applyToGrid(float sizeX, float sizeY, float gain, Mesh grid) {
